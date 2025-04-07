@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 const List = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const url = 'http://localhost:4000'; // Replace with your API base URL
+  const url = 'https://admin-92vt.onrender.com'; // Replace with your API base URL
   const currency = 'Rs.'; // Define your currency symbol here
 
   // Fetch the list of food items from the API
