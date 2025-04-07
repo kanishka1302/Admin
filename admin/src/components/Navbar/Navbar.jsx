@@ -7,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
   // Show toast notification when user logs in successfully
@@ -26,10 +26,8 @@ const Navbar = () => {
   }, [isLoggedIn]);
 
   const handleLogout = () => {
-    // Clear login state from localStorage and context
-    localStorage.removeItem("adminLoggedIn");
-    setIsLoggedIn(false);
-
+    logout(); // ✅ Call the context logout function
+  
     toast.success('Logged out successfully!', {
       position: 'top-right',
       autoClose: 2000,
@@ -39,8 +37,7 @@ const Navbar = () => {
       draggable: true,
       theme: 'colored',
     });
-
-    // Redirect after toast disappears
+  
     setTimeout(() => {
       navigate('/');
     }, 2000);
