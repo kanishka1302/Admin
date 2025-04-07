@@ -7,7 +7,7 @@ const Shops = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const url = "http://localhost:4000"; // Base URL for backend
+    const url = "https://admin-92vt.onrender.com"; // Base URL for backend
 
     // Fetch the list of shops from the API
     const fetchShops = useCallback(async () => {
