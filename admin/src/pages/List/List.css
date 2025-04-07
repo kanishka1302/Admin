@@ -1,101 +1,84 @@
-/* List.css */
-.list_add_flex-col{
-    margin-top:70px;
+/* Container for the entire page */
+.list_add_flex-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  margin-top: 70px;
 }
-/* Container for the list */
-.list {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Title for the list */
-  .list p {
-    font-size: 15px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  /* Table styling */
-  .list-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-  
-  /* Header row */
-  .list-table-format.title {
-    align-items: left;
-    background-color: #e0e0e0;
-    font-weight: bold;
-    color: #333;
-    padding: 10px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-  
-  /* Data rows */
-  .list-table-format {
-    
-    display: flex;
-    margin-left: 50px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom:  solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-  }
-  
- /* Image styling - Square */
+
+/* Table Outer Wrapper */
+.list-table {
+  width: 100%;
+  overflow-x: auto; /* Scroll on small screens */
+}
+
+/* Table Header & Rows */
+.list-table-format {
+  display: grid;
+  grid-template-columns: 100px 2fr 1fr 1fr 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  background-color: #fff;
+  transition: background 0.2s;
+  min-width: 600px; /* Ensures horizontal scroll on small screens */
+}
+
+.list-table-format:hover {
+  background-color: #f9f9f9;
+}
+
+/* Header Row */
+.list-table-format.title {
+  font-weight: bold;
+  background-color: #f4f4f4;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Image Styling */
 .list-table-format img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    margin-right: 10px;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Text Reset */
+p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Action Delete Styling */
+.cursor {
+  cursor: pointer;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.cursor:hover {
+  color: darkred;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .list-table {
+    overflow-x: auto;
   }
-  
-  /* Columns */
-  .list-table-format p {
-    flex: 1;
-    margin-left: 140px;
+
+  .list-table-format {
+    font-size: 13px;
+    min-width: 600px;
   }
-  
-  /* Action button (Remove) */
-  .list-table-format .cursor {
-    color: red;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
-    margin-left: 10px;
+
+  .list-table-format img {
+    width: 60px;
+    height: 60px;
   }
-  
-  /* Hover effect for the action button */
-  .list-table-format .cursor:hover {
-    color: darkred;
-  }
-  
-  /* Loading text */
-  .loading {
-    font-size: 15px;
-    color: #999;
-    text-align: center;
-  }
-  
-  /* Responsive styling */
-  @media (max-width: 768px) {
-    .list-table-format {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .list-table-format img {
-      margin-bottom: 10px;
-    }
-  
-    .list-table-format p {
-      margin-bottom: 5px;
-    }
-  }
+}
