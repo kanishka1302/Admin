@@ -1,0 +1,28 @@
+.userinfo {
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .userinfo h1 {
+    margin-bottom: 20px;
+  }
+  
+  .userinfo p {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .edit-button {
+    display: inline-block;
+    padding: 10px 15px;
+    color: white;
+    background-color: tomato;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  

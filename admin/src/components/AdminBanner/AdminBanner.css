@@ -1,0 +1,20 @@
+/* Adminbanner.css */
+
+.Admin-banner-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    background-color: black;
+  }
+  
+  .Admin-banner {
+    width: 100%;
+    max-width: 900px;
+    height: 500px;
+    border-radius: 12px;
+    object-fit: contain;
+    padding:10px;
+    margin-top:50px;
+  }

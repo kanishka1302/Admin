@@ -1,0 +1,25 @@
+/* Footer styling */
+footer {
+  background-color: #8B0000; /* Deep red background */
+  color: white;
+  text-align: center;
+  padding: 30px;
+  width: 100%;
+  position: relative;
+  box-sizing: border-box; /* Include padding in footer size */
+  margin-top: auto; /* Ensures footer stays at the bottom of the page */
+}
+
+/* Body to ensure footer is pushed to the bottom */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures body takes full height */
+  margin: 0;
+  padding: 0;
+}
+
+/* Main content section */
+main {
+  flex: 1; /* Allows main content to take up remaining space */
+}

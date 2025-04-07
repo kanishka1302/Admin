@@ -1,0 +1,81 @@
+/* General Styling */
+.add {
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 100px; /* Adjusted to center better on the page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.add form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Image Upload */
+.add-img-upload {
+  text-align: center;
+}
+
+.add-img-upload img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 2px dashed #007bff;
+  padding: 10px;
+}
+
+/* Input Fields */
+.add input, .add textarea, .add select {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.add input:focus, .add textarea:focus, .add select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Button */
+.add-btn {
+  padding: 15px;
+  font-size: 18px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .add {
+      width: 95%;
+      padding: 30px;
+  }
+}

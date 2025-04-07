@@ -1,0 +1,180 @@
+/* Vendors Heading */
+.vendors-heading {
+  text-align: center;
+  font-size: 2.2em; /* Slightly larger for emphasis */
+  margin: 30px 0;
+  color: #333; /* Darker shade for better contrast */
+  font-weight: bold;
+  letter-spacing: 1px; /* Slight letter spacing for a polished look */
+}
+
+/* Scrolling Images Section */
+.scrolling-images {
+  overflow: hidden;
+  background-color: #fbf9f9; /* Light grey background */
+  padding: 20px 0;
+}
+
+.scrolling-images-content {
+  display: flex;
+  align-items: center;
+  animation: scroll-left 30s linear infinite;
+}
+
+.scrolling-images img {
+  height: 100px; /* Adjust as needed */
+  margin: 0 25px; /* Increased margin for better spacing */
+  filter: grayscale(50%); /* Slight grayscale for a subtle look */
+  transition: filter 0.3s ease;
+}
+
+.scrolling-images img:hover {
+  filter: grayscale(0); /* Remove grayscale on hover */
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* Footer Section */
+.footer {
+  background-color: #d1c7b7; /* Slightly darker cream background for footer */
+  color: #333; /* Dark text for better contrast */
+  padding: 20px 40px; /* Reduced padding to make footer more compact */
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0px -5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px; /* Reduced gap between content */
+}
+
+.footer-content-left {
+  flex: 1;
+  max-width: 30%;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; /* Reduced gap between items */
+  flex-direction: column;
+}
+
+.footer-logo-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 25px; /* Reduced gap between logo items */
+}
+
+.footer-logo-section img {
+  height: 90px; /* Reduced logo size */
+  width: auto;
+  filter: contrast(0.9); /* Subtle contrast for logo */
+}
+
+.app-download-platforms {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px; /* Reduced gap between download icons */
+  margin-top: -30px; /* Reduced negative margin */
+}
+
+.app-download-platforms img {
+  width: 170px; /* Reduced size for app download icons */
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.app-download-platforms img:first-child {
+  margin-bottom: -100px; /* Reduced negative margin */
+}
+
+.app-download-platforms img:hover {
+  transform: scale(1.08);
+}
+
+.footer-social-icons {
+  margin-top: 10px; /* Reduced margin */
+}
+
+.footer-social-icons img {
+  width: 35px; /* Smaller icon size */
+  margin-right: 10px; /* Reduced spacing between icons */
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.footer-social-icons img:hover {
+  transform: scale(1.15);
+  opacity: 0.9;
+}
+
+.footer-content-center,
+.footer-content-right {
+  flex: 1;
+  max-width: 350px; /* Reduced max width */
+  text-align: center;
+}
+
+/* Footer Section */
+.footer-content-center h2,
+.footer-content-right h2 {
+  margin-bottom: 12px; /* Reduced margin */
+  font-size: 1.8em; /* Reduced font size */
+  font-weight: 700; /* Bolder text for better emphasis */
+  color: #a10707; /* Muted amber color for headings */
+}
+
+.footer-content-center ul,
+.footer-content-right ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+}
+
+.footer-content-center li,
+.footer-content-right li {
+  margin-bottom: 8px; /* Reduced spacing between list items */
+  font-size: 1.1em; /* Slightly smaller font size */
+}
+
+.footer hr {
+  border: 0;
+  height: 1px;
+  background: #e2d9b7; /* Light cream border for a smooth look */
+  margin: 20px 0; /* Reduced margin */
+}
+
+.footer-copyright {
+  text-align: center;
+  font-size: 0.9em; /* Reduced font size */
+  color: #333;
+}
+
+/* Footer Links */
+.footer-link {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 6px 10px; /* Reduced padding */
+  border-radius: 4px;
+  color: #a75004; /* Orange color for links */
+}
+
+.footer-link:hover {
+  color: #fff; /* Change link color to white on hover */
+  background-color: #e74c3c; /* Red background for hover */
+  padding: 6px 12px; /* Slight increase in padding for hover effect */
+}

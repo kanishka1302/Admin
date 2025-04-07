@@ -1,0 +1,155 @@
+/* General Explore Menu Styling */
+.explore-menu {
+    text-align: center;
+    padding: 20px;
+    background-color: #FADBD8; /* Soft red/pinkish background */
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 100%; /* Full width of the page */
+}
+
+/* Header Section */
+.creative-header {
+    text-align: center;
+    background: linear-gradient(135deg, #8B0000, #B22222); /* Deep red gradient */
+    color: #fff;
+    padding: 30px 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeInDown 0.8s ease-in-out;
+}
+
+.creative-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.creative-subtext {
+    font-size: 1.2rem; /* Increased font size */
+    color: #F5F5F5;
+    line-height: 1.8;
+    max-width: 700px;
+    margin: 0 auto;
+    text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Section */
+.explore-menu-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Space between rows */
+    animation: fadeInUp 1s ease-in-out;
+}
+
+/* Row Layout */
+.menu-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Space between cards */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+/* Card Styling */
+.menu-card {
+    background: #fff;
+    border: 1px solid #E57373;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    width: 280px; /* Reduced width */
+    height: 320px; /* Reduced height */
+    text-align: center;
+    transition: transform 0.4s, box-shadow 0.4s;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.menu-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Image Styling */
+.menu-card-image {
+    width: 100%;
+    height: 160px; /* Reduced height */
+    object-fit: cover;
+    transition: transform 0.4s ease-in-out;
+}
+
+.menu-card:hover .menu-card-image {
+    transform: scale(1.1);
+}
+
+/* Title Styling */
+.menu-card-title {
+    font-size: 1.5rem; /* Increased font size */
+    margin: 10px 0 8px; /* Adjusted margin */
+    color: #8B0000;
+    font-weight: bold;
+}
+
+/* Add Button */
+.add-to-cart-btn {
+    background-color: #8B0000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px; /* Button padding */
+    cursor: pointer;
+    font-size: 1.1rem; /* Increased font size */
+    margin-top: 15px; /* Added space between text and button */
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #B22222;
+    transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .menu-card {
+        width: 240px; /* Adjusted width for smaller screens */
+        height: 280px; /* Adjusted height */
+    }
+
+    .menu-card-image {
+        height: 140px; /* Adjusted height for smaller screens */
+    }
+
+    .menu-card-title {
+        font-size: 1.3rem; /* Adjusted font size for smaller screens */
+    }
+
+    .add-to-cart-btn {
+        padding: 8px 18px; /* Adjusted padding */
+        font-size: 1rem; /* Adjusted font size */
+    }
+}

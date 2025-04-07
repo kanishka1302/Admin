@@ -1,0 +1,275 @@
+/* General Container for the Order Page */
+.place-order {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f8f9fa; /* Light neutral background */
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1; /* Ensure it is above other elements */
+}
+
+.place-order:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Payment Section */
+.payment-section {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 5; /* Prevent overlays */
+  pointer-events: auto; /* Allow clicking */
+}
+
+.payment-section h3 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #444;
+}
+
+/* Active Button Style */
+button.active {
+  border: 2px solid #000;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+/* COD Button */
+.payment-section .cod-button {
+  padding: 14px 24px;
+  background-color: #4CAF50; /* Solid green */
+  color: #fff;
+  border: 2px solid #43a047;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.payment-section .cod-button:hover {
+  background-color: #43a047;
+  border-color: #388e3c;
+}
+
+.payment-section .cod-button:active,
+.payment-section .cod-button:focus {
+  background-color: #388e3c;
+  border-color: #2e7d32;
+  outline: none;
+}
+
+/* Razorpay Button */
+.payment-section .razorpay-button {
+  padding: 14px 24px;
+  background-color: #2196F3; /* Solid blue */
+  color: #fff;
+  border: 2px solid #1e88e5;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.payment-section .razorpay-button:hover {
+  background-color: #1e88e5;
+  border-color: #1976d2;
+}
+
+.payment-section .razorpay-button:active,
+.payment-section .razorpay-button:focus {
+  background-color: #1976d2;
+  border-color: #1565c0;
+  outline: none;
+}
+
+/* Place Order Button */
+.place-order .place-order-button {
+  padding: 14px 24px;
+  background-color: #FF5722; /* Solid orange */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.place-order .place-order-button:hover {
+  background-color: #e64a19;
+}
+
+.place-order .place-order-button:active {
+  background-color: #d84315;
+}
+
+/* Disabled Button */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Left side (Address Section) */
+.address-section {
+  flex: 1;
+  background-color: #f3e5f5; /* Soft lavender */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease-in-out;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.address-section:hover {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+}
+
+.address-section h3 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  border-bottom: 3px solid #7b1fa2; /* Deep purple underline */
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.address-section label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #555;
+}
+
+.address-section input[type="text"],
+.address-section input[type="email"],
+.address-section select {
+  width: 100%;
+  padding: 14px 18px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  transition: border 0.3s ease;
+}
+
+.address-section input[type="text"]:focus,
+.address-section input[type="email"]:focus,
+.address-section select:focus {
+  border-color: #7b1fa2;
+  outline: none;
+}
+
+/* Right side (Order Summary and Payment Method) */
+.right-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  z-index: 1;
+}
+
+.order-summary {
+  background-color: #e3f2fd; /* Soft light blue */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease-in-out;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.order-summary:hover {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
+  border-bottom: 3px solid #1e88e5;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.order-details p {
+  margin: 12px 0;
+  font-size: 18px;
+  color: #666;
+}
+
+.order-details p span {
+  font-weight: 600;
+  color: #333;
+}
+
+.order-summary .total {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  border-top: 2px solid #f1f1f1;
+  padding-top: 15px;
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .place-order {
+      flex-direction: column;
+      gap: 20px;
+  }
+
+  .right-side {
+      flex-direction: column;
+  }
+
+  .order-summary,
+  .payment-section,
+  .address-section {
+      padding: 20px;
+  }
+
+  .order-summary h2,
+  .payment-section h3,
+  .address-section h3 {
+      font-size: 20px;
+  }
+
+  .address-section input[type="text"],
+  .address-section input[type="email"],
+  .address-section select {
+      font-size: 14px;
+  }
+
+  .place-order button {
+      font-size: 16px;
+  }
+}

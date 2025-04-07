@@ -1,0 +1,83 @@
+/* Center the login form */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* Style the form container */
+  form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+    position: relative;
+  }
+  
+  /* Close button */
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    color: #333;
+    font-size: 1.2rem;
+  }
+  
+  /* Form title */
+  h1 {
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  /* Input box */
+  .input-box {
+    position: relative;
+    margin-bottom: 1.2rem;
+  }
+  
+  .input-box input {
+    width: 100%;
+    padding: 12px;
+    padding-left: 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+  }
+  
+  .input-box input:focus {
+    border-color: #b30000;
+  }
+  
+  /* Icons inside input fields */
+  .input-box .icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  /* Submit button */
+  button.submit {
+    width: 100%;
+    padding: 12px;
+    background: #d40000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  button.submit:hover {
+    background: #b30000;
+  }

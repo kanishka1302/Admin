@@ -1,0 +1,137 @@
+.wallet-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .wallet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .wallet-header h1 {
+    color: #333;
+    font-size: 1.8rem;
+  }
+  
+  .wallet-balance {
+    text-align: right;
+  }
+  
+  .wallet-balance h2 {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .balance {
+    font-size: 2rem;
+    font-weight: bold;
+    color: tomato;
+  }
+  
+  .wallet-actions {
+    margin-bottom: 2rem;
+  }
+  
+  .add-funds {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .add-funds input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .add-funds button {
+    padding: 0.75rem 1.5rem;
+    background-color: tomato;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-funds button:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+  }
+  
+  .add-funds button:hover:not(:disabled) {
+    background-color: tomato;
+  }
+  
+  .transactions-section {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .transactions-section h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .no-transactions {
+    text-align: center;
+    color: #666;
+    padding: 1rem;
+  }
+  
+  .transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .transactions-table th {
+    background-color: #f0f0f0;
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .transactions-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .transactions-table .credit {
+    color: tomato;
+  }
+  
+  .transactions-table .debit {
+    color: #f44336;
+  }
+  
+  @media (max-width: 600px) {
+    .wallet-container {
+      padding: 1rem;
+    }
+  
+    .wallet-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .add-funds {
+      flex-direction: column;
+    }
+  
+    .add-funds input,
+    .add-funds button {
+      width: 100%;
+    }
+  }

@@ -1,0 +1,128 @@
+.container {
+  width: 80%; /* Reduced from 90% */
+  margin: 0 auto;
+}
+
+.search-header {
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 20px;
+}
+
+.products-section {
+  padding: 20px;
+}
+
+.filtered-items {
+  text-align: center;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+  gap: 15px; /* Reduced gap */
+  grid-auto-rows: auto; /* Ensure rows adjust based on content */
+  width: 100%; /* Ensure it takes the full width */
+}
+
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 items per row on medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: 1fr; /* 1 item per row on mobile screens */
+  }
+}
+
+.food-item {
+  width: 100%; /* Ensure the item takes full width of grid cell */
+  max-width: 300px; /* Reduced maximum width */
+  border-radius: 5px;
+  box-shadow: 0px 0px 3px #00000015;
+  transition: 0.3s;
+  animation: fadeIn 1s;
+  display: flex;
+  flex-direction: column;
+}
+
+.food-item-image {
+  max-width: 385px;
+  width: 100%;
+  border-radius: 5px 5px 0px 0px;
+}
+
+.food-item-info {
+  padding: 1px;
+}
+
+.food-item-name-rating {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.food-item-name-rating p {
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.food-item-desc {
+  color: #676767;
+  font-size: 15px;
+}
+
+.food-item-weight {
+  font-size: 18px;
+  font-weight: 400;
+  color: gray;
+  margin: 5px 0;
+}
+
+.food-item-price {
+  color: tomato;
+  font-size: 26px;
+  font-weight: 500;
+  margin: 10px 0;
+}
+
+.food-item-img-container {
+  position: relative;
+}
+
+.add-to-shop-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background-color: #008cba;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-shop-btn:hover {
+  background-color: #005f7a;
+}
+
+.food-item-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.food-item-counter img {
+  cursor: pointer;
+}

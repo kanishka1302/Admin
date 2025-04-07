@@ -1,0 +1,76 @@
+/* Header Component CSS */
+.header {
+    height: 70vh; /* Adjust based on desired height */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    transition: background-image 1s ease-in-out; /* Smooth transition for slideshow */
+  }
+  
+  .header-contents {
+    position: absolute;
+    bottom: 20%;
+    left: 5%;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+    max-width: 40%;
+    animation: fadeIn 1s; /* Fade-in effect for the text */
+  }
+  
+  .header-contents h2 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin: 0 0 10px;
+    color: #ffa726; /* Orange color */
+  }
+  
+  .header-contents p {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+  
+  /* Fade-in animation for header content */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .header-contents {
+      bottom: 15%;
+      left: 3%;
+      max-width: 80%;
+    }
+  
+    .header-contents h2 {
+      font-size: 2rem;
+    }
+  
+    .header-contents p {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .header {
+      height: 50vh; /* Adjust for smaller screens */
+    }
+  
+    .header-contents h2 {
+      font-size: 1.8rem;
+    }
+  
+    .header-contents p {
+      font-size: 1rem;
+    }
+  }
+  
