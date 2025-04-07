@@ -4,7 +4,7 @@ import { assets } from '../../assets/assets';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const AddShop = ({ url = "http://localhost:4000" }) => {
+const AddShop = ({ url = "https://admin-92vt.onrender.com" }) => {
     const [image, setImage] = useState(null);
 
     const [data, setData] = useState({
