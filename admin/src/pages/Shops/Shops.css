@@ -1,13 +1,16 @@
+/* Main Wrapper */
 .shops_add_flex-col {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  margin-top:70px;
+  margin-top: 70px;
 }
 
+/* Filter Dropdown */
 .filter-container {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .filter-container label {
@@ -16,32 +19,45 @@
 }
 
 .filter-container select {
-  padding: 5px;
+  padding: 8px 12px;
   font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
+/* Table Outer Container (for scroll on small screens) */
 .shops-table {
   width: 100%;
-  max-width: 800px;
-  border-collapse: collapse;
-  margin-top: 10px;
+  overflow-x: auto;
 }
 
+/* Table Header and Rows */
 .shops-table-format {
   display: grid;
-  grid-template-columns: 100px 1fr 2fr 1fr 1fr 50px;
+  grid-template-columns: 100px 1fr 2fr 1.5fr 1fr 50px;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 12px;
   border-bottom: 1px solid #ddd;
   text-align: left;
+  background-color: #fff;
+  transition: background 0.2s;
+  min-width: 700px;
 }
 
+.shops-table-format:hover {
+  background-color: #f9f9f9;
+}
+
+/* Header Row */
 .shops-table-format.title {
   font-weight: bold;
   background-color: #f4f4f4;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
+/* Image Styling */
 .shops-table-format img {
   width: 80px;
   height: 80px;
@@ -49,16 +65,48 @@
   border-radius: 8px;
 }
 
+/* Delete Action */
 .cursor {
   cursor: pointer;
   color: red;
   font-weight: bold;
+  text-align: center;
 }
 
 .cursor:hover {
   color: darkred;
 }
 
+/* Text */
 p {
   margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .shops-table {
+    overflow-x: auto;
+  }
+
+  .shops-table-format {
+    min-width: 700px; /* Ensures scroll works */
+    font-size: 13px;
+  }
+
+  .shops-table-format img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .filter-container {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .filter-container select {
+    width: 100%;
+    margin-top: 10px;
+  }
 }
