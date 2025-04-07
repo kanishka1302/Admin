@@ -5,7 +5,7 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'http://localhost:4000';  // Fixed URL
+  const url = 'https://admin-92vt.onrender.com';  // Fixed URL
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
