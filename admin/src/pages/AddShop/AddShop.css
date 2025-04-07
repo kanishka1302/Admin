@@ -7,7 +7,7 @@
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 100px; /* Adjusted to center better on the page */
+  margin-top: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,12 +17,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
 .add p {
   font-size: 18px;
   font-weight: bold;
   color: #333;
+  margin-bottom: 10px;
 }
 
 /* Image Upload */
@@ -38,20 +40,29 @@
   border-radius: 5px;
   border: 2px dashed #007bff;
   padding: 10px;
+  transition: 0.3s;
+}
+
+.add-img-upload img:hover {
+  border-color: #0056b3;
 }
 
 /* Input Fields */
-.add input, .add textarea, .add select {
+.add input,
+.add textarea,
+.add select {
   width: 100%;
   padding: 15px;
-  font-size: 18px;
+  font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
   outline: none;
   transition: 0.3s;
 }
 
-.add input:focus, .add textarea:focus, .add select:focus {
+.add input:focus,
+.add textarea:focus,
+.add select:focus {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
@@ -59,7 +70,7 @@
 /* Button */
 .add-btn {
   padding: 15px;
-  font-size: 18px;
+  font-size: 16px;
   background: #007bff;
   color: white;
   border: none;
@@ -73,9 +84,32 @@
 }
 
 /* Responsive Design */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .add {
-      width: 95%;
-      padding: 30px;
+    width: 95%;
+    padding: 30px 20px;
+    margin-top: 60px;
+  }
+
+  .add-img-upload img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .add-btn {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .add input,
+  .add textarea,
+  .add select {
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .add p {
+    font-size: 16px;
+    text-align: center;
   }
 }
