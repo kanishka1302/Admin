@@ -1,5 +1,5 @@
 import React from 'react';
-import './Adminbanner.css';
+import './AdminBanner.css';
 import { assets } from '../../assets/assets';
 
 const AdminBanner = () => {
