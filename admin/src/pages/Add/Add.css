@@ -4,10 +4,10 @@
     align-items: center;
     min-height: 100vh;
     background-color: #f8f9fa;
-    padding: 40px;
-}
-
-.add form {
+    padding: 40px 20px; /* Add horizontal padding for mobile */
+  }
+  
+  .add form {
     background: white;
     padding: 30px;
     border-radius: 12px;
@@ -17,17 +17,18 @@
     gap: 20px;
     width: 100%;
     max-width: 500px;
-}
-
-.add-img-upload {
+  }
+  
+  .add-img-upload {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 10px;
-}
-
-.add-img-upload label img {
+    text-align: center;
+  }
+  
+  .add-img-upload label img {
     width: 150px;
     height: 150px;
     object-fit: cover;
@@ -35,42 +36,40 @@
     cursor: pointer;
     border: 2px dashed #ccc;
     padding: 10px;
-}
-
-.add-product-name,
-.add-product-description,
-.add-category,
-.add-price {
+  }
+  
+  .add-product-name,
+  .add-product-description,
+  .add-category,
+  .add-price {
     display: flex;
     flex-direction: column;
     gap: 5px;
-}
-
-.add-product-name input,
-.add-product-description textarea,
-.add-category select,
-.add-price input {
+  }
+  
+  .add-product-name input,
+  .add-product-description textarea,
+  .add-category select,
+  .add-price input {
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
-}
-
-.add-category-price {
+    width: 100%;
+  }
+  
+  .add-category-price {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-}
-
-.add-category {
+  }
+  
+  .add-category,
+  .add-price {
     flex: 1;
-}
-
-.add-price {
-    flex: 1;
-}
-
-.add-btn {
+  }
+  
+  .add-btn {
     background-color: #007bff;
     color: white;
     padding: 12px;
@@ -79,8 +78,34 @@
     font-size: 18px;
     cursor: pointer;
     transition: background 0.3s;
-}
-
-.add-btn:hover {
+  }
+  
+  .add-btn:hover {
     background-color: #0056b3;
-}
+  }
+  
+  /* 🔁 Responsive styles */
+  @media (max-width: 600px) {
+    .add {
+      padding: 20px 10px;
+    }
+  
+    .add-category-price {
+      flex-direction: column;
+    }
+  
+    .add-btn {
+      font-size: 16px;
+      padding: 10px;
+    }
+  
+    .add-img-upload label img {
+      width: 120px;
+      height: 120px;
+    }
+  
+    .add form {
+      padding: 20px;
+    }
+  }
+  
