@@ -7,12 +7,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, justLoggedIn, setJustLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   // Show toast notification when user logs in successfully
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && justLoggedIn) {
       toast.success('Login successful!', {
         position: 'top-right',
         autoClose: 2000,
@@ -22,8 +22,9 @@ const Navbar = () => {
         draggable: true,
         theme: 'colored',
       });
+      setJustLoggedIn(false);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, justLoggedIn]);
 
   const handleLogout = () => {
     logout(); // ✅ Call the context logout function
