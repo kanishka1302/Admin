@@ -10,17 +10,26 @@ export const AuthProvider = ({ children }) => {
     return storedValue === "true"; // Convert string to boolean
   });
 
+  const [justLoggedIn, setJustLoggedIn] = useState(false); // ⬅️ new state
+
   // Sync state with localStorage
   useEffect(() => {
     localStorage.setItem("adminLoggedIn", isLoggedIn ? "true" : "false");
   }, [isLoggedIn]);
 
   // Login and logout handlers
-  const login = () => setIsLoggedIn(true);
-  const logout = () => setIsLoggedIn(false);
+  const login = () => {
+    setIsLoggedIn(true);
+    setJustLoggedIn(true); // ⬅️ mark just logged in
+  };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setJustLoggedIn(false);
+  };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, justLoggedIn, setJustLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
