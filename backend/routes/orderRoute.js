@@ -1,11 +1,11 @@
 import express from 'express';
 import {
-    listOrders,
-    placeOrder,
-    updateStatus,
-    userOrders,
-    placeOrderCod,
-    placeOrderRazorpay,
+  listOrders,
+  placeOrder,
+  updateStatus,
+  userOrders,
+  placeOrderCod,
+  placeOrderRazorpay,
 } from '../controllers/orderController.js';
 
 const orderRouter = express.Router();
