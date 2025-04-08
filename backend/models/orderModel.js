@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 const OrderSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   address: {
@@ -23,12 +21,10 @@ const OrderSchema = new mongoose.Schema({
     },
   ],
   amount: { type: Number, required: true },
-  orderId: { type: String, required: true },
+  orderId: { type: String, required: true }, // ✅ custom order ID (NVYYYYMMDD###)
+  razorpayOrderId: { type: String },         // ✅ store Razorpay ID separately
   paymentMethod: { type: String, enum: ["razorpay", "cod"], required: true },
   payment: { type: Boolean, default: false },
   status: { type: String, default: "Pending" },
   createdAt: { type: Date, default: Date.now },
 });
-
-const OrderModel = mongoose.model("Order", OrderSchema);
-export default OrderModel;
