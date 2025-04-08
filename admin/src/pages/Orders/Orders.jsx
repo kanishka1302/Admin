@@ -5,7 +5,7 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'https://admin-92vt.onrender.com';  // Fixed URL
+  const url = 'http://localhost:4000';  // Fixed URL
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
@@ -51,7 +51,7 @@ const Order = () => {
           <div key={index} className="order-item">
             <img src={assets.parcel_icon} alt="Parcel Icon" />
             <div>
-            <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p> 
+              <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p> 
               <p className="order-item-food">
                 {order.items.map((item, i) => (
                   <span key={i}>
@@ -68,11 +68,19 @@ const Order = () => {
                 <p>{order.address.city}, {order.address.state}, {order.address.country}, {order.address.zipcode}</p>
               </div>
               <p className="order-item-phone">{order.address.phone}</p>
+
+              {/* 👇 Date and time display */}
+              <p className="order-item-date">
+                <b>Ordered At:</b> {new Date(order.createdAt).toLocaleString('en-IN', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                })}
+              </p>
             </div>
             <p>Items: {order.items.length}</p>
             <p>Rs. {order.amount}</p>
             <select onChange={(e) => statusHandler(e, order._id)} value={order.status} className="status">
-              <option value="Food Processing" >Food Processing</option>
+              <option value="Food Processing">Food Processing</option>
               <option value="Out for delivery">Out for delivery</option>
               <option value="Delivered">Delivered</option>
             </select>
