@@ -5,14 +5,14 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'https://admin-92vt.onrender.com';  // Fixed URL
+  const url = 'https://admin-92vt.onrender.com'; // updated to your deployed backend
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
     try {
       const response = await axios.get(`${url}/api/order/list`);
       if (response.data.success) {
-        setOrders(response.data.data);
+        setOrders(response.data.data.reverse());
       } else {
         toast.error("Error fetching orders");
       }
@@ -76,7 +76,13 @@ const Order = () => {
                   timeStyle: 'short',
                 })}
               </p>
+
+              {/* 👇 Order ID display */}
+              <p className="order-id">
+                <b>Order ID:</b> {order.orderId}
+              </p>
             </div>
+
             <p>Items: {order.items.length}</p>
             <p>Rs. {order.amount}</p>
             <select onChange={(e) => statusHandler(e, order._id)} value={order.status} className="status">
