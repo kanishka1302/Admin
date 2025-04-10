@@ -7,10 +7,6 @@
   background: white;
   position: relative; /* Ensure positioning for contained elements */
 }
-.logo{
-  width:100px;
-  height:100px;
-}
 
 /* Styling for the login icon */
 .login-icon {
@@ -81,18 +77,34 @@
   margin-right: 5px;
 }
 
+/* Ensure underline is always present for Home, Catalog, and Contact Us */
+.navbar-menu li span,
+.navbar-menu li a {
+  position: relative;
+  padding-bottom: 2px;
+  border-bottom: 2px solid #49557e;
+  text-decoration: none; /* Remove default underline */
+}
+
+/* Change text color and underline on hover */
+.navbar-menu li span:hover,
+.navbar-menu li a:hover {
+  color: #e67e22; /* Orange color */
+  border-bottom: 2px solid #e67e22;
+}
+
+/* Active class */
+.navbar .active {
+  color: #e67e22;
+  border-bottom: 2px solid #e67e22;
+}
+
 /* Styling for the navbar right section */
 .navbar-right {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 60px; /* Adjust space between elements */
-}
-
-/* Active class in navbar */
-.navbar .active {
-  padding-bottom: 2px;
-  border-bottom: 2px solid #49557e;
 }
 
 /* Search icon styling */
@@ -273,24 +285,12 @@
 }
 
 .address-in-navbar::-webkit-scrollbar-thumb {
-  background-color: #ad2727; /* Scrollbar color */
+  background-color: #ad2727;
   border-radius: 10px;
 }
 
 .address-in-navbar::-webkit-scrollbar-track {
-  background-color: #f1f1f1; /* Track color */
-}
-
-/* Address list styling */
-.address-in-navbar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.address-in-navbar ul li {
-  margin-bottom: 8px;
-  line-height: 1.5;
+  background-color: #f1f1f1;
 }
 
 /* Animation for smoother appearance */
