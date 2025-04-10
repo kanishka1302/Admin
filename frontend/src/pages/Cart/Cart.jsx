@@ -12,10 +12,9 @@ const Cart = () => {
     addToCart,
     removeFromCart,
     getTotalCartAmount,
-    url,
+    url, // Use url from context instead of hardcoding
     currency,
-    shopNames,
-    formatWeight
+    shopNames
   } = useContext(StoreContext);
 
   const [promoCode, setPromoCode] = useState("");
@@ -56,6 +55,15 @@ const Cart = () => {
     (itemId) => cartItems[itemId] === 0
   );
 
+  // Function to calculate weight based on quantity
+  const getItemWeight = (item, quantity) => {
+    if (item.name.toLowerCase().includes("egg")) {
+      return `${quantity} dozen${quantity > 1 ? "s" : ""}`;
+    }
+    return `${quantity * 500}g`;
+  };
+
+  // Memoized group and warning data
   const { groupedItems, warnings } = useMemo(() => {
     const groups = {};
     const warn = [];
@@ -85,6 +93,7 @@ const Cart = () => {
     return { groupedItems: groups, warnings: warn };
   }, [cartItems, food_list, shopNames]);
 
+  // Show toast errors after render
   useEffect(() => {
     warnings.forEach((msg) => toast.error(msg));
   }, [warnings]);
@@ -116,13 +125,13 @@ const Cart = () => {
                       className="cart-item-image"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `${url}/uploads/${item.image}`;
+                        e.target.src = `${url}/images/${item.image}`;
                       }}
                     />
                     <p>{item.name}</p>
                     <p>Price: {currency}{item.price.toFixed(2)}</p>
                     <p>Quantity: {cartItems[item._id]}</p>
-                    <p>Total Weight: {formatWeight(item, cartItems[item._id])}</p>
+                    <p>Weight: {getItemWeight(item, cartItems[item._id])}</p> {/* New column */}
                   </div>
                   <div className="cart-item-actions">
                     <button
