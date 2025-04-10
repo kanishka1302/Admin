@@ -6,14 +6,14 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_BASE_URL = "http://localhost:4000"; // Update if using a live server
+const API_BASE_URL = "http://localhost:5000"; // Update if using a live server
 
 const ShopDetails = () => {
   const { addToCart } = useContext(StoreContext);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const selectedCategory = params.get("category");  // Get category from URL
-  const selectedShopId = params.get("shopId");  // Get shopId from URL
+  const selectedCategory = params.get("category");  
+  const selectedShopId = params.get("shopId");  
 
   const [foodItems, setFoodItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,16 +28,8 @@ const ShopDetails = () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/api/food/list?shopId=${shopId}`);
-      console.log("Fetched Food Items: ", response.data); // Debugging log
       if (response.data.success) {
-        // Filter food items by category before setting state
-        const filteredItems = response.data.data
-          .filter(item => item.category.toLowerCase() === category.toLowerCase())
-          .map(item => ({
-            ...item,
-            image: item.image ? `${API_BASE_URL}/uploads/${item.image}` : "/default-food.png" // Ensure correct image path
-          }));
-        
+        const filteredItems = response.data.data.filter(item => item.category.toLowerCase() === category.toLowerCase());
         setFoodItems(filteredItems);
       } else {
         toast.error("Error fetching food items");
@@ -82,7 +74,8 @@ const ShopDetails = () => {
           <p>No {selectedCategory.toLowerCase()} items available at this shop.</p>
         )}
       </div>
-      <ToastContainer />
+      {/* ✅ Updated ToastContainer with autoClose=1000 */}
+      <ToastContainer autoClose={1000} />
     </div>
   );
 };
