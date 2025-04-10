@@ -15,7 +15,7 @@ const RazorpayPayment = () => {
 
   const createOrder = async (amount) => {
     try {
-      const response = await fetch('http://localhost:4000/create-order', {
+      const response = await fetch('http://localhost:5000/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,21 +36,25 @@ const RazorpayPayment = () => {
 
   const verifyPayment = async (paymentData) => {
     try {
-      const response = await fetch('http://localhost:4000/verify-payment', {
+      const response = await fetch('http://localhost:5000/verify-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify({
+          ...paymentData,
+          userId: 'userId_here', // Make sure to pass the userId here
+          amount: amount, // Pass the amount if needed for verification
+        })
       });
-
+  
       return await response.json();
     } catch (error) {
       console.error('Payment verification error:', error);
       throw error;
     }
   };
-
+  
   const handlePayment = async () => {
     try {
       // Ensure Razorpay script is loaded
@@ -130,3 +134,4 @@ const RazorpayPayment = () => {
 };
 
 export default RazorpayPayment;
+
