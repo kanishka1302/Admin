@@ -1,14 +1,14 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
-import noveglogo from "../assets/noveglogo.jpg";
+import logo from "../assets/logo.png";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = ({ children }) => {
-  const url = "http://localhost:4000"; // Using port 4000 as in the second version
+  const url = "http://localhost:5000";
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
-  const [userId, setUserId] = useState(""); // Store userId separately
+  const [userId, setUserId] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -17,61 +17,38 @@ const StoreContextProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const currency = "₹";
   const deliveryCharge = 50;
-  const [selectedShop, setSelectedShop] = useState(() => {
-    return localStorage.getItem("selectedShop") || "";
-  });
+  const [selectedShop, setSelectedShop] = useState(() => localStorage.getItem("selectedShop") || "");
   const [selectedAddress, setSelectedAddress] = useState(null);
-  
-  // Initialize cart items from localStorage
+
   const [cartItems, setCartItems] = useState(() => {
     const storedCartItems = localStorage.getItem("cartItems");
     return storedCartItems ? JSON.parse(storedCartItems) : {};
   });
 
-  // Initialize shop names from localStorage
   const [shopNames, setShopNames] = useState(() => {
     const storedShopNames = localStorage.getItem("shopNames");
     return storedShopNames ? JSON.parse(storedShopNames) : {};
   });
 
-  // Format weight display
-  const formatWeight = (item, quantity) => {
-    if (item.category.toLowerCase() === "eggs") {
-      return `${quantity} ${quantity === 1 ? "Dozen" : "Dozens"}`;
-    }
-  
-    const baseWeight = item.weight || 500; // Default to 500g if weight is missing
-    const totalWeight = baseWeight * quantity;
-  
-    if (totalWeight >= 1000) {
-      return `${(totalWeight / 1000).toFixed(1)} kg`;
-    }
-  
-    return `${totalWeight} g`;
-  };
-  
+  // 💰 Wallet-related state
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [transactionHistory, setTransactionHistory] = useState([]);
 
-  // Ensure token and userId are retrieved correctly on initial load
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    console.log("🔍 Raw User Data from localStorage:", storedUser);
-    
-    // Set token from localStorage
     setToken(localStorage.getItem("token") || "");
 
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        setUserId(parsedUser?.userId || parsedUser?._id || ""); // Extract userId
-        console.log("✅ Extracted Token:", localStorage.getItem("token"));
-        console.log("✅ Extracted User ID:", parsedUser?.userId || parsedUser?._id);
+        setUserId(parsedUser?.userId || parsedUser?._id || "");
       } catch (error) {
         console.error("❌ Error parsing user data from localStorage:", error);
       }
     }
   }, []);
 
-  // Function to calculate total cart amount
+  // 🛒 Cart logic
   const getTotalCartAmount = () => {
     return Object.entries(cartItems).reduce((total, [id, quantity]) => {
       const item = food_list.find((food) => food._id === id);
@@ -79,20 +56,16 @@ const StoreContextProvider = ({ children }) => {
     }, 0);
   };
 
-  // Add item to the cart
   const addToCart = (itemId, quantity = 1) => {
     if (!userId) {
       console.error("User must be logged in to add items to the cart.");
       return;
     }
-
     setCartItems((prev) => {
       const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
-      // Store cart items with user-specific key
       localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
-      localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // For backward compatibility
+      localStorage.setItem("cartItems", JSON.stringify(updatedCart));
 
-      // Set shop name only if not already set
       if (!shopNames[itemId] && selectedShop?.name) {
         setShopNameForItem(itemId, selectedShop.name);
       }
@@ -100,7 +73,6 @@ const StoreContextProvider = ({ children }) => {
     });
   };
 
-  // Remove item from the cart
   const removeFromCart = (itemId) => {
     if (!userId) return;
 
@@ -108,26 +80,20 @@ const StoreContextProvider = ({ children }) => {
       const updatedCart = { ...prev };
       if (updatedCart[itemId] > 1) updatedCart[itemId] -= 1;
       else delete updatedCart[itemId];
-      
-      // Update both storage locations
       localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
-      localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // For backward compatibility
-      
+      localStorage.setItem("cartItems", JSON.stringify(updatedCart));
       return updatedCart;
     });
   };
 
-  // Clear cart after order placement
   const clearCart = () => {
-    console.log("🧹 Clearing cart...");
     if (userId) {
       localStorage.removeItem(`cartItems_${userId}`);
     }
-    localStorage.removeItem("cartItems"); // For backward compatibility
+    localStorage.removeItem("cartItems");
     setCartItems({});
   };
 
-  // Function to set shop name for an item
   const setShopNameForItem = (itemId, shopName) => {
     setShopNames((prev) => {
       const updatedShopNames = { ...prev, [itemId]: shopName };
@@ -136,7 +102,6 @@ const StoreContextProvider = ({ children }) => {
     });
   };
 
-  // Fetch food list from the API
   const fetchFoodList = async () => {
     try {
       setLoading(true);
@@ -154,13 +119,12 @@ const StoreContextProvider = ({ children }) => {
     }
   };
 
-  // Fetch user orders
   const fetchOrders = async () => {
     if (!token) return;
     try {
       const response = await axios.post(
         `${url}/api/orders/userorders`,
-        { userId: userId || token }, // Use userId if available, fall back to token
+        { userId: userId || token },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
@@ -175,7 +139,6 @@ const StoreContextProvider = ({ children }) => {
     }
   };
 
-  // Logout function
   const logoutUser = () => {
     setToken("");
     setUserId("");
@@ -184,9 +147,10 @@ const StoreContextProvider = ({ children }) => {
     localStorage.removeItem("cartItems");
     setCartItems({});
     setOrders([]);
+    setWalletBalance(0);
+    setTransactionHistory([]);
   };
 
-  // Apply promo code
   const applyPromoCode = (code) => {
     if (code === "DISCOUNT10") {
       setPromoCode(code);
@@ -197,9 +161,7 @@ const StoreContextProvider = ({ children }) => {
     }
   };
 
-  // Restore cart based on userId
   useEffect(() => {
-    console.log("Token or userId changed, checking cart...");
     if (userId) {
       const savedCart = localStorage.getItem(`cartItems_${userId}`);
       if (savedCart) {
@@ -208,10 +170,8 @@ const StoreContextProvider = ({ children }) => {
     }
   }, [userId]);
 
-  // Group items by shop
   const groupItemsByShop = () => {
     const groupedItems = {};
-
     Object.entries(cartItems).forEach(([itemId, quantity]) => {
       if (quantity > 0) {
         const item = food_list.find((food) => food._id === itemId);
@@ -220,26 +180,68 @@ const StoreContextProvider = ({ children }) => {
           if (!groupedItems[shopName]) {
             groupedItems[shopName] = [];
           }
-          groupedItems[shopName].push({...item, quantity});
+          groupedItems[shopName].push({ ...item, quantity });
         }
       }
     });
-
     return groupedItems;
   };
 
-  // Fetch the food list when the component mounts
+  // 💸 Wallet Functions
+  const fetchWalletBalance = async () => {
+    if (!token || !userId) return;
+    try {
+      const res = await axios.get(`${url}/api/wallet/balance/${userId}`);
+      if (res.data.success) {
+        setWalletBalance(res.data.balance);
+      }
+    } catch (err) {
+      console.error("Error fetching wallet balance:", err.message);
+    }
+  };
+
+  const addToWallet = async (amount) => {
+    if (!token || !userId) return;
+    try {
+      const res = await axios.post(
+        `${url}/api/wallet/add`,
+        { userId, amount },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) {
+        setWalletBalance(res.data.updatedBalance);
+        fetchTransactions();
+      }
+    } catch (err) {
+      console.error("Error adding to wallet:", err.message);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    if (!token || !userId) return;
+    try {
+      const res = await axios.get(`${url}/api/wallet/transactions/${userId}`);
+      if (res.data.success) {
+        setTransactionHistory(res.data.transactions);
+      }
+    } catch (err) {
+      console.error("Error fetching transaction history:", err.message);
+    }
+  };
+
   useEffect(() => {
     fetchFoodList();
     if (token) {
       fetchOrders();
+      fetchWalletBalance();
+      fetchTransactions();
     }
   }, [token]);
 
   if (loading) {
     return (
       <div style={styles.loaderContainer}>
-        <img src={noveglogo} alt="Company Logo" style={styles.loader} />
+        <img src={logo} alt="Company Logo" style={styles.loader} />
       </div>
     );
   }
@@ -278,7 +280,13 @@ const StoreContextProvider = ({ children }) => {
         logoutUser,
         orderPlaced,
         setOrderPlaced,
-        formatWeight, // Ensure formatWeight is included in context value
+        // 💳 Wallet context
+        walletBalance,
+        setWalletBalance,
+        transactionHistory,
+        fetchWalletBalance,
+        addToWallet,
+        fetchTransactions
       }}
     >
       {children}
@@ -286,18 +294,18 @@ const StoreContextProvider = ({ children }) => {
   );
 };
 
-// Loader styles
 const styles = {
   loaderContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "white",
+    background: "#fff",
   },
   loader: {
-    width: "150px",
-    height: "auto",
+    width: "100px",
+    height: "100px",
+    animation: "spin 1s linear infinite",
   },
 };
 
