@@ -5,7 +5,7 @@ import order_icon from './order_icon.png'
 import upload_area from './upload_area.png'
 import parcel_icon from './parcel_icon.png'
 import shop_icon from './shop_icon.jpg'
-import admin from './admin.png'
+import admin from './AdminBanner.jpg'
 import list_icon from './list_icon.png'
 
 export const assets ={
