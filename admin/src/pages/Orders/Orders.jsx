@@ -5,14 +5,14 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'https://admin-92vt.onrender.com'; // updated to your deployed backend
+  const url = 'http://localhost:5000'; // updated to your deployed backend
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
     try {
       const response = await axios.get(`${url}/api/order/list`);
       if (response.data.success) {
-        setOrders(response.data.data.reverse());
+        setOrders(response.data.data);
       } else {
         toast.error("Error fetching orders");
       }
@@ -51,7 +51,7 @@ const Order = () => {
           <div key={index} className="order-item">
             <img src={assets.parcel_icon} alt="Parcel Icon" />
             <div>
-              <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p> 
+            <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p>
               <p className="order-item-food">
                 {order.items.map((item, i) => (
                   <span key={i}>
@@ -86,7 +86,7 @@ const Order = () => {
             <p>Items: {order.items.length}</p>
             <p>Rs. {order.amount}</p>
             <select onChange={(e) => statusHandler(e, order._id)} value={order.status} className="status">
-              <option value="Food Processing">Food Processing</option>
+              <option value="Food Processing">Order Received</option>
               <option value="Out for delivery">Out for delivery</option>
               <option value="Delivered">Delivered</option>
             </select>
