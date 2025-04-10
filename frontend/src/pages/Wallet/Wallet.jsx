@@ -1,6 +1,5 @@
-
 import { useState, useContext, useEffect } from 'react';
-import { StoreContext } from '../../context/StoreContext';
+import { StoreContext } from '../../Context/StoreContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import './Wallet.css';
@@ -12,10 +11,21 @@ const Wallet = () => {
   const [addAmount, setAddAmount] = useState('');
   const [isAddingFunds, setIsAddingFunds] = useState(false);
 
+  // Load Razorpay script
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   // Fetch wallet details
   const fetchWalletDetails = async () => {
     try {
-      const response = await axios.get(`${url}/api/wallet/details`, {
+      const response = await axios.get(`${url}/api/wallet/details?userId=${token}`, {
         headers: { token },
       });
 
@@ -28,36 +38,77 @@ const Wallet = () => {
     }
   };
 
-  // Add funds to wallet
+  // Add funds using Razorpay
   const addFundsToWallet = async () => {
     if (!addAmount || isNaN(addAmount) || parseFloat(addAmount) <= 0) {
-      toast.error('Please enter a valid amount');
+      toast.error("Please enter a valid amount");
       return;
     }
 
-    setIsAddingFunds(true);
     const amountToAdd = parseFloat(addAmount);
     try {
       const response = await axios.post(
-        `${url}/api/wallet/add`,
-        { amount: amountToAdd },
+        `${url}/api/wallet/create-order`,
+        { amount: amountToAdd, userId: token },
         { headers: { token } }
       );
 
-      if (response.data.success) {
-        toast.success('Funds added successfully');
-        
-        // Update balance locally
-        setWalletBalance((prevBalance) => prevBalance + amountToAdd);
-
-        // Clear input field and refetch details for updated transactions
-        setAddAmount('');
-        fetchWalletDetails();
+      if (!response.data.success) {
+        toast.error("Failed to create order");
+        return;
       }
+
+      const options = {
+        key: "rzp_test_eRSHa1kaUjMssI",
+        amount: response.data.order.amount,
+        currency: response.data.order.currency,
+        name: "NoVeg Pvt. Ltd.",
+        description: "Wallet Top-Up",
+        image: "/logo.png",
+        order_id: response.data.order.id,
+        handler: async function (response) {
+          const verifyResponse = await axios.post(
+            `${url}/api/wallet/verify-payment`,
+            {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId: token,
+              amount: amountToAdd,
+            },
+            { headers: { token } }
+          );
+
+          if (verifyResponse.data.success) {
+            toast.success("Wallet recharged successfully!");
+            setWalletBalance(prevBalance => prevBalance + amountToAdd);
+            setAddAmount("");
+            fetchWalletDetails();
+          } else {
+            toast.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: "User",
+          email: "user@example.com",
+          contact: "9876543210",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const loadScript = await loadRazorpayScript();
+      if (!loadScript) {
+        toast.error("Failed to load Razorpay");
+        return;
+      }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      toast.error('Failed to add funds');
-    } finally {
-      setIsAddingFunds(false);
+      console.error("Error adding funds:", error);
+      toast.error("Failed to process payment");
     }
   };
 
@@ -67,20 +118,6 @@ const Wallet = () => {
     }
   }, [token]);
 
-  // Render transaction type icon
-  const getTransactionIcon = (type) => {
-    switch (type) {
-      case 'credit':
-        return '➕';
-      case 'debit':
-        return '➖';
-      case 'refund':
-        return '🔙';
-      default:
-        return '💱';
-    }
-  };
-
   return (
     <div className="wallet-container">
       <div className="wallet-header">
@@ -88,27 +125,24 @@ const Wallet = () => {
         <div className="wallet-balance">
           <h2>Current Balance</h2>
           <p className="balance">
-            {currency}
-            {walletBalance.toFixed(2)}
+            {currency}{walletBalance.toFixed(2)}
           </p>
         </div>
       </div>
 
-      <div className="wallet-actions">
-        <div className="add-funds">
-          <input
-            type="number"
-            placeholder="Enter amount to add"
-            value={addAmount}
-            onChange={(e) => setAddAmount(e.target.value)}
-            min="0"
-            step="0.01"
-          />
-          <button onClick={addFundsToWallet} disabled={isAddingFunds}>
-            {isAddingFunds ? 'Adding...' : 'Add Amount'}
-          </button>
-        </div>
-      </div>
+  <div className="wallet-actions">
+    <div className="add-funds">
+    <input
+      type="number"
+      value={addAmount}
+      onChange={(e) => setAddAmount(e.target.value)}
+      placeholder="Enter amount"
+    />
+    <button onClick={addFundsToWallet} disabled={isAddingFunds}>
+      {isAddingFunds ? "Processing..." : "Add Amount"}
+    </button>
+    </div>
+  </div>
 
       <div className="transactions-section">
         <h2>Recent Transactions</h2>
@@ -128,17 +162,11 @@ const Wallet = () => {
               {transactions.map((transaction, index) => (
                 <tr key={index}>
                   <td>{new Date(transaction.date).toLocaleDateString()}</td>
-                  <td>
-                    {getTransactionIcon(transaction.type)}{' '}
-                    {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                  </td>
+                  <td>{transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</td>
                   <td>{transaction.description}</td>
-                  <td
-                    className={transaction.type === 'credit' ? 'credit' : 'debit'}
-                  >
+                  <td className={transaction.type === 'credit' ? 'credit' : 'debit'}>
                     {transaction.type === 'credit' ? '+' : '-'}
-                    {currency}
-                    {Math.abs(transaction.amount).toFixed(2)}
+                    {currency}{Math.abs(transaction.amount).toFixed(2)}
                   </td>
                 </tr>
               ))}
