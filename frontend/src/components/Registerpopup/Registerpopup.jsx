@@ -1,42 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useContext } from "react";
-import { StoreContext } from "../../Context/StoreContext";
 import "./RegisterPopup.css";
 
-const RegisterPopup = ({ isOpen, onClose, onRegisterSuccess }) => {
+const RegisterPopup = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     mobileNumber: "",
   });
 
-  const { setUser } = useContext(StoreContext); // Get setUser function from context
+  const [verifiedNumber, setVerifiedNumber] = useState("");
+
+  useEffect(() => {
+    // Retrieve the verified phone number from localStorage
+    const storedNumber = localStorage.getItem("verifiedPhoneNumber");
+    if (storedNumber) {
+      setVerifiedNumber(storedNumber);
+    }
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRegister = () => {
-    // Simulate registration logic
-    console.log("User Data:", formData);
-
-    // Perform registration validation
+  const handleRegister = async () => {
     if (!formData.name || !formData.email || !formData.mobileNumber) {
       toast.error("Please fill in all fields.");
       return;
     }
 
-    // Store the user data in the context
-    setUser(formData); // Save user data in context
+    try {
+      // Backend API call
+      const response = await fetch("http://localhost:5000/api/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    toast.success("User registered successfully!");
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message || "User registered successfully!");
 
-    // Close the popup
-    onClose();
-    onRegisterSuccess(); // Call success callback
+        // Save user data in localStorage
+        localStorage.setItem("user", JSON.stringify(formData));
+
+        // Clear the form
+        setFormData({ name: "", email: "", mobileNumber: "" });
+
+        // Close the popup
+        onClose();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Registration failed.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while registering.");
+    }
   };
 
   return (
@@ -70,6 +93,7 @@ const RegisterPopup = ({ isOpen, onClose, onRegisterSuccess }) => {
               onChange={handleChange}
               required
             />
+            
             <div className="register-popup-actions">
               <button className="register-btn" onClick={handleRegister}>
                 Register
