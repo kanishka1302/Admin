@@ -11,7 +11,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
   // Function to get the correct image path
   const getImagePath = (image) => {
     // If image starts with "http", return it as is, else add the base URL
-    const imagePath = image?.startsWith('http') ? image :` ${url}/uploads/${image}`;
+    const imagePath = image?.startsWith('http') ? image :` ${url}/images/${image}`;
     console.log('Image Path:', imagePath);  // Debugging the image path
     return imagePath;
   };
@@ -58,7 +58,10 @@ const FoodItem = ({ id, name, price, description, image }) => {
           <p>{name}</p>
         </div>
         <p className="food-item-desc">{description}</p>
-        <p className="food-item-weight">500 g</p>
+        <p className="food-item-weight">
+  {name.toLowerCase().includes('eggs') ? '1 dozen' : '500 g'}
+</p>
+
         <p className="food-item-price">Rs.{price}</p>
       </div>
     </div>
