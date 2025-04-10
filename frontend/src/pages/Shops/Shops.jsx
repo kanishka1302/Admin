@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './Shops.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useContext } from 'react';
 import { StoreContext } from '../../Context/StoreContext';
+import './Shops.css';
 
-const url = "http://localhost:4000"; // Backend API base URL
+const API_BASE_URL = "http://localhost:5000"; // Backend API base URL
+const FALLBACK_IMAGE = "/assets/default-shop.png"; // Default fallback image
 
 const Shops = () => {
     const [shops, setShops] = useState([]);
@@ -15,54 +15,54 @@ const Shops = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const selectedCategory = params.get('category'); // Get selected category from query params
-    const { setSelectedShop } = useContext(StoreContext); // Get the setSelectedShop function
+    const selectedCategory = params.get('category')?.toLowerCase(); // Get category from query params
+    const { setSelectedShop } = useContext(StoreContext);
 
-    // Fetch shop data from backend API
-    const fetchShops = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${url}/api/shops/shops`);
-            console.log('Fetched Shops Response:', response.data);
-
-            if (response.data.success) {
-                setShops(response.data.data);
-            } else {
-                toast.error("Error fetching shops list");
-            }
-        } catch (error) {
-            toast.error("An error occurred while fetching data");
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch shops on component mount
     useEffect(() => {
+        const fetchShops = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/shops/shops`);
+                console.log("Fetched Shops:", response.data); // Debugging Log
+
+                if (response.data.success) {
+                    setShops(response.data.data || []);
+                } else {
+                    toast.error("Failed to load shops.");
+                }
+            } catch (error) {
+                console.error("Error fetching shops:", error.response || error);
+                toast.error("Error fetching shop data.");
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchShops();
     }, []);
 
-    // Filter shops by selected category if available
     const filteredShops = selectedCategory
-        ? shops.filter(shop => shop.category.toLowerCase() === selectedCategory.toLowerCase())
+        ? shops.filter(shop => shop.category?.toLowerCase() === selectedCategory)
         : shops;
 
-    // Handle shop click to navigate to details page
-    const handleShopClick = (shopId, category, shopName, shopImage) => {
-        setSelectedShop({ name: shopName, image: shopImage });
-        navigate(`/shop-details?shopId=${shopId}&category=${category}`);
+    const handleShopClick = (shop) => {
+        console.log("Navigating to shop:", shop); // Debugging Log
+        setSelectedShop({ name: shop.name, image: shop.image });
+        navigate(`/shop-details?shopId=${shop._id}&category=${shop.category}`);
     };
 
-    const getCategorySymbol = (category) => {
-        const symbols = {
-            chicken: '🍗',
-            fish: '🐟',
-            mutton: '🥩',
-            prawns: '🍤',
-            eggs: '🥚',
-        };
-        return symbols[category.toLowerCase()] || '';
+    const getShopImage = (shop) => {
+        if (!shop.image) return FALLBACK_IMAGE;
+        const imageUrl = shop.image.startsWith("/") ? `${API_BASE_URL}${shop.image}` : `${API_BASE_URL}/uploads/${shop.image}`;
+        console.log(`Image for ${shop.name}:`, imageUrl); // Debugging Log
+        return imageUrl;
+    };
+
+    const categoryIcons = {
+        chicken: '🍗',
+        fish: '🐟',
+        mutton: '🥩',
+        prawns: '🍤',
+        eggs: '🥚',
     };
 
     return (
@@ -70,7 +70,7 @@ const Shops = () => {
             {selectedCategory && (
                 <h2 className="category-heading">
                     {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Shops Near You
-                    <span className="food-symbols">{getCategorySymbol(selectedCategory)}</span>
+                    <span className="food-symbols">{categoryIcons[selectedCategory] || ''}</span>
                 </h2>
             )}
             <div className="shops-container">
@@ -78,14 +78,19 @@ const Shops = () => {
                     <p>Loading...</p>
                 ) : filteredShops.length > 0 ? (
                     filteredShops.map((shop) => (
-                        <div key={shop._id} id={shop._id} className="shop-card">
-                            <img src={`${url}/images/${shop.image}`} alt={shop.name} className="shop-image" />
+                        <div key={shop._id} className="shop-card">
+                            <img
+                                src={getShopImage(shop)}
+                                alt={shop.name}
+                                className="shop-image"
+                                onError={(e) => (e.target.src = FALLBACK_IMAGE)}
+                            />
                             <h3 className="shop-name">{shop.name}</h3>
                             <p className="shop-address">{shop.address}</p>
                             <button
                                 aria-label={`Buy from ${shop.name}`}
                                 className="shop-buy-button"
-                                onClick={() => handleShopClick(shop._id, shop.category, shop.name, shop.image)}
+                                onClick={() => handleShopClick(shop)}
                             >
                                 Buy from here
                             </button>
