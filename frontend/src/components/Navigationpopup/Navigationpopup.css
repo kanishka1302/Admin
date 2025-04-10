@@ -1,148 +1,147 @@
-/* Overlay and Popup styling */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .popup-content {
-  background: #ffffff;
-  padding: 20px;
+  background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+  padding: 25px;
+  width: 90%;
+  max-width: 420px;
   border-radius: 12px;
-  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   position: relative;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease-in-out;
+  text-align: center;
+  transform: scale(1);
+  animation: popupAnimation 0.3s ease-in-out;
+}
+
+@keyframes popupAnimation {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .close-mark {
   position: absolute;
-  top: 10px;
+  top: 12px;
   right: 15px;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  color: #49557e;
   cursor: pointer;
-  transition: color 0.3s;
+  color: #444;
+  transition: color 0.3s ease;
 }
 
 .close-mark:hover {
-  color: #e74c3c;
+  color: red;
 }
 
-.popup-content h2 {
-  margin-bottom: 20px;
+h2 {
   font-size: 22px;
   color: #333;
   font-weight: bold;
-}
-
-.location-options {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.pincode-input,
-.otp-button,
-.use-current-location {
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  outline: none;
-  transition: all 0.3s ease;
+  margin-bottom: 18px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .pincode-input {
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  outline: none;
+  transition: 0.3s;
 }
 
 .pincode-input:focus {
-  border-color: #0275d8;
-  background-color: #fff;
-}
-
-.use-current-location {
-  border: none;
-  background-color: #0275d8;
-  color: #fff;
-  cursor: pointer;
-}
-
-.use-current-location:hover {
-  background-color: #025aa5;
-}
-
-.divider {
-  font-size: 16px;
-  color: #aaa;
-  margin: 10px 0;
-}
-
-.message {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #e74c3c;
+  border-color: #ff6600;
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
 }
 
 .otp-button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(to right, #ff6600, #e65c00);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
   border: none;
-  background-color: #e15b26;
-  color: #fff;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
 }
 
 .otp-button:hover {
-  background-color: #cc4e1f;
+  background: linear-gradient(to right, #e65c00, #ff4500);
+  box-shadow: 0 6px 15px rgba(255, 69, 0, 0.4);
+  transform: scale(1.05);
 }
 
-/* New styles for toggling address visibility */
+.message {
+  margin-top: 12px;
+  font-size: 15px;
+  color: #666;
+  font-weight: 500;
+  background: #fff3e0;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.highlight {
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.address-container {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #444;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .toggle-address {
-  color: #0275d8;
+  color: #007bff;
   cursor: pointer;
-  text-decoration: underline;
-  font-size: 14px;
+  font-weight: bold;
 }
 
 .toggle-address:hover {
-  color: #025aa5;
+  text-decoration: underline;
 }
 
-
-/* Responsive design adjustments */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .popup-content {
-    padding: 15px;
     width: 95%;
+    padding: 20px;
   }
 
-  .pincode-input,
-  .otp-button,
-  .use-current-location {
-    font-size: 14px;
+  .pincode-input {
+    font-size: 15px;
   }
-}
 
-/* Animation for popup fade-in */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .otp-button {
+    font-size: 15px;
   }
 }
