@@ -4,8 +4,18 @@ import { assets } from '../../assets/assets';
 import SugunaLogo from '../../assets/Suguna-Foods-Brand-Logo.png';
 import VencobbLogo from '../../assets/vencobb.jpg';
 import SnehaChickenLogo from '../../assets/sneha chicken.jpg';
+import { Link } from 'react-router-dom'; // Import Link
 
 const Footer = () => {
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div>
       <h2 className="vendors-heading">Our Vendors</h2>
@@ -57,21 +67,22 @@ const Footer = () => {
           <div className="footer-content-center">
             <h2>COMPANY</h2>
             <ul>
-              <li className="footer-link">Home</li>
               <li className="footer-link">
-                <a href="AboutUs" className="footer-link">About Us</a>
+                <Link to="/" className="footer-link" onClick={scrollToTop}>Home</Link> {/* Home link updated */}
               </li>
-              <li className="footer-link">Delivery</li>
-              <li className="footer-link">Privacy Policy</li>
+              <li className="footer-link">
+                <Link to="/AboutUs" className="footer-link">About Us</Link>
+              </li>
+              <li className="footer-link">
+                <Link to="/Privacy-policy" className="footer-link">Privacy Policy</Link> {/* Updated link */}
+              </li>
             </ul>
           </div>
 
           {/* Right Section */}
           <div className="footer-content-right">
             <h2>Get In Touch!!</h2>
-            <h2>Chat with us</h2>
             <ul>
-              <li>+91 7093276351</li>
               <li>Contact@noveg.pvt.ltd</li>
             </ul>
           </div>
@@ -85,7 +96,7 @@ const Footer = () => {
 
         <hr />
         <p className="footer-copyright">
-          Copyright 2024 @ NoVeg.pvt.ltd - All Rights Reserved
+          Copyright 2025 @ NoVeg.pvt.ltd - All Rights Reserved
         </p>
       </div>
     </div>
