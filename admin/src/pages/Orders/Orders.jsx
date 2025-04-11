@@ -5,7 +5,7 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'http://localhost:5000'; // updated to your deployed backend
+  const url = 'https://admin-92vt.onrender.com'; // updated to your deployed backend
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
