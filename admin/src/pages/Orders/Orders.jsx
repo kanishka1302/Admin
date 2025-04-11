@@ -16,7 +16,6 @@ const Order = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Requesting from:", `${url}/api/order/list`);
       if (response.data.success) {
         setOrders(response.data.data);
       } else {
