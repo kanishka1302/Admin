@@ -18,10 +18,10 @@ import foodRouter from "./routes/foodRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import shopRouter from "./routes/shopRoute.js";
-import walletRouter from "./routes/walletRoute.js";
+/*import walletRouter from "./routes/walletRoute.js";
 import ticketRouter from "./routes/ticketRoute.js";
 import locationRouter from "./routes/locationRoute.js";
-import profileRouter from "./routes/profileRoute.js";
+import profileRouter from "./routes/profileRoute.js"; */
 
 // Models
 import orderModel from "./models/orderModel.js";
@@ -223,10 +223,10 @@ app.use("/api/food", foodRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/shops", shopRouter);
-app.use("/api/wallet", walletRouter);
+/* app.use("/api/wallet", walletRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/location", locationRouter);
-app.use("/api/profile", profileRouter);
+app.use("/api/profile", profileRouter); */
 
 // ✅ Base Route
 app.get("/", (req, res) => {
