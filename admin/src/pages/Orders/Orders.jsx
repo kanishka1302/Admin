@@ -11,7 +11,7 @@ const Order = () => {
   const fetchAllOrders = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(`https://admin-92vt.onrender.com/api/order/list`, {
+      const response = await axios.get(`${url}/api/order/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
