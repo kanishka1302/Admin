@@ -21,7 +21,7 @@ import shopRouter from "./routes/shopRoute.js";
 /*import walletRouter from "./routes/walletRoute.js";
 import ticketRouter from "./routes/ticketRoute.js";
 import locationRouter from "./routes/locationRoute.js";
-import profileRouter from "./routes/profileRoute.js"; */
+import profileRouter from "./routes/profileRoute.js";*/
 
 // Models
 import orderModel from "./models/orderModel.js";
@@ -223,10 +223,10 @@ app.use("/api/food", foodRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/shops", shopRouter);
-/* app.use("/api/wallet", walletRouter);
+/*app.use("/api/wallet", walletRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/location", locationRouter);
-app.use("/api/profile", profileRouter); */
+app.use("/api/profile", profileRouter);*/
 
 // ✅ Base Route
 app.get("/", (req, res) => {
@@ -234,17 +234,16 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Catch All
-app.use(cors({
-  origin: "https://admin-1-55sr.onrender.com", // 
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+app.use("*", (req, res) => {
+  console.warn(`❗ Invalid route: ${req.method} ${req.originalUrl}`);
+  res.status(404).send(`Cannot ${req.method} ${req.originalUrl}`);
+});
 
 // ✅ Socket.IO Server Setup
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://admin-1-55sr.onrender.com", 
+    origin: "*", // Change to frontend URL in production
     methods: ["GET", "POST"],
   },
 });
