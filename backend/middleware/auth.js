@@ -4,28 +4,38 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const authMiddleware = async (req, res, next) => {
-    try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ success: false, message: "Not Authorized, Login Again" });
-        }
+  try {
+    const authHeader = req.headers.authorization;
 
-        // Extract the token after "Bearer "
-        const token = authHeader.split(" ")[1];
-
-        // Verify the token using the secret key
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Attach the user ID to the request object (not modifying req.body)
-        req.user = { 
-            id: decoded.id,
-        role: decoded.role
-        };
-
-        next(); // Proceed to the next middleware/controller
-    } catch (error) {
-        return res.status(401).json({ success: false, message: "Invalid Token" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Not Authorized, Login Again"
+      });
     }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach decoded values to request
+    req.user = {
+      id: decoded.id,
+      role: decoded.role // ✅ Now includes role
+    };
+
+    // Optional: Only allow admins (uncomment below if needed)
+    // if (req.user.role !== "admin") {
+    //   return res.status(403).json({ success: false, message: "Access denied. Admins only." });
+    // }
+
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid Token"
+    });
+  }
 };
 
 export default authMiddleware;
