@@ -234,16 +234,17 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Catch All
-app.use("*", (req, res) => {
-  console.warn(`❗ Invalid route: ${req.method} ${req.originalUrl}`);
-  res.status(404).send(`Cannot ${req.method} ${req.originalUrl}`);
-});
+app.use(cors({
+  origin: "https://admin-1-55sr.onrender.com", // 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
 // ✅ Socket.IO Server Setup
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Change to frontend URL in production
+    origin: "https://admin-1-55sr.onrender.com", 
     methods: ["GET", "POST"],
   },
 });
