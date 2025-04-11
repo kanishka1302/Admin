@@ -1,92 +1,77 @@
+import express from 'express';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import validator from 'validator';
+import userModel from '../models/userModel.js';
 
 dotenv.config();
 
-const authMiddleware = async (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
+const router = express.Router();
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Not Authorized, Login Again"
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Attach decoded values to request
-    req.user = {
-      id: decoded.id,
-      role: decoded.role // ✅ Now includes role
-    };
-
-    // Optional: Only allow admins (uncomment below if needed)
-    // if (req.user.role !== "admin") {
-    //   return res.status(403).json({ success: false, message: "Access denied. Admins only." });
-    // }
-
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid Token"
-    });
-  }
+// 🔐 Token creator
+const createToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-export default authMiddleware;
-
-
-
-
-
-/*const express = require('express');
-const router = express.Router();
-const User = require('../../backend/models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
+// 📝 Register User
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'Email already in use' });
 
-    const user = new User({ name, email, password });
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) return res.status(400).json({ success: false, message: 'Email already in use' });
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email" });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = new userModel({ name, email, password: hashedPassword });
     await user.save();
-    res.status(201).json({ message: 'User created successfully' });
+
+    const token = createToken(user._id);
+    res.status(201).json({ success: true, token, user: { name: user.name, email: user.email } });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
+// 🔑 Login User
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'User not found' });
+
+    const user = await userModel.findOne({ email });
+    if (!user) return res.status(400).json({ success: false, message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user: { name: user.name, email: user.email } });
+    const token = createToken(user._id);
+    res.json({ success: true, token, user: { name: user.name, email: user.email } });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
+// 🔁 Forgot Password (mock)
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: 'No account found' });
+  const user = await userModel.findOne({ email });
 
-  res.json({ message: 'Password reset link sent (mock)' });
+  if (!user) return res.status(400).json({ success: false, message: 'No account found' });
+
+  // Simulate email sending
+  res.json({ success: true, message: 'Password reset link sent (mock)' });
 });
 
-module.exports = router;*/
-
+export default router;
