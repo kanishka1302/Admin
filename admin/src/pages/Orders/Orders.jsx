@@ -5,36 +5,50 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 
 const Order = () => {
-  const url = 'https://admin-92vt.onrender.com'; // updated to your deployed backend
+  const url = 'https://admin-92vt.onrender.com'; // your backend URL
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(`${url}/api/order/list`);
+      const response = await axios.get(`${url}/api/order/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.data.success) {
         setOrders(response.data.data);
       } else {
         toast.error("Error fetching orders");
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching orders:', error.response?.data || error.message);
       toast.error('Failed to fetch orders. Please check the backend connection.');
     }
   };
 
   const statusHandler = async (event, orderId) => {
+    const token = localStorage.getItem("token");
     try {
-      const response = await axios.post(`${url}/api/order/status`, {
-        orderId,
-        status: event.target.value,
-      });
+      const response = await axios.post(
+        `${url}/api/order/status`,
+        {
+          orderId,
+          status: event.target.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.data.success) {
         fetchAllOrders();
       } else {
         toast.error("Failed to update order status");
       }
     } catch (error) {
-      console.error('Error updating order status:', error);
+      console.error('Error updating order status:', error.response?.data || error.message);
       toast.error('Failed to update order status.');
     }
   };
@@ -51,7 +65,7 @@ const Order = () => {
           <div key={index} className="order-item">
             <img src={assets.parcel_icon} alt="Parcel Icon" />
             <div>
-            <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p>
+              <p className="order-item-shop"><b>Shop:</b> {order.shopName}</p>
               <p className="order-item-food">
                 {order.items.map((item, i) => (
                   <span key={i}>
@@ -68,16 +82,12 @@ const Order = () => {
                 <p>{order.address.city}, {order.address.state}, {order.address.country}, {order.address.zipcode}</p>
               </div>
               <p className="order-item-phone">{order.address.phone}</p>
-
-              {/* 👇 Date and time display */}
               <p className="order-item-date">
                 <b>Ordered At:</b> {new Date(order.createdAt).toLocaleString('en-IN', {
                   dateStyle: 'medium',
                   timeStyle: 'short',
                 })}
               </p>
-
-              {/* 👇 Order ID display */}
               <p className="order-id">
                 <b>Order ID:</b> {order.orderId}
               </p>
@@ -85,7 +95,11 @@ const Order = () => {
 
             <p>Items: {order.items.length}</p>
             <p>Rs. {order.amount}</p>
-            <select onChange={(e) => statusHandler(e, order._id)} value={order.status} className="status">
+            <select
+              onChange={(e) => statusHandler(e, order._id)}
+              value={order.status}
+              className="status"
+            >
               <option value="Food Processing">Order Received</option>
               <option value="Out for delivery">Out for delivery</option>
               <option value="Delivered">Delivered</option>
