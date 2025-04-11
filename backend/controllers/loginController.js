@@ -26,53 +26,31 @@ export const createLogin = async (req, res) => {
 };
 
 // Controller to verify the login (e.g., handle OTP verification or other verification mechanisms)
-import jwt from 'jsonwebtoken';
-
 export const verifyLogin = async (req, res) => {
   try {
-    const { phoneNumber, otp } = req.body;
+    const { phoneNumber, otp } = req.body; // Example: OTP verification logic
 
-    // Simulate OTP check (replace with real OTP logic later)
-    if (otp !== "1234") {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    // Find user
+    // Find user by phone number
     const user = await Login.findOne({ phoneNumber });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update verified status
+    // Here, add your OTP verification logic, this is just a placeholder
+    if (otp !== "1234") {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Update the login verification status
     user.isVerified = true;
     await user.save();
 
-    // Create JWT token
-    const token = jwt.sign(
-      {
-        id: user._id,
-        role: "admin", // or "user" — set accordingly
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Login verified successfully",
-      token,
-      user: {
-        id: user._id,
-        phoneNumber: user.phoneNumber,
-        role: "admin", // send it to frontend if needed
-      }
-    });
+    res.status(200).json({ message: "Login verified successfully" });
   } catch (err) {
     console.error("Error verifying login:", err);
     res.status(500).json({ message: "Error verifying login", error: err.message });
   }
 };
-
 
 // Controller to get all logins (you can expand this for specific queries)
 export const getAllLogins = async (req, res) => {
