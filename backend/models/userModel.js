@@ -5,7 +5,11 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     cartData: { type: Object, default: {} },
-    role: { type: String, default: "user" } // ✅ added field for distinguishing admin/user
+    role: {
+        type: String,
+        enum: ['user', 'admin'], // restrict to specific roles
+        default: 'user'
+    }
 }, { minimize: false });
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);
