@@ -5,7 +5,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types'; // For prop validation
 import { StoreContext } from '../../Context/StoreContext.jsx';
 import './Verify.css';
-import RegisterPopup from '../../components/RegisterPopup/Registerpopup.jsx'; // Corrected import path
+import RegisterPopup from '../../components/Registerpopup/Registerpopup.jsx'; // Corrected import path
 
 const Verify = ({ onLoginSuccess }) => {
   const { url } = useContext(StoreContext); // Get the API base URL from context
