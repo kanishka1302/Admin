@@ -22,7 +22,7 @@ import Shops from './pages/Shops/Shops';
 import ShopDetails from './components/ShopDetails/ShopDetails';
 import RegisterPopup from './components/Registerpopup/Registerpopup.jsx';
 import ParentComponent from './components/ParentComponent/ParentComponent';
-import Map from './pages/Map/Map'; 
+//import Map from './pages/Map/Map'; 
 import DeliveryAddress from './pages/DeliveryAddress/DeliveryAddress'; 
 import Privacypolicy from './components/Privacypolicy/Privacypolicy';
 
