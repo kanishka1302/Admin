@@ -49,7 +49,7 @@ const OrderSchema = new mongoose.Schema(
     discountApplied: { type: Boolean, default: false },
     promoCode: { type: String, default: "" },
 
-    status: { type: String, default: "Pending" }, // You can expand this: "Pending", "Confirmed", "Delivered", "Cancelled", etc.
+    status: { type: String, default: "Order Received" }, // You can expand this: "Pending", "Confirmed", "Delivered", "Cancelled", etc.
   },
   {
     timestamps: true, // createdAt & updatedAt auto-managed
