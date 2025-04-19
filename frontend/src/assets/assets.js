@@ -1,4 +1,4 @@
-import noveglogo from './noveglogo.jpg';
+import logo from './logo.png';
 import searchicon from './search_icon.png';
 import basketicon from './cart.gif';
 import chicken from './Chicken.png';
@@ -21,6 +21,7 @@ import logout_icon from './logout_icon.png';
 import profile_icon from './profile_icon.png';
 import parcel_icon from './parcel_icon.png';
 import tawakkal from './tawakkal.jpg';
+import anmolchicken from './anmolchicken.jpg';
 import SugunaFoodsLogo from './Suguna-Foods-Brand-Logo.png';
 import vencobb from './vencobb.jpg';
 import sunshine from './sunshine.jpg';
@@ -48,9 +49,11 @@ import bonelezchicken from './bonelezchicken.png';
 import installBanner from './installbanner.jpg';
 import add_icon_green from './add_icon_green.png'; // Add to cart icon
 import remove_icon_red from './remove_icon_red.png'; // Remove from cart icon
+import chaticon from './chaticon.png';
+import addCart from './add_cart.gif';
 
 export const assets = {
-  noveglogo,
+  logo,
   searchicon,
   basketicon,
   chicken,
@@ -73,7 +76,7 @@ export const assets = {
   profile_icon,
   parcel_icon,
   tawakkal,
- 
+  anmolchicken,
   SugunaFoodsLogo,
   vencobb,
   sunshine,
@@ -101,6 +104,8 @@ export const assets = {
   installBanner,
   add_icon_green, // Added Add to Cart icon
   remove_icon_red, // Added Remove from Cart icon
+  chaticon,
+  addCart,
 };
 
 export const menu_list = [
