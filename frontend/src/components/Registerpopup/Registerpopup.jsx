@@ -33,7 +33,7 @@ const RegisterPopup = ({ isOpen, onClose }) => {
 
     try {
       // Backend API call
-      const response = await fetch("http://localhost:5000/api/profile", {
+      const response = await fetch("https://admin-92vt.onrender.com/api/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
