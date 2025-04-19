@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './NavigationPopup.css';
+import './Navigationpopup.css';
 
 const NavigationPopup = ({ onClose, onLocationSubmit }) => {
   const [pinCode, setPinCode] = useState('');
