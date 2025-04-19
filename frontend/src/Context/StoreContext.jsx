@@ -1,6 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import logo from "../assets/logo.png";
+import { toast } from "react-toastify";
+import { io } from "socket.io-client";
+export const socket = io("http://localhost:5000");  // replace with your server URL
+
 
 export const StoreContext = createContext(null);
 
@@ -92,6 +96,8 @@ const StoreContextProvider = ({ children }) => {
     }
     localStorage.removeItem("cartItems");
     setCartItems({});
+    setPromoCode("");
+    setDiscountApplied(false);
   };
 
   const setShopNameForItem = (itemId, shopName) => {
@@ -211,6 +217,7 @@ const StoreContextProvider = ({ children }) => {
       if (res.data.success) {
         setWalletBalance(res.data.updatedBalance);
         fetchTransactions();
+        notify("Amount added to wallet!");
       }
     } catch (err) {
       console.error("Error adding to wallet:", err.message);
@@ -228,6 +235,35 @@ const StoreContextProvider = ({ children }) => {
       console.error("Error fetching transaction history:", err.message);
     }
   };
+
+  const placeOrderWithWallet = async (orderData) => {
+    if (!token || !userId) return;
+    try {
+      const response = await axios.post(
+        `${url}/api/orders/place-order-wallet`,
+        { ...orderData, userId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.success) {
+        handleWalletPaymentSuccess();
+      } else {
+        notify(response.data.message || "Failed to place wallet order", "error");
+      }
+    } catch (error) {
+      console.error("Wallet order error:", error.message);
+      notify("Something went wrong with wallet payment", "error");
+    }
+  };
+
+  const handleWalletPaymentSuccess = () => {
+    clearCart();
+    setOrderPlaced(true);
+    fetchOrders();
+    fetchWalletBalance();
+    notify("Order placed using Wallet!");
+  };
+
+  const notify = (msg, type = "success") => toast[type](msg);
 
   useEffect(() => {
     fetchFoodList();
@@ -272,6 +308,7 @@ const StoreContextProvider = ({ children }) => {
         shopNames,
         setShopNames,
         orders,
+        setOrders,
         fetchOrders,
         clearCart,
         selectedAddress,
@@ -280,13 +317,16 @@ const StoreContextProvider = ({ children }) => {
         logoutUser,
         orderPlaced,
         setOrderPlaced,
-        // 💳 Wallet context
         walletBalance,
         setWalletBalance,
         transactionHistory,
         fetchWalletBalance,
+        fetchWalletDetails: fetchWalletBalance, // ✅ Expose this correctly
         addToWallet,
-        fetchTransactions
+        fetchTransactions,
+        handleWalletPaymentSuccess,
+        notify,
+        placeOrderWithWallet
       }}
     >
       {children}
