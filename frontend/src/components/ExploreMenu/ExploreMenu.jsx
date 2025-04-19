@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './ExploreMenu.css';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets';
-import NavigationPopup from '../Navigationpopup/Navigationpopup.jsx';
+import NavigationPopup from '../NavigationPopup/NavigationPopup';
 
 const ExploreMenu = () => {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [pendingCategory, setPendingCategory] = useState(null); // 🆕 hold category before login
+  const [pendingCategory, setPendingCategory] = useState(null);
 
   const menuItems = [
     { menu_name: 'chicken', image: assets.chicken, label: 'Chicken' },
@@ -19,27 +18,14 @@ const ExploreMenu = () => {
     { menu_name: 'eggs', image: assets.eggs, label: 'Eggs' },
   ];
 
-  const isShopClosed = () => {
-    const currentHour = new Date().getHours();
-    return currentHour < 8 || currentHour >= 22;
-  };
-
   useEffect(() => {
-    if (isShopClosed()) {
-      setIsModalOpen(true);
-    }
     const user = localStorage.getItem('user');
     setIsLoggedIn(!!user);
   }, []);
 
   const handleNavigation = (menuName) => {
-    if (isShopClosed()) {
-      setIsModalOpen(true);
-      return;
-    }
-
     if (!isLoggedIn) {
-      setPendingCategory(menuName); // 🆕 save the category
+      setPendingCategory(menuName);
       setShowPopup(true);
       return;
     }
@@ -50,7 +36,7 @@ const ExploreMenu = () => {
 
   const handlePopupClose = () => {
     setShowPopup(false);
-    setPendingCategory(null); // 🧹 optional: clear pending category
+    setPendingCategory(null);
   };
 
   const handleLocationSubmit = (location) => {
@@ -60,7 +46,7 @@ const ExploreMenu = () => {
     if (pendingCategory) {
       navigate(`/shops?category=${pendingCategory}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setPendingCategory(null); // 🧹 clear after navigation
+      setPendingCategory(null);
     }
   };
 
@@ -81,9 +67,8 @@ const ExploreMenu = () => {
               <img src={item.image} alt={item.label} className="menu-card-image" />
               <h3 className="menu-card-title">{item.label}</h3>
               <button
-                className={`add-to-cart-btn ${isShopClosed() ? 'disabled' : ''}`}
+                className="add-to-cart-btn"
                 onClick={() => handleNavigation(item.menu_name)}
-                disabled={isShopClosed()}
               >
                 + Add
               </button>
@@ -97,9 +82,8 @@ const ExploreMenu = () => {
               <img src={item.image} alt={item.label} className="menu-card-image" />
               <h3 className="menu-card-title">{item.label}</h3>
               <button
-                className={`add-to-cart-btn ${isShopClosed() ? 'disabled' : ''}`}
+                className="add-to-cart-btn"
                 onClick={() => handleNavigation(item.menu_name)}
-                disabled={isShopClosed()}
               >
                 + Add
               </button>
@@ -107,19 +91,6 @@ const ExploreMenu = () => {
           ))}
         </div>
       </div>
-
-      {/* ⚠ Shop Closed Modal */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>⚠ Shop Closed</h2>
-            <p>
-              You cannot order items now. The shop will be available from <strong>8 AM - 10 PM</strong>.
-            </p>
-            <button onClick={() => setIsModalOpen(false)}>Okay, Got it</button>
-          </div>
-        </div>
-      )}
 
       {/* 🔒 Login Location Popup */}
       {showPopup && (
