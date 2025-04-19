@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_BASE_URL = "http://localhost:5000"; // Update if using a live server
+const API_BASE_URL = "https://admin-92vt.onrender.com"; // Update if using a live server
 
 const ShopDetails = () => {
   const { addToCart } = useContext(StoreContext);
