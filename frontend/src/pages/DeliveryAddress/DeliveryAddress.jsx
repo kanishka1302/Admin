@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Map from "../Map/Map"; // Assuming you have a Map component for location selection
+//import Map from "../Map/Map"; // Assuming you have a Map component for location selection
 import "./DeliveryAddress.css";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
