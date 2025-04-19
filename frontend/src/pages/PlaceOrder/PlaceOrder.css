@@ -1,275 +1,251 @@
-/* General Container for the Order Page */
+/* Main Container */
 .place-order {
   display: flex;
-  gap: 30px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px;
-  background-color: #f8f9fa; /* Light neutral background */
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1; /* Ensure it is above other elements */
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px; /* Equal spacing between sections */
+  padding: 20px;
+  max-width: 1100px;
+  margin: auto;
 }
 
-.place-order:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+/* Left Side - Delivery Address */
+.address-section {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-left: 6px solid #dd0202;
+}
+
+/* Right Side - Order Summary & Payment Method */
+.right-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Adds gap between order summary & payment method */
+  width: 40%;
+}
+.order-summary {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-left: 6px solid #dd0202;
+  
+}
+/* Order Summary & Payment Sections */
+.payment-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-left: 6px solid #dd0202;
+  margin-top: 20px;
+  width: 400px;
+}
+
+/* Headings */
+.address-section h3,
+.order-summary h2,
+.payment-section h3 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #b22222;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* Form Fields */
+.address-section label,
+.payment-section label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.address-section input {
+  
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  
+}
+
+.address-section input:focus {
+  border-color: #ff4500;
+  outline: none;
+}
+
+/* Order Summary Text */
+.order-summary p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #555;
+  margin: 10px 0;
 }
 
 /* Payment Section */
-.payment-section {
-  background-color: #ffffff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+.payment-section label {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+/* Custom Radio Buttons */
+.payment-section input[type="radio"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ff4500;
+  border-radius: 50%;
+  outline: none;
+  margin-right: 10px;
+  cursor: pointer;
   position: relative;
-  z-index: 5; /* Prevent overlays */
-  pointer-events: auto; /* Allow clicking */
 }
 
-.payment-section h3 {
-  margin-top: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #444;
-}
-
-/* Active Button Style */
-button.active {
-  border: 2px solid #000;
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 10;
-}
-
-/* COD Button */
-.payment-section .cod-button {
-  padding: 14px 24px;
-  background-color: #4CAF50; /* Solid green */
-  color: #fff;
-  border: 2px solid #43a047;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  transition: all 0.3s ease;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.payment-section .cod-button:hover {
-  background-color: #43a047;
-  border-color: #388e3c;
-}
-
-.payment-section .cod-button:active,
-.payment-section .cod-button:focus {
-  background-color: #388e3c;
-  border-color: #2e7d32;
-  outline: none;
-}
-
-/* Razorpay Button */
-.payment-section .razorpay-button {
-  padding: 14px 24px;
-  background-color: #2196F3; /* Solid blue */
-  color: #fff;
-  border: 2px solid #1e88e5;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  transition: all 0.3s ease;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.payment-section .razorpay-button:hover {
-  background-color: #1e88e5;
-  border-color: #1976d2;
-}
-
-.payment-section .razorpay-button:active,
-.payment-section .razorpay-button:focus {
-  background-color: #1976d2;
-  border-color: #1565c0;
-  outline: none;
+.payment-section input[type="radio"]:checked {
+  background-color: #ff4500;
+  border: 5px solid white;
+  box-shadow: 0 0 0 2px #ff4500;
 }
 
 /* Place Order Button */
-.place-order .place-order-button {
-  padding: 14px 24px;
-  background-color: #FF5722; /* Solid orange */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bold;
+.payment-section button {
   width: 100%;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  z-index: 10;
-  pointer-events: auto;
+  background: #ff4500;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: 0.3s;
 }
 
-.place-order .place-order-button:hover {
-  background-color: #e64a19;
+.payment-section button:hover {
+  background: #d13a00;
 }
 
-.place-order .place-order-button:active {
-  background-color: #d84315;
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .place-order {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .address-section {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .right-section {
+    width: 100%;
+    max-width: 500px;
+  }
 }
 
-/* Disabled Button */
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* Order Placed Successfully */
 
-/* Left side (Address Section) */
-.address-section {
-  flex: 1;
-  background-color: #f3e5f5; /* Soft lavender */
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease-in-out;
-  z-index: 1;
-  pointer-events: auto;
-}
 
-.address-section:hover {
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
-}
-
-.address-section h3 {
-  margin-top: 0;
+.order-success h2 {
   font-size: 24px;
-  font-weight: 700;
+  font-weight: bold;
+  color: #28a745; /* Success color */
+  margin-bottom: 10px;
+}
+
+.order-success p {
+  font-size: 18px;
+  font-weight: bold;
   color: #333;
-  border-bottom: 3px solid #7b1fa2; /* Deep purple underline */
-  padding-bottom: 10px;
   margin-bottom: 20px;
 }
 
-.address-section label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 16px;
-  color: #555;
+/* Order Success Button */
+.order-success button {
+  background: #03963c;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.address-section input[type="text"],
-.address-section input[type="email"],
-.address-section select {
-  width: 100%;
-  padding: 14px 18px;
-  margin-top: 8px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-  color: #333;
-  background-color: #fff;
-  transition: border 0.3s ease;
+.order-success button:hover {
+  background: #37af89;
 }
 
-.address-section input[type="text"]:focus,
-.address-section input[type="email"]:focus,
-.address-section select:focus {
-  border-color: #7b1fa2;
-  outline: none;
-}
 
-/* Right side (Order Summary and Payment Method) */
-.right-side {
-  flex: 1;
+
+.order-success {
+  text-align: center;
+  position: relative;
+  padding: 80px; /* Increased padding */
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  width: 600px; /* Increased width */
+  height: 500px; /* Increased height */
+  margin: auto; /* Center the container */
+  border: 2px solid #266c4b;
+  border-radius: 10%;
+ 
 }
 
-.order-summary {
-  background-color: #e3f2fd; /* Soft light blue */
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease-in-out;
-  z-index: 1;
-  pointer-events: auto;
+.hidden-section {
+  display: none;
+}
+.warning-text {
+  color: red;
+  margin-top: 10px;
+  font-size: 0.9rem;
 }
 
-.order-summary:hover {
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+.address-error {
+  color: #f44336;
+  font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-weight: 500;
 }
-
-.order-summary h2 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 700;
-  color: #333;
-  border-bottom: 3px solid #1e88e5;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
-
-.order-details p {
-  margin: 12px 0;
-  font-size: 18px;
+button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
   color: #666;
 }
-
-.order-details p span {
-  font-weight: 600;
-  color: #333;
+.highlight-warning {
+  border: 2px dashed #f44336;
+  background-color: #fff5f5;
+  padding: 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
-.order-summary .total {
-  margin-top: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  border-top: 2px solid #f1f1f1;
-  padding-top: 15px;
+.warning-text {
+  color: #f44336;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
-/* Mobile Responsiveness */
-@media screen and (max-width: 768px) {
-  .place-order {
-      flex-direction: column;
-      gap: 20px;
-  }
 
-  .right-side {
-      flex-direction: column;
-  }
-
-  .order-summary,
-  .payment-section,
-  .address-section {
-      padding: 20px;
-  }
-
-  .order-summary h2,
-  .payment-section h3,
-  .address-section h3 {
-      font-size: 20px;
-  }
-
-  .address-section input[type="text"],
-  .address-section input[type="email"],
-  .address-section select {
-      font-size: 14px;
-  }
-
-  .place-order button {
-      font-size: 16px;
-  }
-}
