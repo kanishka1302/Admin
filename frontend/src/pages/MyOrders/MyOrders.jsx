@@ -10,83 +10,53 @@ const MyOrders = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [visibleProgressIndex, setVisibleProgressIndex] = useState(null);
-  const { url, token, currency, shopNames } = useContext(StoreContext);
+  const { url, token, currency } = useContext(StoreContext);
   const location = useLocation();
-  const newOrder = location.state?.newOrder; // Get the newly placed order from PlaceOrder
+  const orderStages = ["Order Received", "Out for Delivery", "Delivered"];
+
+  const getOrderStageIndex = (status) => {
+    if (!status) return -1;
+    const normalized = status.toLowerCase();
+    return orderStages.findIndex((stage) => stage.toLowerCase() === normalized);
+  };
 
   const fetchOrders = async () => {
     try {
-        setLoading(true);
-        setError(null);
+      setLoading(true);
+      setError(null);
 
-        if (!token) {
-            setError("Authentication error. Please log in again.");
-            return;
-        }
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const userId = storedUser?.userId || storedUser?._id;
 
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        const userId = storedUser?.userId || storedUser?._id;
+      const response = await axios.post(
+        `${url}/api/orders/userorders`,
+        { userId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-        if (!userId) {
-            setError("User details are missing. Please log in again.");
-            return;
-        }
-
-        // Fetch orders from the backend
-        const response = await axios.post(
-            `${url}/api/orders/userorders`,
-            { userId },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (response.data?.success) {
-            console.log("Fetched Orders:", response.data.data); // ✅ Debugging
-
-            // Ensure shopName is included for each item
-            const updatedOrders = response.data.data.map((order) => ({
-                ...order,
-                items: order.items.map((item) => ({
-                    ...item,
-                    shopName: item.shopName || "Unknown Shop", // ✅ Ensure shopName is set
-                })),
-            }));
-
-            setData(updatedOrders);
-        } else {
-            setData([]);
-            setError(response.data.message || "No orders found.");
-        }
+      if (response.data?.success) {
+        const updatedOrders = response.data.data.reverse();
+        setData(updatedOrders);
+      } else {
+        setData([]);
+        setError(response.data.message || "No orders found.");
+      }
     } catch (error) {
-        console.error("Error fetching orders:", error);
-        setError("Failed to fetch your orders. Please try again later.");
+      console.error("Error fetching orders:", error);
+      setError("Failed to fetch your orders. Please try again later.");
     } finally {
-        setLoading(false);
-    }
-};
-
-  
-  // Fetch orders on component mount
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-  
-
-  const getOrderProgress = (status) => {
-    switch (status) {
-      case "Processing":
-        return 33;
-      case "Out for Delivery":
-        return 66;
-      case "Delivered":
-        return 100;
-      default:
-        return 0;
+      setLoading(false);
     }
   };
 
-  const handleTrackOrder = (index) => {
+  const handleTrackOrder = async (index) => {
+    await fetchOrders(); // 👈 Fetch latest orders when button is clicked
     setVisibleProgressIndex(index === visibleProgressIndex ? null : index);
   };
+
+  useEffect(() => {
+    fetchOrders(); // Initial load
+  }, []);
 
   return (
     <div className="my-orders">
@@ -96,35 +66,53 @@ const MyOrders = () => {
       {!loading && !error && data.length === 0 && <p>No orders found.</p>}
       {!loading && !error && data.length > 0 && (
         <div className="container">
-          {data.map((order, index) => {
-            const orderId = `NV2025-${String(index + 1).padStart(3, "0")}`;
-            return (
-              <div key={order._id || index} className="my-orders-order">
+          {data.map((order, index) => (
+            <div key={order._id || index} className="my-orders-order">
+              <div className="order-main">
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
                 <p>
-                  {order.items.map((item) => `${item.name} x ${item.quantity}`).join(", ")} (Order ID: {orderId})
+                  {order.items
+                    .map((item) => `${item.name} x ${item.quantity}`)
+                    .join(", ")}
                 </p>
-                <p><b>Shop(s):</b> {order.items.map((item) => item.shopName).join(", ") || "Unknown Shop"}</p>
-                <p>{currency} {order.amount?.toFixed(2) || "0.00"}</p>
+                <p>
+                  <b>Shop(s):</b>{" "}
+                  {order.items.map((item) => item.shopName).join(", ") ||
+                    "Unknown Shop"}
+                </p>
+                <p>
+                  {currency} {order.amount?.toFixed(2) || "0.00"}
+                </p>
                 <p>
                   <span>●</span>
                   <b>{order.status || "Unknown"}</b>
                 </p>
-                {visibleProgressIndex === index && (
-                  <div className="progress-bar">
-                    <div
-                      style={{ width: `${getOrderProgress(order.status)}%` }}
-                      className="progress"
-                    />
-                  </div>
-                )}
-                {visibleProgressIndex === index && (
-                  <p>Progress: {getOrderProgress(order.status)}%</p>
-                )}
-                <button onClick={() => handleTrackOrder(index)}>Track Order</button>
+                <button onClick={() => handleTrackOrder(index)}>
+                  Track Order
+                </button>
               </div>
-            );
-          })}
+
+              {visibleProgressIndex === index && (
+                <div className="order-tracking-wrapper">
+                  <div className="order-tracking">
+                    {orderStages.map((stage, stageIndex) => (
+                      <div
+                        key={stageIndex}
+                        className={`stage ${
+                          getOrderStageIndex(order.status) >= stageIndex
+                            ? "active"
+                            : ""
+                        }`}
+                      >
+                        <span className="stage-icon">{stageIndex + 1}</span>
+                        <p>{stage}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
