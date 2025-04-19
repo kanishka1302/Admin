@@ -4,7 +4,7 @@ import orderModel from '../models/orderModel.js';
 import {
   listOrders,
   placeOrder,
-  updateStatus,
+  updateOrderStatus,
   userOrders,
   placeOrderCod,
   placeOrderRazorpay,
