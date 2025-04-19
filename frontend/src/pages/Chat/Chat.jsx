@@ -19,7 +19,7 @@ const getInitialChatKey = () => {
   return "chatMessages_default";
 };
 
-const socket = io("http://localhost:5000");
+const socket = io("https://admin-92vt.onrender.com");
 
 const Chat = () => {
   const navigate = useNavigate();
