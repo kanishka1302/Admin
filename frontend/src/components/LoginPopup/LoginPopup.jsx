@@ -38,7 +38,7 @@ const LoginPopup = ({ setShowLogin }) => {
       alert("OTP sent!");
 
       // Ensure the URL is correct
-      await axios.post("http://localhost:5000/api/login/create", {
+      await axios.post("https://admin-92vt.onrender.com/api/login/create", {
         phoneNumber,
         verificationId: confirmationResult.verificationId,
       });
@@ -63,7 +63,7 @@ const LoginPopup = ({ setShowLogin }) => {
         alert("Phone number verified successfully");
   
         // Fetch user details from database
-        const response = await axios.post("http://localhost:5000/api/profile/check", {
+        const response = await axios.post("https://admin-92vt.onrender.com/api/profile/check", {
           mobileNumber: phoneNumber,
         });
   
