@@ -10,12 +10,17 @@ import DeliveryAddress from "../DeliveryAddress/DeliveryAddress";
 
 const PlaceOrder = () => {
   const location = useLocation();
-  const { totalAmount } = location.state || {};
+  const { totalAmount, discountApplied, promoCode } = location.state || {};
   const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [addressList, setAddressList] = useState([]);
+
+
   const [data, setData] = useState({
     firstName: "",
     lastName: "",
@@ -43,8 +48,13 @@ const PlaceOrder = () => {
   } = useContext(StoreContext);
 
   useEffect(() => {
+    setAttemptedSubmit(true);
     const savedAddress = JSON.parse(localStorage.getItem("selectedAddress"));
+    const storedAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
+    setAddressList(storedAddresses);
+ 
     if (savedAddress) {
+      setSelectedAddress(savedAddress);
       setData((prevData) => ({
         ...prevData,
         firstName: savedAddress.firstName || prevData.firstName,
@@ -57,6 +67,7 @@ const PlaceOrder = () => {
       }));
     }
   }, []);
+  
 
   useEffect(() => {
     if (!token) {
@@ -67,8 +78,40 @@ const PlaceOrder = () => {
     }
   }, [token, getTotalCartAmount, navigate, orderPlaced]);
 
+  const handleSelectAddress = (address) => {
+    const firstName = address.name?.split(" ")[0] || "";
+    const lastName = address.name?.split(" ")[1] || "";
+
+    setData((prevData) => ({
+      ...prevData,
+      firstName: address.firstName || firstName,
+      lastName: address.lastName || lastName,
+      phone: address.mobileNumber || prevData.phone,
+      street: address.address || prevData.street,
+      city: address.city || prevData.city,
+      state: address.state || prevData.state,
+      zipcode: address.pincode || prevData.zipcode,
+    }));
+
+    setSelectedAddress(address);
+  };
+
+  const isFormComplete = data.firstName && data.street && data.phone;
+
   const placeOrder = async (e) => {
     e.preventDefault();
+    
+    if (addressList.length === 0) {
+      toast.error("Please add a delivery address first.");
+      return;
+    }
+    
+   
+
+    if (!isFormComplete) {
+      toast.error("Please complete all required fields.");
+      return;
+    }
 
     const orderItems = food_list
       .filter((item) => cartItems[item._id] > 0)
@@ -90,21 +133,23 @@ const PlaceOrder = () => {
 
     const orderData = {
       userId,
+      name: `${data.firstName} ${data.lastName}`,
       address: data,
       items: orderItems,
       shopName,
       amount: Math.round(totalAmount + deliveryCharge),
       paymentMethod,
       status: "Processing",
+      promoCode: promoCode || null,
+      discountApplied: discountApplied || false
+      
     };
 
     try {
       if (paymentMethod === "razorpay") {
-        const response = await axios.post(
-          `${url}/api/order/razorpay`,
-          orderData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (response.data.success) {
           const options = {
@@ -115,18 +160,16 @@ const PlaceOrder = () => {
             description: "Order Payment",
             image: assets.logo,
             order_id: response.data.order.id,
-            handler: async function (response) {
+            handler: async (response) => {
               try {
-                const verifyResponse = await axios.post(
-                  `${url}/api/order/verify`,
-                  {
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_signature: response.razorpay_signature,
-                    orderData,
-                  },
-                  { headers: { Authorization: `Bearer ${token}` } }
-                );
+                const verifyResponse = await axios.post(`${url}/api/order/verify`, {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderData,
+                }, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
 
                 if (verifyResponse.data.success) {
                   const finalOrderId = verifyResponse.data.orderId;
@@ -158,12 +201,13 @@ const PlaceOrder = () => {
           const razorpay = new window.Razorpay(options);
           razorpay.open();
         }
-      } else if (paymentMethod === "cod") {
+      } else {
         const response = await axios.post(`${url}/api/order/cod`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.success) {
+          toast.success("Order placed successfully!");
           setNewOrder({ ...orderData, _id: response.data.orderId });
           setOrderPlaced(true);
           setTimeout(() => {
@@ -181,24 +225,6 @@ const PlaceOrder = () => {
     }
   };
 
-  const handleSelectAddress = (address) => {
-    setData((prevData) => ({
-      ...prevData,
-      firstName: address.firstName || prevData.firstName,
-      lastName: address.lastName || prevData.lastName,
-      phone: address.mobileNumber || prevData.phone,
-      street: address.address || prevData.street,
-      city: address.city || prevData.city,
-      state: address.state || prevData.state,
-      zipcode: address.pincode || prevData.zipcode,
-    }));
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
   return (
     <div className="place-order">
       {orderPlaced && newOrder ? (
@@ -212,31 +238,14 @@ const PlaceOrder = () => {
         </div>
       ) : (
         <>
-          <div className="address-section">
+          <div className={`address-section ${!selectedAddress ? "highlight-warning" : ""}`}>
             <h3>Delivery Address</h3>
+
+            {!selectedAddress && attemptedSubmit && (
+              <p className="warning-text">⚠️ Please select a delivery address to place the order.</p>
+            )}
+
             <DeliveryAddress onSelectAddress={handleSelectAddress} />
-            <div className="hidden-section">
-              <label>
-                First Name:
-                <input type="text" name="firstName" value={data.firstName} onChange={handleInputChange} />
-              </label>
-              <label>
-                Last Name:
-                <input type="text" name="lastName" value={data.lastName} onChange={handleInputChange} />
-              </label>
-              <label>
-                Email:
-                <input type="email" name="email" value={data.email} onChange={handleInputChange} />
-              </label>
-              <label>
-                Address:
-                <input type="text" name="street" value={data.street} onChange={handleInputChange} />
-              </label>
-              <label>
-                Phone:
-                <input type="text" name="phone" value={data.phone} onChange={handleInputChange} />
-              </label>
-            </div>
           </div>
 
           <div className="right-side">
@@ -267,7 +276,13 @@ const PlaceOrder = () => {
                 />
                 Razorpay
               </label>
-              <button onClick={placeOrder}>Place Order</button>
+
+              <button
+                onClick={placeOrder}
+                className={!isFormComplete || !selectedAddress ? "disabled" : ""}
+              >
+                PLACE ORDER
+              </button>
             </div>
           </div>
         </>
