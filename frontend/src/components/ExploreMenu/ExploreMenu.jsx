@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ExploreMenu.css';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets';
-import NavigationPopup from '../NavigationPopup/Navigationpopup.jsx';
+import NavigationPopup from '../Navigationpopup/Navigationpopup.jsx';
 
 const ExploreMenu = () => {
   const navigate = useNavigate();
