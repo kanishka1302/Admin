@@ -15,7 +15,7 @@ const RazorpayPayment = () => {
 
   const createOrder = async (amount) => {
     try {
-      const response = await fetch('http://localhost:5000/create-order', {
+      const response = await fetch('https://admin-92vt.onrender.com/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ const RazorpayPayment = () => {
 
   const verifyPayment = async (paymentData) => {
     try {
-      const response = await fetch('http://localhost:5000/verify-payment', {
+      const response = await fetch('https://admin-92vt.onrender.com/verify-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
