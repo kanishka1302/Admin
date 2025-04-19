@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./UserInfo.css";
-import { StoreContext } from "../../context/StoreContext"; // adjust path if needed
+import { StoreContext } from "../../Context/StoreContext"; // adjust path if needed
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
