@@ -16,7 +16,7 @@ const SearchResults = () => {
         const query = new URLSearchParams(location.search).get('query') || ''; // Extract search query
         console.log('Search Query:', query); // Log the query
 
-        const response = await axios.get('http://localhost:4000/api/food/list', {
+        const response = await axios.get('https://admin-92vt.onrender.com/api/food/list', {
           params: { query },
         });
 
