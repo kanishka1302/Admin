@@ -5,6 +5,9 @@ import Razorpay from "razorpay";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import { io } from '../server.js';
+import OrderModel from "../models/orderModel.js";
+
 dotenv.config();
 
 const razorpay = new Razorpay({
@@ -18,35 +21,40 @@ const deliveryCharge = 50;
 // ✅ COD Order
 const placeOrderCod = async (req, res) => {
   try {
-    const { userId, address, items, amount, shopName } = req.body;
-    if (!userId || !address || !items || !amount || !shopName) {
+    const { userId, address, items, shopName, discountApplied, promoCode } = req.body;
+
+    if (!userId || !address || !items || !shopName) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
-    
+
+    const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
+
     const orderId = await generateOrderId();
 
     const newOrder = new orderModel({
       userId,
       address,
       items,
-      amount,
+      amount: totalAmount,
       shopName,
       orderId,
       paymentMethod: "cod",
-      status: "Pending",
+      status: "Order Received",
       payment: false,
+      discountApplied, 
+      promoCode, 
     });
 
     await newOrder.save();
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-    const updatedOrders = await orderModel.find({ userId }).sort({ createdAt: -1 });
+    io.emit("new-order", newOrder);
 
     res.status(200).json({
       success: true,
       message: "COD Order Placed Successfully",
       orderId,
-      data: updatedOrders,
+      data: newOrder,
     });
   } catch (error) {
     console.error("❌ Error placing COD order:", error);
@@ -57,86 +65,137 @@ const placeOrderCod = async (req, res) => {
 // ✅ Razorpay Order
 const placeOrderRazorpay = async (req, res) => {
   try {
-    const { userId, items, address, shopName } = req.body;
+    const { userId, address, items, shopName, discountApplied, promoCode } = req.body;
 
     if (!userId || !items || !address || !shopName) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
+    // Validate item prices and quantities
+    for (const item of items) {
+      if (item.price > 10000 || item.quantity <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid price or quantity detected for item: ${item.name}`,
+        });
+      }
+    }
+
+    // 🧮 Calculate total amount in ₹
+    const totalAmountInRupees = items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    ) + deliveryCharge;
+
+    if (totalAmountInRupees <= 0) {
+      return res.status(400).json({ success: false, message: "Total amount must be greater than 0." });
+    }
+
+    console.log("🧾 Total Amount in ₹:", totalAmountInRupees);
+
+    // 💰 Convert to paise for Razorpay
+    const totalAmountInPaise = totalAmountInRupees * 100;
+
+    // Generate unique orderId
     const orderId = await generateOrderId();
 
-    const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
-
+    // 🔧 Create order on Razorpay
     const razorpayOrder = await razorpay.orders.create({
-      amount: totalAmount * 100,
-      currency,
+      amount: totalAmountInRupees,
+      currency: "INR",
       receipt: `receipt_${orderId}`,
     });
 
+    // 📝 Save order in DB (in ₹)
     const newOrder = new orderModel({
       userId,
       address,
       items,
       shopName,
-      amount: totalAmount,
+      amount: totalAmountInRupees,
       orderId,
       paymentMethod: "razorpay",
-      payment: true,
-      status: "Pending",
+      payment: false,
+      status: "Order Received",
       razorpayOrderId: razorpayOrder.id,
+      discountApplied, 
+      promoCode,
     });
 
     await newOrder.save();
+
+    // 🛒 Clear user's cart
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
+    // 📤 Respond to frontend
     res.json({
       success: true,
       message: "Razorpay Order Placed Successfully",
       orderId,
       razorpayOrderId: razorpayOrder.id,
-      amount: totalAmount,
-      currency,
+      amount: totalAmountInPaise,
+      currency: "INR",
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
+
   } catch (error) {
     console.error("❌ Error placing Razorpay order:", error);
     res.status(500).json({ success: false, message: "Error placing order" });
   }
 };
 
-// ✅ Combined Entry Point
+
+// Entry Point for Orders
 const placeOrder = async (req, res) => {
   const { paymentMethod } = req.body;
-  if (paymentMethod === "cod") {
-    return placeOrderCod(req, res);
-  } else {
-    return placeOrderRazorpay(req, res);
+  switch (paymentMethod) {
+    case "cod":
+      return placeOrderCod(req, res); // Handle cash-on-delivery orders
+    case "razorpay":
+      return placeOrderRazorpay(req, res); // Handle Razorpay orders
+    default:
+      return res.status(400).json({ success: false, message: "Invalid payment method" });
   }
 };
 
-// ✅ Verify Razorpay Signature
+// Verify Razorpay Payment Signature
 const verifyOrder = async (req, res) => {
   try {
-    const { orderId, paymentId, signature } = req.body;
-    const body = orderId + "|" + paymentId;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(body.toString())
-      .digest("hex");
+    // Verify Razorpay signature
+    const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+    sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const digest = sha.digest("hex");
 
-    if (expectedSignature === signature) {
-      await orderModel.findOneAndUpdate({ razorpayOrderId: orderId }, { payment: true });
-      res.json({ success: true, message: "Payment Verified" });
-    } else {
-      res.status(400).json({ success: false, message: "Invalid Signature" });
+    if (digest !== razorpay_signature) {
+      return res.status(400).json({ msg: "Transaction is not legitimate!" });
     }
+
+    // Retrieve existing order from database
+    const existingOrder = await orderModel.findOne({ razorpayOrderId: razorpay_order_id });
+    if (!existingOrder) {
+      return res.status(404).json({ msg: "Order not found" });
+    }
+
+    // Update order status upon successful verification
+    existingOrder.payment = true;
+    await existingOrder.save();
+
+    // Notify via WebSocket (if applicable)
+    io.emit("new-order", existingOrder);
+
+    res.json({
+      success: true,
+      msg: "Payment verified successfully!",
+      orderId: existingOrder.orderId,
+      paymentId: razorpay_payment_id,
+    });
   } catch (error) {
     console.error("❌ Error during payment verification:", error);
     res.status(500).json({ success: false, message: "Error during payment verification" });
   }
 };
-
 // ✅ List All Orders (Admin)
 const listOrders = async (req, res) => {
   try {
@@ -162,7 +221,6 @@ const listOrders = async (req, res) => {
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-
     if (!userId) return res.status(400).json({ success: false, message: "User ID is required." });
 
     const query = mongoose.Types.ObjectId.isValid(userId)
@@ -170,10 +228,7 @@ const userOrders = async (req, res) => {
       : { userId };
 
     const orders = await orderModel.find(query).sort({ createdAt: -1 });
-
-    if (!orders.length) {
-      return res.status(404).json({ success: false, message: "No orders found for this user." });
-    }
+    if (!orders.length) return res.status(404).json({ success: false, message: "No orders found." });
 
     res.json({ success: true, data: orders });
   } catch (error) {
@@ -183,61 +238,80 @@ const userOrders = async (req, res) => {
 };
 
 // ✅ Update Status
-const updateStatus = async (req, res) => {
+// In your orderController.js
+const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    await orderModel.findByIdAndUpdate(orderId, { status });
-    res.json({ success: true, message: "Status Updated" });
-  } catch (error) {
-    console.error("❌ Error updating status:", error);
-    res.status(500).json({ success: false, message: "Error updating status" });
-  }
-};
-const generateNewAdminOrderId = async () => {
-  try {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    const dateString = `${yyyy}${mm}${dd}`; // e.g., "20250408"
 
-    const startOfDay = new Date(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
-    const endOfDay = new Date(`${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
 
-    // Count the number of orders created today
-    const todayOrdersCount = await orderModel.countDocuments({
-      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    order.status = status;
+    await order.save();
+
+    // Emit status update to all clients
+    const io = req.app.get("io"); // Get Socket.IO instance
+    io.emit("orderStatusUpdated", {
+      _id: order._id,
+      status: order.status,
     });
 
-    // Generate the next sequence number for the day
-    const nextOrderNumber = String(todayOrdersCount + 1).padStart(3, "0");
-    const newOrderId = `NV${dateString}${nextOrderNumber}`; // e.g., "NV20250408001"
-
-    console.log(`Generated Admin Order ID: ${newOrderId}`);
-    return newOrderId;
+    res.json({ success: true, message: "Order status updated", data: order });
   } catch (error) {
-    console.error("Error generating Admin Order ID:", error);
-    throw new Error("Failed to generate Admin Order ID");
+    console.error("Error updating order status:", error);
+    res.status(500).json({ success: false, message: "Failed to update order status" });
   }
 };
+
+// Update Order Progress
+const updateOrderProgress = async (req, res) => {
+  try {
+    const { orderId, newStatus } = req.body;
+
+    if (!orderId || !newStatus) {
+      return res.status(400).json({ success: false, message: "Order ID and new status are required." });
+    }
+
+    const order = await orderModel.findOne({ orderId });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found." });
+    }
+
+    // Update the status based on the newStatus
+    order.status = newStatus;
+    await order.save();
+
+    // Optionally, emit the new status via socket (for real-time updates on the admin side)
+    io.emit("orderStatusUpdated", { orderId, status: newStatus });
+
+    res.json({
+      success: true,
+      message: `Order status updated to ${newStatus}`,
+      data: order,
+    });
+  } catch (error) {
+    console.error("❌ Error updating order progress:", error);
+    res.status(500).json({ success: false, message: "Failed to update order progress" });
+  }
+};
+
+
+// ✅ Generate Admin Order
 const generateAdminOrder = async (req, res) => {
   try {
     const { customerOrderId } = req.body;
-
-    // Fetch the existing customer order
     const existingOrder = await orderModel.findOne({ orderId: customerOrderId });
-    if (!existingOrder) {
-      return res.status(404).json({ success: false, message: "Customer order not found" });
-    }
+    if (!existingOrder) return res.status(404).json({ success: false, message: "Customer order not found" });
 
-    // Generate a new admin-specific order ID
-    const newOrderId = await generateNewAdminOrderId();
+    const newOrderId = await generateOrderId();
 
-    // Clone the existing order with the new order ID
     const newAdminOrder = new orderModel({
-      ...existingOrder.toObject(), // Clone all existing order details
-      orderId: newOrderId, // Set the new order ID
-      createdAt: new Date(), // Set the creation date to now
+      ...existingOrder.toObject(),
+      orderId: newOrderId,
+      createdAt: new Date(),
     });
 
     await newAdminOrder.save();
@@ -249,17 +323,19 @@ const generateAdminOrder = async (req, res) => {
       data: newAdminOrder,
     });
   } catch (error) {
-    console.error("Error generating Admin Order:", error);
+    console.error("❌ Error generating Admin Order:", error);
     res.status(500).json({ success: false, message: "Failed to generate Admin Order" });
   }
 };
+
 export {
   placeOrder,
   placeOrderCod,
   placeOrderRazorpay,
   listOrders,
   userOrders,
-  updateStatus,
+  updateOrderProgress,
   verifyOrder,
   generateAdminOrder,
+  updateOrderStatus
 };
