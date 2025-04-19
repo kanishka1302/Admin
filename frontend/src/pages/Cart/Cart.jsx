@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import "./Cart.css";
-import { StoreContext } from "../../Context/StoreContext.jsx";
+import { assets } from "../../assets/assets";
+import { StoreContext } from "../../Context/StoreContext";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,6 +48,8 @@ const Cart = () => {
     navigate("/order", {
       state: {
         totalAmount: calculateTotalAmount(),
+        discountApplied,
+        promoCode,
       },
     });
   };
@@ -102,6 +105,7 @@ const Cart = () => {
     <div className="cart-container">
       {isCartEmpty ? (
         <div className="empty-cart">
+          <img src={assets.addCart} alt="add cart Icon" className="add-cart" />
           <h2>Your cart is empty!</h2>
           <button
             className="continue-shopping-button"
