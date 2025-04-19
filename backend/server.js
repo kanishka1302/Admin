@@ -9,6 +9,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { generateOrderId } from "./utils/generateOrderId.js";
 
+
 // Config and DB
 import { connectDB } from "./config/db.js";
 
@@ -18,10 +19,10 @@ import foodRouter from "./routes/foodRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import shopRouter from "./routes/shopRoute.js";
-/*import walletRouter from "./routes/walletRoute.js";
+import walletRouter from "./routes/walletRoute.js";
 import ticketRouter from "./routes/ticketRoute.js";
 import locationRouter from "./routes/locationRoute.js";
-import profileRouter from "./routes/profileRoute.js";*/
+import profileRouter from "./routes/profileRoute.js";
 
 // Models
 import orderModel from "./models/orderModel.js";
@@ -58,13 +59,13 @@ const razorpay = new Razorpay({
 // ✅ Razorpay Order Creation
 app.post("/api/order/razorpay", async (req, res) => {
   try {
-    const { address, items, amount, userId, shopName } = req.body;
+    const { address, items, amount, userId, shopName, discountApplied, promoCode } = req.body;
     if (!userId || !address || !items || !amount || isNaN(amount) || amount <= 0) {
       return res.status(400).json({ error: "Invalid request data" });
     }
 
     const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100),
+      amount: amount * 100, // ✅ Convert to paise
       currency: "INR",
       receipt: `order_rcptid_${Date.now()}`,
       notes: {
@@ -72,20 +73,23 @@ app.post("/api/order/razorpay", async (req, res) => {
         items: JSON.stringify(items),
       },
     });
-
+    
     if (!order) throw new Error("Razorpay order creation failed");
-
+    
     const newOrder = new orderModel({
       userId,
       address,
       items,
-      amount: order.amount,
+      amount, // ✅ Store in rupees
       orderId: order.id,
       paymentMethod: "razorpay",
-      status: "Pending",
+      status: "Order Received",
       payment: false,
       shopName,
+      discountApplied, 
+      promoCode,
     });
+    
 
     await newOrder.save();
 
@@ -148,7 +152,7 @@ app.post("/api/order/verify", async (req, res) => {
 // ✅ Cash On Delivery Order
 app.post("/api/order/cod", async (req, res) => {
   try {
-    const { address, items, amount, userId, shopName } = req.body;
+    const { address, items, amount, userId, shopName, discountApplied, promoCode } = req.body;
     if (!userId) return res.status(400).json({ error: "User ID is required" });
 
     const orderId = await generateOrderId();
@@ -160,9 +164,11 @@ app.post("/api/order/cod", async (req, res) => {
       amount,
       orderId,
       paymentMethod: "cod",
-      status: "Pending",
+      status: "Order Received",
       payment: false,
       shopName,
+      discountApplied, 
+      promoCode,
     });
 
     await newOrder.save();
@@ -223,10 +229,10 @@ app.use("/api/food", foodRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/shops", shopRouter);
-/*app.use("/api/wallet", walletRouter);
+app.use("/api/wallet", walletRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/location", locationRouter);
-app.use("/api/profile", profileRouter);*/
+app.use("/api/profile", profileRouter);
 
 // ✅ Base Route
 app.get("/", (req, res) => {
@@ -241,7 +247,7 @@ app.use("*", (req, res) => {
 
 // ✅ Socket.IO Server Setup
 const server = http.createServer(app);
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "*", // Change to frontend URL in production
     methods: ["GET", "POST"],
