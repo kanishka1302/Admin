@@ -33,7 +33,7 @@ orderRouter.post('/razorpay', authMiddleware, placeOrderRazorpay);
 orderRouter.post('/verify', authMiddleware, verifyOrder); // ✅ NEW
 
 // Admin/User: Update order status
-orderRouter.post('/status', authMiddleware, updateStatus);
+orderRouter.post('/status', authMiddleware, updateOrderStatus);
 
 orderRouter.post('/admin/newOrder', generateAdminOrder);
 
