@@ -10,7 +10,7 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../Context/StoreContext.jsx";
 import { auth } from "../../firebase";
-import RegisterPopup from "../RegisterPopup/Registerpopup.jsx";
+import RegisterPopup from "../Registerpopup/Registerpopup.jsx";
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
