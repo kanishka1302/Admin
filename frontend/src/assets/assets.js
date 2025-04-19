@@ -7,7 +7,7 @@ import eggs from './Eggs.png';
 import fish from './fish.png';
 import prawns from './prawns.png';
 import food_1 from './food_1.png';
-import fish1 from './fish1.png';
+import fish1 from './Fish1.png';
 import insta from './instagram.png';
 import yt from './youtube.png';
 import fb from './facebook.png';
