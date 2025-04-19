@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { StoreContext } from '../../Context/StoreContext';
 import './Shops.css';
 
-const API_BASE_URL = "http://localhost:5000"; // Backend API base URL
+const API_BASE_URL = "https://admin-92vt.onrender.com // Backend API base URL
 const FALLBACK_IMAGE = "/assets/default-shop.png"; // Default fallback image
 
 const Shops = () => {
