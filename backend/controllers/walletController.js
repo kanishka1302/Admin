@@ -1,4 +1,4 @@
-import WalletModel from '../models/WalletModel.js';
+import WalletModel from '../models/walletModel.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
