@@ -1,85 +1,83 @@
-/* General Styles */
+/* Base Styles - Mobile First */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #ffffff;
+  background-color: #fff;
   color: #333;
+  font-size: 16px;
   line-height: 1.6;
 }
 
-/* Container Styles */
 .container {
-  max-width: 1200px; /* Restrict the width for large screens */
-  margin: 40px auto; /* Center the container */
-  padding: 30px;
+  width: 90%;
+  margin: 1.5rem auto;
+  padding: 1rem;
   background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: left;
 }
 
-/* Heading Styles */
 .container h3 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
   text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
 }
 
-/* Paragraph Styles */
 .container p {
-  font-size: 18px;
-  line-height: 1.8;
+  font-size: 1rem;
   color: #555;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
-/* Make the last paragraph margin-less */
 .container p:last-child {
   margin-bottom: 0;
 }
 
-/* Highlighted phrases within paragraphs */
 .container p span {
-  color: #d9534f; /* Highlight text in red */
+  color: #d9534f;
   font-weight: bold;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Medium devices (tablets) */
+@media (min-width: 768px) {
   .container {
-    padding: 20px;
+    width: 80%;
+    padding: 1.5rem;
   }
 
   .container h3 {
-    font-size: 22px;
+    font-size: 1.75rem;
   }
 
   .container p {
-    font-size: 16px;
+    font-size: 1.125rem;
   }
 }
 
-@media (max-width: 480px) {
+/* Large devices (desktops) */
+@media (min-width: 1024px) {
   .container {
-    padding: 15px;
+    width: 60%;
+    padding: 2rem;
   }
 
   .container h3 {
-    font-size: 20px;
+    font-size: 2rem;
   }
 
   .container p {
-    font-size: 14px;
+    font-size: 1.25rem;
   }
 }
 
-/* Optional Global Styles for Links */
+/* Global Link Styles */
 a {
   text-decoration: none;
   color: #333;
+  transition: all 0.3s ease;
 }
 
 a:hover {
