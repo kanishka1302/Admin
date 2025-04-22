@@ -1,28 +1,202 @@
-.userinfo {
+.userinfo-container {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  padding: 30px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.userinfo-section {
+  flex: 1;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+.userinfo-section h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.userinfo-section p {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.userinfo-section input {
+  margin-left: 10px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.edit-button,
+.save-button {
+  padding: 10px 20px;
+  background-color: #0059ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.edit-button:hover,
+.save-button:hover {
+  background-color: #0041c2;
+}
+
+.success-message {
+  color: green;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Address section */
+.address-section {
+  flex: 1;
+  padding: 20px;
+}
+
+.section-heading {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.address-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.address-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 16px;
+  padding: 15px;
+  padding-left: 23px;
+  scrollbar-width: none; /* Firefox */
+  align-items: center;
+}
+
+.address-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.address-card {
+  min-width: 200px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.address-card:hover {
+  transform: scale(1.02);
+}
+
+.address-card p {
+  margin: 4px 30px;
+  font-size: 14px;
+}
+
+.arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 100;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.arrow-btn:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.arrow-btn.left {
+  left: -20px;
+}
+
+.arrow-btn.right {
+  right: -20px;
+}
+@media (max-width: 768px) {
+  .userinfo-container {
+    flex-direction: column;
+    gap: 20px;
     padding: 20px;
-    max-width: 500px;
-    margin: auto;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
-  
-  .userinfo h1 {
-    margin-bottom: 20px;
+
+  .userinfo-section,
+  .address-section {
+    padding: 15px;
   }
-  
-  .userinfo p {
-    font-size: 16px;
-    margin-bottom: 10px;
+
+  .userinfo-section h1 {
+    font-size: 20px;
+    margin-bottom: 15px;
   }
-  
-  .edit-button {
-    display: inline-block;
-    padding: 10px 15px;
-    color: white;
-    background-color: tomato;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+
+  .userinfo-section p {
+    font-size: 14px;
   }
-  
+
+  .userinfo-section input {
+    width: 100%;
+    margin: 8px 0;
+  }
+
+  .edit-button,
+  .save-button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .section-heading {
+    font-size: 18px;
+  }
+
+  .address-carousel {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .address-card {
+    min-width: 160px;
+    padding: 12px;
+  }
+
+  .address-card p {
+    font-size: 13px;
+    margin: 4px 20px;
+  }
+
+  .arrow-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  .arrow-btn.left {
+    left: -10px;
+  }
+
+  .arrow-btn.right {
+    right: -10px;
+  }
+}
+
