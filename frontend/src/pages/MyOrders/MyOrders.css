@@ -62,19 +62,16 @@ body {
 }
 
 .my-orders-order {
-  display: grid;
-  grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr 1fr;
-  align-items: center;
-  gap: var(--spacing-base);
-  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 1rem;
   padding: 20px;
   color: var(--text-color);
-  border: none;
   border-radius: var(--border-radius);
   background: var(--bg-color);
   box-shadow: var(--shadow-md);
   transition: all var(--transition-speed);
-  position: relative;
   overflow: hidden;
 }
 
@@ -117,6 +114,8 @@ body {
   font-weight: 600;
   color: var(--text-bold);
   margin-bottom: 5px;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .my-orders-order p span {
@@ -202,91 +201,37 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Better responsive design */
-@media (max-width: 1024px) {
-  .my-orders-order {
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
-    gap: 15px;
-  }
+/* Order layout grid */
+.order-main {
+  display: grid;
+  grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: var(--spacing-base);
+  width: 100%;
 }
 
-@media (max-width: 900px) {
-  .my-orders-order {
-    grid-template-columns: 0.5fr 2fr 1fr;
-    row-gap: 15px;
-    font-size: 13px;
-    padding: 15px;
-  }
-  
-  .my-orders button {
-    font-size: 13px;
-    padding: 8px 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .my-orders-order {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 20px 15px;
-  }
-  
-  .my-orders-order:before {
-    width: 100%;
-    height: 4px;
-  }
-  
-  .my-orders-order img {
-    margin: 0 auto 10px;
-    width: 80px;
-    height: 80px;
-  }
-  
-  .my-orders h2:after {
-    left: 0%;
-    transform: translateX(-50%);
-    width: 80px;
-  }
-  
-  .my-orders h2 {
-    text-align: center;
-  }
-}.order-tracking {
+.order-tracking {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
   padding: 0 10px;
   position: relative;
-  
 }
-.my-orders-order {
+
+/* Tracking stages */
+.stage {
   display: flex;
   flex-direction: column;
-}
-
-.order-main {
-  display: grid;
-  grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr 1fr;
-  align-items: center;
-  gap: var(--spacing-base);
-}
-
-
-
-.stage {
-  display:flex ;
-  flex-direction:column;
   align-items: center;
   flex: 1;
-  position:relative;
+  position: relative;
   opacity: 0.5;
   transition: opacity 0.3s;
-  min-width: 200px; /* Prevent squishing */
-  white-space: nowrap; /* Prevents text wrapping */
+  min-width: 200px;
+  white-space: nowrap;
   text-align: center;
 }
-
 
 .stage.active {
   opacity: 1;
@@ -313,11 +258,10 @@ body {
   color: white;
 }
 
-/* Connecting line */
 .stage:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: 14px; /* half of icon height */
+  top: 14px;
   left: 50%;
   right: -50%;
   height: 3px;
@@ -328,7 +272,96 @@ body {
 .stage.active:not(:last-child)::after {
   background-color: green;
 }
-.my-orders-order {
-  position: relative;
-  padding-bottom: 1rem;
+
+/* RESPONSIVE DESIGN */
+
+/* Medium Screens */
+@media (max-width: 1024px) {
+  .order-main {
+    grid-template-columns: 1fr 2fr 1fr;
+    row-gap: 16px;
+  }
+
+  .stage {
+    min-width: 150px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .my-orders-order {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .order-main {
+    grid-template-columns: 1fr;
+  }
+
+  .order-tracking {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding: 10px 0;
+  }
+
+  .stage {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: auto;
+    white-space: normal;
+    text-align: left;
+    gap: 10px;
+  }
+
+  .stage-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    margin-bottom: 0;
+  }
+
+  .stage:not(:last-child)::after {
+    content: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .my-orders-order {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .order-main {
+    grid-template-columns: 1fr;
+  }
+
+  .order-tracking {
+    padding: 0 5px;
+  }
+
+  .stage {
+    padding: 6px 0;
+    gap: 8px;
+  }
+
+  .stage-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+  }
+
+  .stage.active {
+    font-weight: bold;
+    color: green;
+  }
+
+  .my-orders-order img {
+    width: 48px;
+    height: 48px;
+  }
 }
