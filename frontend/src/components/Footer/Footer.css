@@ -1,17 +1,17 @@
 /* Vendors Heading */
 .vendors-heading {
   text-align: center;
-  font-size: 2.2em; /* Slightly larger for emphasis */
+  font-size: 2.2em;
   margin: 30px 0;
-  color: #333; /* Darker shade for better contrast */
+  color: #333;
   font-weight: bold;
-  letter-spacing: 1px; /* Slight letter spacing for a polished look */
+  letter-spacing: 1px;
 }
 
 /* Scrolling Images Section */
 .scrolling-images {
   overflow: hidden;
-  background-color: #fbf9f9; /* Light grey background */
+  background-color: #fbf9f9;
   padding: 20px 0;
 }
 
@@ -22,14 +22,14 @@
 }
 
 .scrolling-images img {
-  height: 100px; /* Adjust as needed */
-  margin: 0 25px; /* Increased margin for better spacing */
-  filter: grayscale(50%); /* Slight grayscale for a subtle look */
+  height: 100px;
+  margin: 0 25px;
+  filter: grayscale(50%);
   transition: filter 0.3s ease;
 }
 
 .scrolling-images img:hover {
-  filter: grayscale(0); /* Remove grayscale on hover */
+  filter: grayscale(0);
 }
 
 @keyframes scroll-left {
@@ -41,64 +41,61 @@
   }
 }
 
-
 /* Footer Section */
 .footer {
-  background-color: #d1c7b7; /* Slightly darker cream background for footer */
-  color: #333; /* Dark text for better contrast */
-  padding: 20px 40px; /* Reduced padding to make footer more compact */
+  background-color: #d1c7b7;
+  color: #333;
+  padding: 20px 40px;
   font-family: 'Arial', sans-serif;
-  box-shadow: 0px -5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  box-shadow: 0px -5px 15px rgba(0, 0, 0, 0.1);
 }
-
 
 .footer-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 20px; /* Reduced gap between content */
+  gap: 20px;
 }
 
-.footer-content-left {
+.footer-content-left,
+.footer-content-center,
+.footer-content-right {
   flex: 1;
-  max-width: 30%;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px; /* Reduced gap between items */
-  flex-direction: column;
+  min-width: 250px;
+  max-width: 350px;
 }
 
 .footer-logo-section {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 25px; /* Reduced gap between logo items */
+  gap: 25px;
 }
 
 .footer-logo-section img {
-  height: 90px; /* Reduced logo size */
+  height: 90px;
   width: auto;
-  filter: contrast(0.9); /* Subtle contrast for logo */
+  filter: contrast(0.9);
 }
 
 .app-download-platforms {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px; /* Reduced gap between download icons */
-  margin-top: -30px; /* Reduced negative margin */
+  gap: 12px;
+  margin-top: -30px;
 }
 
 .app-download-platforms img {
-  width: 170px; /* Reduced size for app download icons */
+  width: 170px;
   height: auto;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
 .app-download-platforms img:first-child {
-  margin-bottom: -100px; /* Reduced negative margin */
+  margin-bottom: -100px;
 }
 
 .app-download-platforms img:hover {
@@ -106,12 +103,12 @@
 }
 
 .footer-social-icons {
-  margin-top: 10px; /* Reduced margin */
+  margin-top: 10px;
 }
 
 .footer-social-icons img {
-  width: 35px; /* Smaller icon size */
-  margin-right: 10px; /* Reduced spacing between icons */
+  width: 35px;
+  margin-right: 10px;
   cursor: pointer;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -121,20 +118,12 @@
   opacity: 0.9;
 }
 
-.footer-content-center,
-.footer-content-right {
-  flex: 1;
-  max-width: 350px; /* Reduced max width */
-  text-align: center;
-}
-
-/* Footer Section */
 .footer-content-center h2,
 .footer-content-right h2 {
-  margin-bottom: 12px; /* Reduced margin */
-  font-size: 1.8em; /* Reduced font size */
-  font-weight: 700; /* Bolder text for better emphasis */
-  color: #a10707; /* Muted amber color for headings */
+  margin-bottom: 12px;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #a10707;
 }
 
 .footer-content-center ul,
@@ -147,34 +136,88 @@
 
 .footer-content-center li,
 .footer-content-right li {
-  margin-bottom: 8px; /* Reduced spacing between list items */
-  font-size: 1.1em; /* Slightly smaller font size */
+  margin-bottom: 8px;
+  font-size: 1.1em;
 }
 
 .footer hr {
   border: 0;
   height: 1px;
-  background: #e2d9b7; /* Light cream border for a smooth look */
-  margin: 20px 0; /* Reduced margin */
+  background: #e2d9b7;
+  margin: 20px 0;
+}
+
+.footer-link {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #a75004;
+}
+
+.footer-link:hover {
+  color: #fff;
+  background-color: #e74c3c;
+  padding: 6px 12px;
 }
 
 .footer-copyright {
   text-align: center;
-  font-size: 0.9em; /* Reduced font size */
+  font-size: 0.9em;
   color: #333;
 }
 
-/* Footer Links */
-.footer-link {
-  cursor: pointer;
-  transition: color 0.3s ease;
-  padding: 6px 10px; /* Reduced padding */
-  border-radius: 4px;
-  color: #a75004; /* Orange color for links */
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-content-left,
+  .footer-content-center,
+  .footer-content-right {
+    max-width: 100%;
+  }
+
+  .footer-logo-section,
+  .app-download-platforms {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .footer-logo-section img,
+  .app-download-platforms img {
+    margin: 10px 0;
+  }
 }
 
-.footer-link:hover {
-  color: #fff; /* Change link color to white on hover */
-  background-color: #e74c3c; /* Red background for hover */
-  padding: 6px 12px; /* Slight increase in padding for hover effect */
-}
+@media (max-width: 480px) {
+  .vendors-heading {
+    font-size: 1.8em;
+  }
+
+  .scrolling-images img {
+    height: 80px;
+    margin: 0 15px;
+  }
+
+  .footer-content-center h2,
+  .footer-content-right h2 {
+    font-size: 1.5em;
+  }
+
+  .footer-content-center li,
+  .footer-content-right li {
+    font-size: 1em;
+  }
+
+  .footer-social-icons img {
+    width: 30px;
+  }
+
+  .footer-link {
+    font-size: 0.95em;
+  }
+} 
