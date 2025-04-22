@@ -73,8 +73,10 @@ const MyOrders = () => {
                 <p>
                   {order.items
                     .map((item) => `${item.name} x ${item.quantity}`)
-                    .join(", ")}
+                    .join(", ")}<br></br>
+                    Order ID: {order.orderId}
                 </p>
+               
                 <p>
                   <b>Shop(s):</b>{" "}
                   {order.items.map((item) => item.shopName).join(", ") ||
