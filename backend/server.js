@@ -23,6 +23,8 @@ import walletRouter from "./routes/walletRoute.js";
 import ticketRouter from "./routes/ticketRoute.js";
 import locationRouter from "./routes/locationRoute.js";
 import profileRouter from "./routes/profileRoute.js";
+import addressRouter from "./routes/addressRoute.js";
+import loginRoutes from "./routes/loginRoute.js";
 
 // Models
 import orderModel from "./models/orderModel.js";
@@ -223,6 +225,12 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
+app.post("/api/login/create", async (req, res) => {
+  const { phoneNumber, verificationId } = req.body;
+  console.log("OTP requested for:", phoneNumber, "Verification ID:", verificationId);
+  res.status(200).json({ message: "OTP request logged" });
+});
+
 // ✅ API Routes
 app.use("/api/user", userRouter);
 app.use("/api/food", foodRouter);
@@ -233,6 +241,8 @@ app.use("/api/wallet", walletRouter);
 app.use("/api/tickets", ticketRouter);
 app.use("/api/location", locationRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/address", addressRouter);
+app.use("/api/login", loginRoutes);
 
 // ✅ Base Route
 app.get("/", (req, res) => {
