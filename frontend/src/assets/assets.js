@@ -5,7 +5,7 @@ import chicken from './Chicken.png';
 import mutton from './Mutton.png';
 import eggs from './Eggs.png';
 import fish from './fish.png';
-import prawns from './Prawns.png';
+import prawns from './prawns.png';
 import food_1 from './food_1.png';
 import fish1 from './Fish1.png';
 import insta from './instagram.png';
