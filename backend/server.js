@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
 app.use(cors({
-  origin: "https://frontend-31u7.onrender.com",
+  origin: "*",
   credentials: true, // Optional: only if you're using cookies or authorization headers
 }));
 
