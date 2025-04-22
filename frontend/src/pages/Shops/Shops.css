@@ -1,4 +1,4 @@
-/* General styles for the page */
+/* ========== General Page Styles ========== */
 .shops-page {
   padding: 20px;
   background: linear-gradient(to bottom, #ffffff, #f9f9f9);
@@ -11,7 +11,7 @@
   min-height: 100vh;
 }
 
-/* Heading style for categories */
+/* ========== Category Heading ========== */
 .category-heading {
   font-size: 2.5em;
   font-weight: 700;
@@ -27,7 +27,7 @@
   color: #b30303;
 }
 
-/* Adjusting category-section for layout */
+/* ========== Category Section ========== */
 .category-section {
   display: flex;
   flex-direction: column;
@@ -35,18 +35,19 @@
   margin-bottom: 40px;
 }
 
-/* Container for category shops */
+/* ========== Shops Container ========== */
 .shops-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
   justify-content: center;
   margin-top: 15px;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
+  padding: 0 10px;
 }
 
-/* Shop card style */
+/* ========== Shop Card ========== */
 .shop-card {
   width: 240px;
   background: #ffffff;
@@ -57,10 +58,10 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Space out text and button properly */
+  justify-content: space-between;
   align-items: center;
   text-align: center;
-  padding: 10px 0; /* Add padding for better spacing */
+  padding: 10px 0;
 }
 
 .shop-card:hover {
@@ -75,25 +76,26 @@
   border-bottom: 3px solid #f0f0f0;
 }
 
-/* Shop card details */
+/* ========== Shop Text ========== */
 .shop-name {
   font-size: 1.4em;
   font-weight: 600;
   color: #333;
-  margin: 8px 0; /* Ensure consistent spacing */
+  margin: 8px 0;
 }
 
-.shop-address, .shop-pincode {
+.shop-address,
+.shop-pincode {
   font-size: 1em;
   color: #666;
   margin: 5px 0;
 }
 
 .shop-pincode {
-  font-style: italic; /* Differentiate pincode visually */
+  font-style: italic;
 }
 
-/* Button style */
+/* ========== Buy Button ========== */
 .shop-buy-button {
   background: linear-gradient(90deg, #b03030, #d94545);
   color: #ffffff;
@@ -113,15 +115,61 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive design */
+/* ========== Responsive Design ========== */
+
+/* Tablets & small laptops */
+@media (max-width: 992px) {
+  .shop-card {
+    width: 45%;
+    max-width: 300px;
+  }
+
+  .shops-container {
+    gap: 15px;
+  }
+}
+
+/* Mobile devices */
 @media (max-width: 768px) {
   .shop-card {
-    width: 85%; /* Adjust card size for narrower screens */
-    margin-bottom: 15px;
+    width: 100%;
+    max-width: 90%;
+  }
+
+  .category-heading {
+    font-size: 2em;
+    padding-bottom: 6px;
+    gap: 6px;
   }
 
   .shops-container {
     flex-direction: column;
     align-items: center;
+  }
+
+  .shop-buy-button {
+    padding: 10px 16px;
+    font-size: 1em;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .shop-card {
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .category-heading {
+    font-size: 1.7em;
+  }
+
+  .shop-name {
+    font-size: 1.2em;
+  }
+
+  .shop-address,
+  .shop-pincode {
+    font-size: 0.95em;
   }
 }
