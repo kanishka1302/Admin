@@ -3,7 +3,7 @@ import './Navbar.css';
 import { assets } from '../../assets/assets';
 import { Link, useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../Context/StoreContext.jsx';
-import NavigationPopup from '../Navigationpopup/Navigationpopup.jsx';
+import NavigationPopup from '../Navigationpopup/NavigationPopup.jsx';
 import locationIcon from '../../assets/icons8-location-48.png';
 import loginIcon from '../../assets/icons8-login-24.png';
 import profileIcon from '../../assets/icons8-profile-32.png';
@@ -14,16 +14,15 @@ const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState('menu');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Select Location');
-  const [showChat, setShowChat] = useState(false); // ✅ Toggle chat
+  const [showChat, setShowChat] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const { getTotalCartAmount, token, setToken, clearCart } = useContext(StoreContext);
   const navigate = useNavigate();
 
-  // ✅ Load token and location on page load
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
-    if (savedToken) {
-      setToken(savedToken);
-    }
+    if (savedToken) setToken(savedToken);
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser && storedUser.address) {
@@ -37,12 +36,8 @@ const Navbar = ({ setShowLogin }) => {
     }
   }, [setToken]);
 
-  // ✅ Open Location Popup
-  const handleSelectLocation = () => {
-    setIsPopupOpen(true);
-  };
+  const handleSelectLocation = () => setIsPopupOpen(true);
 
-  // ✅ Save location
   const onLocationSubmit = (message) => {
     setIsPopupOpen(false);
     setSelectedLocation(message);
@@ -51,7 +46,6 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
-  // ✅ Logout function
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('cartItems');
@@ -62,31 +56,34 @@ const Navbar = ({ setShowLogin }) => {
     navigate('/');
   };
 
-  // ✅ Profile Page
   const handleProfileClick = () => navigate('/userinfo');
 
-  // ✅ Toggle Chat (Now Opens Immediately Without Reload)
   const handleChatClick = () => {
     if (token) {
-      setShowChat(!showChat); // ✅ Toggle Chat Instantly
+      setShowChat(!showChat);
     } else {
       setShowLogin(true);
     }
   };
 
-  // ✅ Navigate to Home
   const handleHomeClick = () => {
     setMenu('Home');
     navigate('/');
+    setIsMobileMenuOpen(false);
   };
 
-  // ✅ Navigate to Catalog
   const handleCatalogClick = () => {
     setMenu('Catalog');
     navigate('/');
     setTimeout(() => {
       document.getElementById('explore-menu')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleContactClick = () => {
+    setMenu('Contact Us');
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -95,27 +92,36 @@ const Navbar = ({ setShowLogin }) => {
         <img src={assets.logo} alt="Logo" className="logo" />
       </Link>
 
-      <div className="navbar-center">
+      {/* Hamburger Icon */}
+      <button className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        <span className="bar"></span>
+        <span className="bar"></span>
+        <span className="bar"></span>
+      </button>
+
+      {/* Navbar Menu */}
+      <div className={`navbar-center ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <ul className="navbar-menu">
           <li>
-            <span 
-              onClick={handleHomeClick} 
+            <span
+              onClick={handleHomeClick}
               className={menu === 'Home' ? 'active' : ''}
             >
               <i className="fa-solid fa-house"></i> Home
             </span>
           </li>
           <li>
-            <span 
-              onClick={handleCatalogClick} 
+            <span
+              onClick={handleCatalogClick}
               className={menu === 'Catalog' ? 'active' : ''}
             >
               <i className="fa-solid fa-th-list"></i> Catalog
             </span>
           </li>
           <li>
-            <a href="#footer" 
-              onClick={() => setMenu('Contact Us')} 
+            <a
+              href="#footer"
+              onClick={handleContactClick}
               className={menu === 'Contact Us' ? 'active' : ''}
             >
               <i className="fa-solid fa-envelope"></i> Contact Us
@@ -124,14 +130,15 @@ const Navbar = ({ setShowLogin }) => {
         </ul>
       </div>
 
-      {/* ✅ Location */}
+      {/* Right Section */}
       <div className="navbar-right">
+        {/* Location */}
         <div className="select-location" onClick={handleSelectLocation}>
           <img src={locationIcon} alt="Location Icon" className="location-icon" />
           <span>{selectedLocation}</span>
         </div>
 
-        {/* ✅ Cart */}
+        {/* Cart */}
         <div className="navbar-searchicon">
           <Link to="/cart">
             <img src={assets.basketicon} alt="Basket Icon" />
@@ -139,7 +146,7 @@ const Navbar = ({ setShowLogin }) => {
           <div className={getTotalCartAmount() > 0 ? 'dot' : ''}></div>
         </div>
 
-        {/* ✅ Login / Profile */}
+        {/* Login / Profile */}
         {!token ? (
           <span className="login-text" onClick={() => setShowLogin(true)}>
             <img src={loginIcon} alt="Login Icon" className="login-icon" />
@@ -175,7 +182,7 @@ const Navbar = ({ setShowLogin }) => {
         )}
       </div>
 
-      {/* ✅ Location Popup */}
+      {/* Location Popup */}
       {isPopupOpen && (
         <NavigationPopup
           onClose={() => setIsPopupOpen(false)}
@@ -183,7 +190,7 @@ const Navbar = ({ setShowLogin }) => {
         />
       )}
 
-      {/* ✅ Render Chat Dynamically */}
+      {/* Chat */}
       {showChat && <Chat />}
     </div>
   );
