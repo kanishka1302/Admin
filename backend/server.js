@@ -40,7 +40,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: "https://frontend-31u7.onrender.com",
+  credentials: true, // Optional: only if you're using cookies or authorization headers
+}));
+
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/images", express.static("uploads"));
