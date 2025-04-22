@@ -1,34 +1,37 @@
-import { useState, useEffect } from 'react';
-import './Header.css';
+import React, { useEffect, useState } from "react";
+import Banner1 from "../../assets/Banner1.jpg";
+import Banner2 from "../../assets/Banner2.jpg";
+import "./Header.css"; // Import the CSS file
 
 const Header = () => {
-  const images = [
-    '/Banner1.jpg',
-    '/Banner2.jpg',
+  const slides = [
+    {
+      image: Banner1,
+    },
+    {
+      image: Banner2,
+    }
   ];
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 3) % images.length);
-    }, 6000); // Change image every 4 seconds
-
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, [images.length]);
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div
-      className="header"
-      style={{ backgroundImage: `url(${images[currentImageIndex]})` }}
-    >
-      {/* Show content only for Banner1 */}
-      {currentImageIndex === 0 && (
-        <div className="header-contents">
-          <h2>Order Your Meat!!</h2>
-          <p>Make your day with fresh meat</p>
-        </div>
-      )}
+    <div className="header-container">
+      <img
+        src={slides[currentIndex].image}
+        alt="banner"
+        className="header-image"
+      />
+      <div className="header-text">
+        {slides[currentIndex].text}
+      </div>
     </div>
   );
 };
