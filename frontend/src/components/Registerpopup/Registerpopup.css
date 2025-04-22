@@ -1,3 +1,6 @@
+/* ===========================
+   Register Popup Styles
+=========================== */
 .register-popup {
   position: fixed;
   top: 0;
@@ -9,19 +12,24 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .register-popup-container {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .register-popup-container h2 {
   margin-bottom: 20px;
+  font-size: 1.5rem;
 }
 
 .register-popup-container input {
@@ -32,31 +40,33 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 .register-popup-actions {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.register-btn {
+.register-btn,
+.close-btn {
+  flex: 1;
+  min-width: 120px;
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .close-btn {
   background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
 }
 
 .register-btn:hover {
@@ -66,11 +76,66 @@
 .close-btn:hover {
   background-color: #d32f2f;
 }
-/* Add any custom styles for the toast notifications here */
+
+/* ===========================
+   Toast Styles (Optional)
+=========================== */
 .Toastify__toast--success {
-  background-color: #4caf50;
+  background-color: #ffffff;
 }
 
 .Toastify__toast--error {
   background-color: #fbfbfb;
+}
+
+/* ===========================
+   Responsive Media Queries
+=========================== */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .register-popup-container {
+    max-width: 90%;
+    padding: 16px;
+  }
+
+  .register-popup-container h2 {
+    font-size: 1.3rem;
+  }
+
+  .register-popup-container input {
+    font-size: 15px;
+  }
+
+  .register-btn,
+  .close-btn {
+    font-size: 15px;
+    padding: 8px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+  .register-popup-container {
+    padding: 14px;
+  }
+
+  .register-popup-container h2 {
+    font-size: 1.2rem;
+  }
+
+  .register-popup-container input {
+    font-size: 14px;
+  }
+
+  .register-popup-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .register-btn,
+  .close-btn {
+    width: 100%;
+    font-size: 14px;
+  }
 }
