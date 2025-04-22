@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-//import Map from "../Map/Map";
+import Map from "../Map/Map";
 import "./DeliveryAddress.css";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
@@ -32,7 +32,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
       setUserId(storedUser._id || null);
   
       // ✅ Fetch addresses independently
-      axios.get(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`)
+      axios.get(`http://localhost:5000/api/address/user/${mobileNumber}`)
         .then((res) => {
           console.log("✅ Fetched addresses:", res.data);
           setAddresses(Array.isArray(res.data) ? res.data : []);
@@ -66,7 +66,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
         // 📌 Use the login mobile number as the owner
         const loginMobile = JSON.parse(localStorage.getItem("user"))?.mobileNumber;
   
-        const response = await axios.post("https://admin-92vt.onrender.com/api/address/save", {
+        const response = await axios.post("http://localhost:5000/api/address/save", {
           ownerId: userId,
           contactAddress: {
             ...sanitizedAddress,
