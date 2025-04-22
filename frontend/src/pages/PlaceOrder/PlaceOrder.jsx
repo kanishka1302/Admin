@@ -277,12 +277,20 @@ const PlaceOrder = () => {
                 Razorpay
               </label>
 
-              <button
-                onClick={placeOrder}
-                className={!isFormComplete || !selectedAddress ? "disabled" : ""}
-              >
-                PLACE ORDER
-              </button>
+              {(!isFormComplete || !selectedAddress) && (
+  <p className="warning-text" style={{ color: "red", marginBottom: "10px" }}>
+    ⚠️ Please select a delivery address and complete required details before placing the order.
+  </p>
+)}
+
+<button
+  onClick={placeOrder}
+  disabled={!isFormComplete || !selectedAddress}
+  className={!isFormComplete || !selectedAddress ? "disabled" : ""}
+>
+  PLACE ORDER
+</button>
+
             </div>
           </div>
         </>
