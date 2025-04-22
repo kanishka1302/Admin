@@ -3,7 +3,7 @@ import './Navbar.css';
 import { assets } from '../../assets/assets';
 import { Link, useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../Context/StoreContext.jsx';
-import NavigationPopup from '../Navigationpopup/NavigationPopup.jsx';
+import NavigationPopup from '../Navigationpopup/Navigationpopup.jsx';
 import locationIcon from '../../assets/icons8-location-48.png';
 import loginIcon from '../../assets/icons8-login-24.png';
 import profileIcon from '../../assets/icons8-profile-32.png';
