@@ -41,9 +41,10 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
 app.use(cors({
-  origin: "*",
-  credentials: true, // Optional: only if you're using cookies or authorization headers
+  origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
+  credentials: true,
 }));
+
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -263,8 +264,10 @@ app.use("*", (req, res) => {
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "*", // Change to frontend URL in production
+    origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
     methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   },
 });
 
