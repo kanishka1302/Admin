@@ -1,117 +1,122 @@
-/* General Explore Menu Styling */
+/* ========== Explore Menu ========== */
 .explore-menu {
     text-align: center;
     padding: 20px;
-    background-color: #FADBD8; /* Soft red/pinkish background */
+    background-color: #fadbd8;
     border-radius: 15px;
     margin: 20px auto;
-    max-width: 100%; /* Full width of the page */
-}
-
-/* Header Section */
-.creative-header {
+    max-width: 100%;
+  }
+  
+  /* ========== Header Section ========== */
+  .creative-header {
     text-align: center;
-    background: linear-gradient(135deg, #8B0000, #B22222); /* Deep red gradient */
+    background: linear-gradient(135deg, #8b0000, #b22222);
     color: #fff;
     padding: 30px 20px;
     border-radius: 15px;
     margin-bottom: 30px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     animation: fadeInDown 0.8s ease-in-out;
-}
-
-.creative-header h1 {
+  }
+  
+  .creative-header h1 {
     font-size: 2.8rem;
     margin-bottom: 15px;
     font-weight: bold;
     color: #fff;
     text-shadow: 2px 3px rgba(0, 0, 0, 0.3);
-}
-
-.creative-subtext {
-    font-size: 1.2rem; /* Increased font size */
-    color: #F5F5F5;
+  }
+  
+  .creative-subtext {
+    font-size: 1.2rem;
+    color: #f5f5f5;
     line-height: 1.8;
     max-width: 700px;
     margin: 0 auto;
     text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-/* Card Section */
-.explore-menu-cards {
+  }
+  
+  /* ========== Card Section ========== */
+  .explore-menu-cards {
     display: flex;
     flex-direction: column;
-    gap: 30px; /* Space between rows */
+    gap: 30px;
     animation: fadeInUp 1s ease-in-out;
-}
-
-/* Row Layout */
-.menu-row {
+  }
+  
+  /* ========== Row Layout ========== */
+  .menu-row {
     display: flex;
     justify-content: center;
-    gap: 30px; /* Space between cards */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-}
-
-/* Card Styling */
-.menu-card {
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  
+  /* ========== Menu Card ========== */
+  .menu-card {
     background: #fff;
-    border: 1px solid #E57373;
+    border: 1px solid #e57373;
     border-radius: 15px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    width: 280px; /* Reduced width */
-    height: 320px; /* Reduced height */
+    width: 280px;
+    height: 320px;
     text-align: center;
     transition: transform 0.4s, box-shadow 0.4s;
     overflow: hidden;
     cursor: pointer;
-}
-
-.menu-card:hover {
+  }
+  
+  .menu-card:hover {
     transform: translateY(-10px) scale(1.05);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-}
-
-/* Image Styling */
-.menu-card-image {
+  }
+  
+  /* ========== Image ========== */
+  .menu-card-image {
     width: 100%;
-    height: 160px; /* Reduced height */
+    height: 160px;
     object-fit: cover;
     transition: transform 0.4s ease-in-out;
-}
-
-.menu-card:hover .menu-card-image {
+  }
+  
+  .menu-card:hover .menu-card-image {
     transform: scale(1.1);
-}
-
-/* Title Styling */
-.menu-card-title {
-    font-size: 1.5rem; /* Increased font size */
-    margin: 10px 0 8px; /* Adjusted margin */
-    color: #8B0000;
+  }
+  
+  /* ========== Title ========== */
+  .menu-card-title {
+    font-size: 1.5rem;
+    margin: 10px 0 8px;
+    color: #8b0000;
     font-weight: bold;
-}
-
-/* Add Button */
-.add-to-cart-btn {
-    background-color: #8B0000;
+  }
+  
+  /* ========== Button ========== */
+  .add-to-cart-btn {
+    background-color: #8b0000;
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 10px 20px; /* Button padding */
+    padding: 10px 20px;
     cursor: pointer;
-    font-size: 1.1rem; /* Increased font size */
-    margin-top: 15px; /* Added space between text and button */
+    font-size: 1.1rem;
+    margin-top: 15px;
     transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
-}
-
-.add-to-cart-btn:hover {
-    background-color: #B22222;
+  }
+  
+  .add-to-cart-btn:hover {
+    background-color: #b22222;
     transform: scale(1.05);
-}
-
-/* ======= Modal Popup ======= */
-.modal-overlay {
+  }
+  
+  .add-to-cart-btn.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* ========== Modal ========== */
+  .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -160,65 +165,119 @@
     background-color: #b71c1c;
   }
   
-  /* ======= Button Disabled ======= */
-  .add-to-cart-btn.disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  /* ========== Animations ========== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
-  /* ======= Fade In Animation ======= */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
   @keyframes fadeIn {
-    0% {
+    from {
       opacity: 0;
       transform: scale(0.9);
     }
-    100% {
+    to {
       opacity: 1;
       transform: scale(1);
     }
   }
   
-
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
+  /* ========== Responsive ========== */
+  @media (max-width: 1024px) {
     .menu-card {
-        width: 240px; /* Adjusted width for smaller screens */
-        height: 280px; /* Adjusted height */
+      width: 260px;
+      height: 300px;
     }
-
+  
     .menu-card-image {
-        height: 140px; /* Adjusted height for smaller screens */
+      height: 150px;
     }
-
+  
     .menu-card-title {
-        font-size: 1.3rem; /* Adjusted font size for smaller screens */
+      font-size: 1.4rem;
     }
-
+  
     .add-to-cart-btn {
-        padding: 8px 18px; /* Adjusted padding */
-        font-size: 1rem; /* Adjusted font size */
+      font-size: 1rem;
     }
-}
+  }
+  
+  @media (max-width: 768px) {
+    .creative-header h1 {
+      font-size: 2.2rem;
+    }
+  
+    .creative-subtext {
+      font-size: 1rem;
+    }
+  
+    .menu-card {
+      width: 220px;
+      height: 270px;
+    }
+  
+    .menu-card-image {
+      height: 130px;
+    }
+  
+    .menu-card-title {
+      font-size: 1.2rem;
+    }
+  
+    .add-to-cart-btn {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .creative-header h1 {
+      font-size: 1.8rem;
+    }
+  
+    .creative-subtext {
+      font-size: 0.95rem;
+    }
+  
+    .menu-card {
+      width: 100%;
+      height: auto;
+    }
+  
+    .menu-card-image {
+      height: 180px;
+    }
+  
+    .menu-card-title {
+      font-size: 1.1rem;
+    }
+  
+    .add-to-cart-btn {
+      width: 90%;
+      font-size: 1rem;
+      margin: 10px auto 15px;
+    }
+  
+    .modal-content {
+      width: 90%;
+      padding: 15px 20px;
+    }
+  }
+  
