@@ -48,7 +48,7 @@ const UserInfo = () => {
       if (!mobileNumber) return;
 
       try {
-        const res = await fetch(`http://localhost:5000/api/address/user/${mobileNumber}`);
+        const res = await fetch(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
