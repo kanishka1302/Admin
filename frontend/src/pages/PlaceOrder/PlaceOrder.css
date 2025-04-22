@@ -1,15 +1,16 @@
-/* Main Container */
+/* ========== Layout Container ========== */
 .place-order {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 30px; /* Equal spacing between sections */
+  gap: 30px;
   padding: 20px;
   max-width: 1100px;
   margin: auto;
+  flex-wrap: wrap;
 }
 
-/* Left Side - Delivery Address */
+/* ========== Address Section ========== */
 .address-section {
   flex: 1;
   background: #fff;
@@ -17,35 +18,28 @@
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-left: 6px solid #dd0202;
+  min-width: 300px;
 }
 
-/* Right Side - Order Summary & Payment Method */
+/* ========== Right Side ========== */
 .right-section {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Adds gap between order summary & payment method */
+  gap: 20px;
   width: 40%;
+  min-width: 300px;
 }
-.order-summary {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-left: 6px solid #dd0202;
-  
-}
-/* Order Summary & Payment Sections */
+
+.order-summary,
 .payment-section {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-left: 6px solid #dd0202;
-  margin-top: 20px;
-  width: 400px;
 }
 
-/* Headings */
+/* ========== Section Headings ========== */
 .address-section h3,
 .order-summary h2,
 .payment-section h3 {
@@ -57,7 +51,7 @@
   padding-bottom: 5px;
 }
 
-/* Form Fields */
+/* ========== Form Labels & Inputs ========== */
 .address-section label,
 .payment-section label {
   display: block;
@@ -68,13 +62,12 @@
 }
 
 .address-section input {
-  
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-bottom: 12px;
   font-size: 16px;
-  
 }
 
 .address-section input:focus {
@@ -82,7 +75,7 @@
   outline: none;
 }
 
-/* Order Summary Text */
+/* ========== Order Summary ========== */
 .order-summary p {
   font-size: 18px;
   font-weight: bold;
@@ -90,7 +83,7 @@
   margin: 10px 0;
 }
 
-/* Payment Section */
+/* ========== Payment Section Radio Buttons ========== */
 .payment-section label {
   display: flex;
   align-items: center;
@@ -101,7 +94,6 @@
   cursor: pointer;
 }
 
-/* Custom Radio Buttons */
 .payment-section input[type="radio"] {
   appearance: none;
   width: 18px;
@@ -120,7 +112,7 @@
   box-shadow: 0 0 0 2px #ff4500;
 }
 
-/* Place Order Button */
+/* ========== Button ========== */
 .payment-section button {
   width: 100%;
   background: #ff4500;
@@ -139,31 +131,28 @@
   background: #d13a00;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .place-order {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .address-section {
-    width: 100%;
-    max-width: 500px;
-  }
-
-  .right-section {
-    width: 100%;
-    max-width: 500px;
-  }
+/* ========== Order Success Message ========== */
+.order-success {
+  text-align: center;
+  padding: 80px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 600px;
+  height: 500px;
+  margin: auto;
+  border: 2px solid #266c4b;
+  border-radius: 10%;
 }
-
-/* Order Placed Successfully */
-
 
 .order-success h2 {
   font-size: 24px;
   font-weight: bold;
-  color: #28a745; /* Success color */
+  color: #28a745;
   margin-bottom: 10px;
 }
 
@@ -174,7 +163,6 @@
   margin-bottom: 20px;
 }
 
-/* Order Success Button */
 .order-success button {
   background: #03963c;
   color: #fff;
@@ -191,48 +179,21 @@
   background: #37af89;
 }
 
-
-
-.order-success {
-  text-align: center;
-  position: relative;
-  padding: 80px; /* Increased padding */
-  border-radius: 15px;
-  background: #fff;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 600px; /* Increased width */
-  height: 500px; /* Increased height */
-  margin: auto; /* Center the container */
-  border: 2px solid #266c4b;
-  border-radius: 10%;
- 
-}
-
-.hidden-section {
-  display: none;
-}
-.warning-text {
-  color: red;
-  margin-top: 10px;
-  font-size: 0.9rem;
-}
-
+/* ========== Warnings & Disabled Styles ========== */
+.warning-text,
 .address-error {
   color: #f44336;
   font-size: 14px;
-  margin-top: 8px;
-  margin-bottom: 10px;
   font-weight: 500;
+  margin-top: 8px;
 }
+
 button.disabled {
   background-color: #ccc;
   cursor: not-allowed;
   color: #666;
 }
+
 .highlight-warning {
   border: 2px dashed #f44336;
   background-color: #fff5f5;
@@ -241,11 +202,88 @@ button.disabled {
   transition: all 0.3s ease;
 }
 
-.warning-text {
-  color: #f44336;
-  margin-top: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
+/* ========== Media Queries ========== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .place-order {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .address-section,
+  .right-section {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .order-success {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    padding: 60px;
+    border-radius: 30px;
+  }
 }
 
+/* Medium Screens (Phones) */
+@media (max-width: 768px) {
+  .order-success {
+    padding: 40px 20px;
+  }
 
+  .order-success h2 {
+    font-size: 20px;
+  }
+
+  .order-success p {
+    font-size: 16px;
+  }
+
+  .order-success button {
+    font-size: 16px;
+    padding: 10px 18px;
+  }
+
+  .payment-section button {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
+
+/* Small Screens */
+@media (max-width: 480px) {
+  .place-order {
+    padding: 10px;
+    gap: 20px;
+  }
+
+  .address-section,
+  .right-section {
+    padding: 15px;
+  }
+
+  .payment-section button {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .order-success {
+    padding: 30px 15px;
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  .order-success h2 {
+    font-size: 18px;
+  }
+
+  .order-success p {
+    font-size: 15px;
+  }
+
+  .order-success button {
+    font-size: 15px;
+    padding: 10px 14px;
+  }
+}
