@@ -1,29 +1,17 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-//import Map from "../Map/Map"; // Assuming you have a Map component for location selection
+import Map from "../Map/Map";
 import "./DeliveryAddress.css";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
   const navigate = useNavigate();
-
-  // State to manage saved addresses in localStorage
-  const [addresses, setAddresses] = useState(() => {
-    const savedAddresses = localStorage.getItem("savedAddresses");
-    return savedAddresses ? JSON.parse(savedAddresses) : [];
-  });
-
-  const [selectedAddress, setSelectedAddress] = useState(null);  // Default to null
-
-  // Load the selected address from localStorage (if any) when the component mounts
-  useEffect(() => {
-    const storedSelected = localStorage.getItem("selectedAddress");
-    setSelectedAddress(storedSelected ? JSON.parse(storedSelected) : null);
-  }, []);
-
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showMapPopup, setShowMapPopup] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-
+  const [userId, setUserId] = useState(null);
   const [newAddress, setNewAddress] = useState({
     name: "",
     mobileNumber: "",
@@ -35,55 +23,88 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     country: "India",
   });
 
-  // Save addresses to localStorage whenever they change
   useEffect(() => {
-    // Don't auto-select any address when component mounts
-    setSelectedAddress(null);
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const mobileNumber = storedUser?.mobileNumber;
+  
+    if (mobileNumber) {
+      // Set userId directly from storedUser if available
+      setUserId(storedUser._id || null);
+  
+      // ✅ Fetch addresses independently
+      axios.get(`http://localhost:5000/api/address/user/${mobileNumber}`)
+        .then((res) => {
+          console.log("✅ Fetched addresses:", res.data);
+          setAddresses(Array.isArray(res.data) ? res.data : []);
+        })
+        .catch((err) => {
+          console.error("❌ Error fetching addresses:", err);
+        });
+    }
+  }, []);
+  useEffect(() => {
+    const storedSelected = localStorage.getItem("selectedAddress");
+    setSelectedAddress(storedSelected ? JSON.parse(storedSelected) : null);
   }, []);
 
-  // Prefill form with selectedAddress if exists
   useEffect(() => {
     if (selectedAddress) {
       setNewAddress(selectedAddress);
     }
   }, [selectedAddress]);
 
-  // Handle adding or updating address
-  const handleAddOrUpdateAddress = () => {
+  const handleAddOrUpdateAddress = async () => {
     const { name, mobileNumber, address, city, state, pincode } = newAddress;
   
     if (name && mobileNumber && address && city && state && pincode) {
-      let updatedAddresses = [...addresses];
-  
-      if (editIndex !== null) {
-        // Update existing address
-        updatedAddresses[editIndex] = newAddress;
-  
-        // If the address being edited is currently selected, update selectedAddress too
-        if (selectedAddress?.pincode === addresses[editIndex].pincode) {
-          setSelectedAddress(newAddress);
-          localStorage.setItem("selectedAddress", JSON.stringify(newAddress));
+      try {
+        const sanitizedAddress = { ...newAddress };
+        if (!editIndex && sanitizedAddress._id) {
+          delete sanitizedAddress._id; // avoid duplicate _id
         }
-      } else {
-        // Add new address without selecting it
-        updatedAddresses.push(newAddress);
-        // No change to selectedAddress here
-      }
   
-      // Update addresses and reset form
-      setAddresses(updatedAddresses);
-      setShowForm(false);
-      setNewAddress({
-        name: "",
-        mobileNumber: "",
-        type: "Home",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-        country: "India",
-      });
-      setEditIndex(null);
+        // 📌 Use the login mobile number as the owner
+        const loginMobile = JSON.parse(localStorage.getItem("user"))?.mobileNumber;
+  
+        const response = await axios.post("http://localhost:5000/api/address/save", {
+          ownerId: userId,
+          contactAddress: {
+            ...sanitizedAddress,
+            ownerMobile: loginMobile,
+          }, 
+        });
+  
+        const saved = response.data.address;
+  
+        const updatedAddresses = [...addresses];
+        if (editIndex !== null) {
+          updatedAddresses[editIndex] = saved;
+  
+          if (selectedAddress?.pincode === addresses[editIndex].pincode) {
+            setSelectedAddress(saved);
+            localStorage.setItem("selectedAddress", JSON.stringify(saved));
+          }
+        } else {
+          updatedAddresses.push(saved);
+        }
+  
+        setAddresses(updatedAddresses);
+        setShowForm(false);
+        setNewAddress({
+          name: "",
+          mobileNumber: "",
+          type: "Home",
+          address: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "India",
+        });
+        setEditIndex(null);
+      } catch (err) {
+        console.error("❌ Failed to save address:", err);
+        alert("Something went wrong while saving the address.");
+      }
     } else {
       alert("Please fill in all required fields");
     }
@@ -98,12 +119,10 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }));
   };
 
-  // Handle using live location (assuming Map component returns location data)
   const handleUseLiveLocation = () => {
     setShowMapPopup(true);
   };
 
-  // Handle location selection from the map
   const handleLocationSelect = (locationData) => {
     if (locationData) {
       setNewAddress((prev) => ({
@@ -117,7 +136,6 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }
   };
 
-  // Select an address to be used for the order
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
     localStorage.setItem("selectedAddress", JSON.stringify(address));
@@ -131,19 +149,18 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }
   };
 
-  // Delete an address from the list
   const handleDeleteAddress = (index) => {
     const updatedAddresses = addresses.filter((_, i) => i !== index);
     setAddresses(updatedAddresses);
 
-    // If the selected address is deleted, clear it
-    if (selectedAddress && addresses[index] && selectedAddress.pincode === addresses[index].pincode) {
+    if (selectedAddress && addresses[index]?._id === selectedAddress._id) {
       setSelectedAddress(null);
       localStorage.removeItem("selectedAddress");
     }
+
+    // Optional: Delete from backend (not implemented in your backend yet)
   };
 
-  // Edit an existing address
   const handleEditAddress = (index) => {
     setEditIndex(index);
     setNewAddress(addresses[index]);
@@ -162,7 +179,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
                 type="radio"
                 name="selectedAddress"
                 className="radio-left"
-                checked={selectedAddress?.pincode === addr.pincode}
+                //checked={selectedAddress?._id === addr._id}
                 onChange={() => handleSelectAddress(addr)}
               />
               <div className="address-card">
@@ -192,18 +209,9 @@ const DeliveryAddress = ({ onSelectAddress }) => {
           <h4>{editIndex !== null ? "Edit Address" : "Add New Address"}</h4>
 
           <div>
-            <label>
-              <input type="radio" name="type" value="Home"  checked={newAddress.type === "Home"} onChange={handleInputChange} />
-              Home
-            </label>
-            <label>
-              <input type="radio" name="type" value="Office"  checked={newAddress.type === "Office"} onChange={handleInputChange} />
-              Office
-            </label>
-            <label>
-              <input type="radio" name="type" value="Others" checked={newAddress.type === "Others"} onChange={handleInputChange} />
-              Others
-            </label>
+            <label><input type="radio" name="type" value="Home" checked={newAddress.type === "Home"} onChange={handleInputChange} /> Home</label>
+            <label><input type="radio" name="type" value="Office" checked={newAddress.type === "Office"} onChange={handleInputChange} /> Office</label>
+            <label><input type="radio" name="type" value="Others" checked={newAddress.type === "Others"} onChange={handleInputChange} /> Others</label>
           </div>
 
           <input type="text" name="name" placeholder="Full Name" value={newAddress.name} onChange={handleInputChange} />
@@ -213,9 +221,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
           <input type="text" name="state" placeholder="State" value={newAddress.state} onChange={handleInputChange} />
           <input type="text" name="pincode" placeholder="Pincode" maxLength="6" value={newAddress.pincode} onChange={handleInputChange} />
 
-          <button onClick={handleAddOrUpdateAddress}>
-            {editIndex !== null ? "Update Address" : "Save Address"}
-          </button>
+          <button onClick={handleAddOrUpdateAddress}>{editIndex !== null ? "Update Address" : "Save Address"}</button>
           <button onClick={() => { setShowForm(false); setEditIndex(null); }}>Cancel</button>
           <button onClick={handleUseLiveLocation}>Use Live Location</button>
         </div>
