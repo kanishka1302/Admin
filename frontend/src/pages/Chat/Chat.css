@@ -244,3 +244,67 @@
 .chat-icon:hover {
   transform: scale(1.15);
 }
+@media (max-width: 400px) {
+  .chat-page-wrapper {
+    width: 90vw;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 30px;
+  }
+
+  .chat-header {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .minimize-btn,
+  .close-btn {
+    font-size: 13px;
+    padding: 4px 6px;
+    margin: 0 4px;
+  }
+
+  .chat-messages {
+    max-height: calc(100vh - 180px);
+    padding: 8px;
+  }
+
+  .chat-message {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .options button {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .chat-input-container {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .chat-input-container input {
+    font-size: 13px;
+    padding: 8px 10px;
+    width: 90%;
+  }
+
+  .chat-input-container button {
+    width: 90%;
+    font-size: 13px;
+    padding: 10px;
+    margin-left: 0;
+  }
+
+  .chat-icon {
+    width: 40px;
+    height: 40px;
+    right: 10px;
+    bottom: 10px;
+  }
+}
