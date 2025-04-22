@@ -8,9 +8,9 @@ const FoodDisplay = ({ category = 'All' }) => {
       <div className="food-display-list">
         <div className="banner-container">
           <img
-            src={assets.installBanner}  // Using the import for installBanner image
-            alt="Install Banner"
-            className="install-banner"
+            src={assets.comingsoonBanner}  // Using the import for installBanner image
+            alt="comingsoon Banner"
+            className="comingsoon-banner"
           />
         </div>
       </div>
