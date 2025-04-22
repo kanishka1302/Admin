@@ -44,7 +44,7 @@ const Footer = () => {
               <img src={assets.logo} alt="NoVeg Logo" />
               <div className="divider"></div>
               <div className="app-download-platforms">
-                <img src={assets.playstore} alt="Download on Google Play" />
+                
               </div>
             </div>
             <p>
@@ -71,10 +71,10 @@ const Footer = () => {
                 <Link to="/" className="footer-link" onClick={scrollToTop}>Home</Link> {/* Home link updated */}
               </li>
               <li className="footer-link">
-                <Link to="/AboutUs" className="footer-link">About Us</Link>
+                <Link to="/AboutUs" className="footer-link" onClick={scrollToTop}>About Us</Link>
               </li>
               <li className="footer-link">
-                <Link to="/Privacy-policy" className="footer-link">Privacy Policy</Link> {/* Updated link */}
+                <Link to="/Privacy-policy" className="footer-link" onClick={scrollToTop}>Privacy Policy</Link> {/* Updated link */}
               </li>
             </ul>
           </div>
@@ -84,7 +84,11 @@ const Footer = () => {
             <h2>Get In Touch!!</h2>
             <ul>
               <li>Contact@noveg.pvt.ltd</li>
+              <li>
+                <Link to="/chat" className="chat-button"> Chat with us</Link>
+              </li>
             </ul>
+
           </div>
           <div className="footer-content-right">
             <h2>Support Hours</h2>
