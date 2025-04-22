@@ -46,7 +46,7 @@ import prawns_crabs from './Prawns_crabs.png';
 import fishz from './fishz.png';
 import muttonz from './mutttonz.png';
 import bonelezchicken from './bonelezchicken.png';
-import installBanner from './installBanner.jpg';
+import comingsoonBanner from './comingsoonBanner.jpg';
 import add_icon_green from './add_icon_green.png'; // Add to cart icon
 import remove_icon_red from './remove_icon_red.png'; // Remove from cart icon
 import chaticon from './chaticon.png';
@@ -104,7 +104,7 @@ export const assets = {
   fishz,
   muttonz,
   bonelezchicken,
-  installBanner,
+  comingsoonBanner,
   add_icon_green, // Added Add to Cart icon
   remove_icon_red, // Added Remove from Cart icon
   chaticon,
