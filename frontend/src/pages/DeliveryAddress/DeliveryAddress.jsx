@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Map from "../Map/Map";
+//import Map from "../Map/Map";
 import "./DeliveryAddress.css";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
