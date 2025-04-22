@@ -1,306 +1,229 @@
-/* Ensure general navbar layout */
+/* Reset basic styles */
 .navbar {
-  padding: 20px 0;
+  width: 100vw;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  background: white;
-  position: relative; /* Ensure positioning for contained elements */
+  padding:50px;
+  margin:0px;
+  background-color: #fff;
+  position: relative;
+  height: 200px;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
 }
 
-/* Styling for the login icon */
-.login-icon {
-  width: 23px;
-  height: 23px;
-  vertical-align: middle;
-  margin-right: 8px;
-}
-
-/* Styling for the login text */
-.login-text {
-  font-size: 17px;
-  font-family: 'Outfit', sans-serif;
-  color: black;
+.logo {
+  height: 150px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
+
 }
 
-/* Styling for the location section */
-.select-location {
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  border-radius: 3px;
+}
+
+/* Center Menu */
+.navbar-center {
+  flex: 1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 8px; /* Space between the icon and text */
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 200px; /* Restrict the maximum width */
-  overflow: hidden; /* Prevent overflowing content */
-  white-space: nowrap; /* Prevent text from wrapping */
-  text-overflow: ellipsis; /* Add ellipsis (...) for overflowing text */
-  cursor: pointer;
 }
 
-/* Styling for the location icon */
-.location-icon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0; /* Ensure the icon doesn't shrink */
-}
-
-/* Styling for the select location text */
-.select-location span {
-  overflow: hidden; /* Hide overflowing text */
-  text-overflow: ellipsis; /* Add ellipsis to the text */
-  white-space: nowrap; /* Prevent text from wrapping */
-}
-
-/* Navbar menu styling */
 .navbar-menu {
-  display: flex;
   list-style: none;
-  gap: 40px; /* Adjust spacing between menu items */
-  color: black;
-  font-size: 18px;
-  margin-left: 160px; /* Move the navbar menu 1 inch to the right */
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
 }
 
-/* Styling for each menu item */
 .navbar-menu li {
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  font-weight: 500;
+  color: #333;
 }
 
-/* Image inside the navbar menu */
-.navbar-menu li img {
-  margin-right: 5px;
+.navbar-menu .active {
+  color: #ff4d4f;
 }
 
-/* Ensure underline is always present for Home, Catalog, and Contact Us */
-.navbar-menu li span,
-.navbar-menu li a {
-  position: relative;
-  padding-bottom: 2px;
-  border-bottom: 2px solid #49557e;
-  text-decoration: none; /* Remove default underline */
-}
-
-/* Change text color and underline on hover */
-.navbar-menu li span:hover,
-.navbar-menu li a:hover {
-  color: #e67e22; /* Orange color */
-  border-bottom: 2px solid #e67e22;
-}
-
-/* Active class */
-.navbar .active {
-  color: #e67e22;
-  border-bottom: 2px solid #e67e22;
-}
-
-/* Styling for the navbar right section */
+/* Right Section */
 .navbar-right {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 60px; /* Adjust space between elements */
+  gap: 20px;
 }
 
-/* Search icon styling */
+.select-location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.location-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .navbar-searchicon {
   position: relative;
-  display: flex;
 }
 
-/* Dot near the search icon */
-.navbar-searchicon .dot {
+.navbar-searchicon img {
+  width: 28px;
+  cursor: pointer;
+}
+
+.dot {
   position: absolute;
-  min-width: 10px;
-  min-height: 10px;
-  background-color: tomato;
-  border-radius: 5px;
-  top: -8px;
-  right: -8px;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
 }
 
-/* Styling for the navbar profile */
+/* Login */
+.login-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.login-icon {
+  width: 20px;
+}
+
+/* Profile Dropdown */
 .navbar-profile {
   position: relative;
+  cursor: pointer;
 }
 
-/* Profile dropdown styling */
+.navbar-profile img {
+  width: 32px;
+}
+
 .nav-profile-dropdown {
   position: absolute;
-  display: none;
+  top: 40px;
   right: 0;
-  z-index: 1;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 10px;
+  width: 180px;
+  display: none;
+  flex-direction: column;
+  z-index: 100;
 }
 
 .navbar-profile:hover .nav-profile-dropdown {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #fff4f2;
-  padding: 12px 25px;
-  border-radius: 4px;
-  border: 1px solid tomato;
-  outline: 2px solid white;
-  list-style: none;
-  width: max-content;
 }
 
-/* Styling for each dropdown item */
 .nav-profile-dropdown li {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-/* Image inside the dropdown */
+.nav-profile-dropdown li:hover {
+  background-color: #f5f5f5;
+}
+
 .nav-profile-dropdown img {
   width: 20px;
 }
 
-/* Hover effect on dropdown items */
-.nav-profile-dropdown li:hover {
-  color: #e2a809;
-}
-
-/* Profile separator */
-.navbar-profile hr {
-  background-color: gray;
-  height: 1px;
-  border: none;
-}
-
-/* Search bar styling */
-.navbar-search {
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 200px;
-}
-
-.navbar-search input {
-  width: 100%;
-  padding: 10px;
-  padding-right: 30px;
-  border: 1px solid black;
-  border-radius: 20px;
-  font-size: 14px;
-}
-
-.navbar-search .search-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: auto;
-  cursor: pointer;
-}
-
-.navbar-search input:focus {
-  border-color: #ad2727;
-}
-
-.navbar-search input::placeholder {
-  color: #888;
-}
-
-/* Address Box Styling */
-.address-in-navbar {
-  font-size: 14px;
-  color: #49557e;
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
-  position: fixed; /* Fixed to the window */
-  top: 20px; /* Adjust top position */
-  right: 20px; /* Adjust right position */
-  width: 300px; /* Fixed width */
-  height: 300px; /* Ensure it's large enough */
-  overflow-y: scroll; /* Always allow scrolling */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow */
-  z-index: 2000; /* Ensure it appears above other content */
-  border: 1px solid #d9d9d9;
-  animation: fadeIn 0.3s ease-in-out;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
-  word-wrap: break-word; /* Ensure address text wraps to new line */
-}
-
-/* Add a title bar for the address box */
-.address-in-navbar .address-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
-
-/* Styling for truncated address */
-.address-in-navbar .address {
-  display: block;
-  max-height: 60px; /* Limit the height when truncated */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Show full address when clicked */
-.address-in-navbar .address.expanded {
-  max-height: none; /* Remove the height limit */
-  white-space: normal; /* Allow the text to wrap to multiple lines */
-  text-overflow: clip; /* Remove ellipsis when expanded */
-}
-
-/* Show "Show more" or "Show less" based on state */
-.address-in-navbar .toggle-address {
-  color: #ad2727;
-  cursor: pointer;
-  font-size: 14px;
-  text-decoration: underline;
-}
-
-/* Close button for the box */
-.address-in-navbar .close-btn {
-  background-color: transparent;
-  border: none;
-  font-size: 18px;
-  color: #ad2727;
-  cursor: pointer;
-}
-
-.address-in-navbar .close-btn:hover {
-  color: #e74c3c;
-}
-
-/* Scrollbar aesthetics */
-.address-in-navbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.address-in-navbar::-webkit-scrollbar-thumb {
-  background-color: #ad2727;
-  border-radius: 10px;
-}
-
-.address-in-navbar::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
-}
-
-/* Animation for smoother appearance */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .navbar{
+    gap:20px;
+    padding-left: 0px;
+    padding-right: 0px;
+    align-items: center;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .hamburger {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo{
+    height: 50px;
+    cursor: pointer;
+  }
+  .navbar-profile img{
+    width:15px;
+    padding-left: 0px;
+
+  }
+  .basket-icon{
+    height: 25px;
+    width: auto;
+  }
+  .location-icon{
+    height: 20px;
+    width: auto;
+  }
+
+  .navbar-center {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column;
+    display: none;
+  }
+
+  .navbar-center.mobile-open {
+    display: flex;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+    align-items: center;
+    font-size: 15px;
+  }
+
+  .navbar-right {
+    padding:10px;
+    gap: 10px;
+    align-items: center;
+    place-items: center;
+  }
+
+  .select-location span {
+    display: none;
+  }
+
+  .nav-profile-dropdown {
+    right: -30px;
   }
 }
