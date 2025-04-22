@@ -3,7 +3,7 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
-export const socket = io("http://localhost:5000");  // replace with your server URL
+export const socket = io("https://admin-92vt.onrender.com");  // replace with your server URL
 
 
 export const StoreContext = createContext(null);
