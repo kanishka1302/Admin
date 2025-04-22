@@ -4,10 +4,10 @@ import basketicon from './cart.gif';
 import chicken from './Chicken.png';
 import mutton from './Mutton.png';
 import eggs from './Eggs.png';
-import fish from './Fish.png';
+import fish from './fish.png';
 import prawns from './Prawns.png';
 import food_1 from './food_1.png';
-import fish1 from './fish1.png';
+import fish1 from './Fish1.png';
 import insta from './instagram.png';
 import yt from './youtube.png';
 import fb from './facebook.png';
@@ -46,13 +46,14 @@ import prawns_crabs from './Prawns_crabs.png';
 import fishz from './fishz.png';
 import muttonz from './mutttonz.png';
 import bonelezchicken from './bonelezchicken.png';
-import installBanner from './installbanner.jpg';
+import installBanner from './installBanner.jpg';
 import add_icon_green from './add_icon_green.png'; // Add to cart icon
 import remove_icon_red from './remove_icon_red.png'; // Remove from cart icon
 import chaticon from './chaticon.png';
 import addCart from './add_cart.gif';
 import Banner2 from './Banner2.jpg';
 import Banner1 from './Banner1.jpg';
+import oderconfirmm from './orderconfirmm.gif';
 
 export const assets = {
   logo,
