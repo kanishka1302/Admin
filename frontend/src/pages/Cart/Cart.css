@@ -62,7 +62,7 @@
 }
 
 /* Weight, Price, and Quantity Alignment */
-.cart-item-details p:nth-child(4), 
+.cart-item-details p:nth-child(4),
 .cart-item-details p:nth-child(5) {
   text-align: center;
   flex: 1;
@@ -226,7 +226,121 @@
 .checkout-button:hover {
   background-color: #45a049;
 }
-.add-cart{
-  width:75px;
+
+.add-cart {
+  width: 75px;
   height: 75px;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .promo-code-section {
+    margin-left: 150px;
+    margin-right: 150px;
+    width: 100%;
+  }
+
+  .cart-summary {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+
+  .cart-actions {
+    gap: 60px;
+  }
+}
+
+/* Mobile View Styles */
+@media (max-width: 768px) {
+  /* Shop name section font size */
+  .shop-name-section {
+    font-size: 20px;
+  }
+
+  .shop-name {
+    font-size: 22px;
+    padding: 5px 8px;
+    margin-bottom: 10px;
+  }
+
+  /* Cart Item Image */
+  .cart-item-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* Cart Item Text */
+  .cart-item-details p {
+    font-size: 14px;
+  }
+
+  /* Adjust Cart Item Layout */
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item-actions {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .cart-item-details {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item-details p:nth-child(4),
+  .cart-item-details p:nth-child(5) {
+    text-align: left;
+  }
+
+  /* Promo code section on mobile */
+  .promo-code-section {
+    margin-left: 20px;
+    margin-right: 20px;
+    width: 90%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .promo-input {
+    width: 80%;
+  }
+
+  .apply-promo-button {
+    width: 80%;
+    margin-top: 10px;
+  }
+
+  /* Cart Summary on mobile */
+  .cart-summary {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  /* Cart Actions on mobile */
+  .cart-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .continue-shopping-button,
+  .checkout-button {
+    width: 100%;
+    min-width: 200px;
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  /* Empty Cart Section */
+  .empty-cart {
+    height: auto;
+    padding: 20px;
+  }
+
+  .add-cart {
+    width: 50px;
+    height: 50px;
+  }
 }
