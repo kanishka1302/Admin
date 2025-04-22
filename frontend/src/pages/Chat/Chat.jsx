@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./Chat.css";
 import chaticon from "../../assets/chaticon.png";
+
+
 
 // Helper: Get unique chat key per user
 const getInitialChatKey = () => {
@@ -35,6 +37,7 @@ const Chat = () => {
   const [isChatVisible, setIsChatVisible] = useState(true); // New state to control visibility
   const messagesEndRef = useRef(null);
   const [conversationState, setConversationState] = useState("initial");
+  const location = useLocation();
 
   useEffect(() => {
     ticketIdRef.current = ticketId;
@@ -62,6 +65,15 @@ const Chat = () => {
       localStorage.setItem(chatKey, JSON.stringify(defaultMsg));
     }
   }, [chatKey]);
+
+  
+  useEffect(() => {
+    if (location.pathname === "/chat") {
+      setIsChatVisible(true);
+      setIsMinimized(false); // optional: un-minimize when navigating back
+    }
+  }, [location]);
+
 
   useEffect(() => {
     const persistable = messages.filter((msg) => typeof msg.text === "string");
