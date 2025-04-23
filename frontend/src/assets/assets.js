@@ -52,7 +52,7 @@ import remove_icon_red from './remove_icon_red.png'; // Remove from cart icon
 import chaticon from './chaticon.png';
 import addCart from './add_cart.gif';
 import Banner2 from './Banner2.jpg';
-import Banner1 from './Banner1.jpg';
+import Banner1 from './Banner1.png';
 import oderconfirmm from './orderconfirmm.gif';
 
 export const assets = {
