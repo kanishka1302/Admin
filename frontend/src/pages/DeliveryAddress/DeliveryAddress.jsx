@@ -171,7 +171,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
       const mobileNumber = address.ownerMobile;
 
       const response = await axios.delete(
-        `http://localhost:5000/api/address/delete/${addressId}/${mobileNumber}`
+        `https://admin-92vt.onrender.com/api/address/delete/${addressId}/${mobileNumber}`
       );
 
       if (response.data.success) {
