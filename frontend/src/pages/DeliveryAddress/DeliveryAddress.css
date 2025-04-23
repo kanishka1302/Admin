@@ -406,6 +406,17 @@ button:focus, input[type="radio"]:focus {
     gap: 15px;
   }
 }
+.locationRadio-btn{
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.locationRadio-btn label{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  
+}
 
 @media (max-width: 480px) {
   .delivery-address {
@@ -431,5 +442,11 @@ button:focus, input[type="radio"]:focus {
 
   button {
     font-size: 14px;
+  }
+  .locationRadio-btn{
+    gap: 10px;
+  }
+  .locationRadio-btn label{
+    gap: 5px;
   }
 }
