@@ -34,7 +34,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-const allowedOrigins = ['https://frontend-31u7.onrender.com'];
+// CORS Configuration
+const allowedOrigins = [
+  'https://frontend-31u7.onrender.com',  // Frontend domain
+  'https://admin-1-55sr.onrender.com',   // Admin domain
+];
 
 // Path for uploads
 const __filename = fileURLToPath(import.meta.url);
@@ -42,8 +46,16 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
 app.use(cors({
-  origin: allowedOrigins,  // Allow only this frontend domain
-  credentials: true,
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      // Allow the origin (if it's one of the allowed origins)
+      callback(null, true);
+    } else {
+      // Reject any other origin
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow cookies or credentials to be sent
 }));
 
 app.use(express.json());
@@ -67,10 +79,10 @@ const razorpay = new Razorpay({
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
+    origin: allowedOrigins,  // Allow only the Frontend and Admin domains
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+    credentials: true, // Allow cookies or credentials to be sent
   },
 });
 
