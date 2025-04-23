@@ -1,80 +1,85 @@
-import { useContext } from 'react';
-import './FoodItem.css';
-import { assets } from '../../assets/assets';
-import { StoreContext } from '../../Context/StoreContext';
-import { toast } from 'react-toastify'; // Importing toast
-import PropTypes from 'prop-types'; // Importing PropTypes
+import { useContext } from "react";
+import PropTypes from "prop-types";
+import { toast } from "react-toastify";
+import "./FoodItem.css";
+import { StoreContext } from "../../Context/StoreContext";
+import { assets } from "../../assets/assets";
 
 const FoodItem = ({ id, name, price, description, image }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
 
-  // Function to get the correct image path
-  const getImagePath = (image) => {
-    // If image starts with "http", return it as is, else add the base URL
-    const imagePath = image?.startsWith('http') ? image :` ${url}/images/${image}`;
-    console.log('Image Path:', imagePath);  // Debugging the image path
-    return imagePath;
+  const getImagePath = (img) => {
+    return img?.startsWith("http") ? img : `${url}/images/${img}`;
   };
 
-  const handleAddToCart = (id) => {
+  const handleAdd = () => {
     addToCart(id);
-    toast.success(`${name} added to cart!`); // Success toast when item is added
+    toast.success(`${name} added to cart!`);
   };
 
-  const handleRemoveFromCart = (id) => {
+  const handleRemove = () => {
     removeFromCart(id);
-    toast.info(`${name} removed from cart!`); // Info toast when item is removed
+    toast.info(`${name} removed from cart!`);
   };
+
+  const quantity = cartItems[id] || 0;
 
   return (
     <div className="food-item">
       <div className="food-item-img-container">
-        <img className="food-item-image" src={getImagePath(image)} alt={name} />
-        {!cartItems[id] ? (
+        <img
+          className="food-item-image"
+          src={getImagePath(image)}
+          alt={`Image of ${name}`}
+        />
+
+        {quantity === 0 ? (
           <img
             className="add"
-            onClick={() => handleAddToCart(id)}
-            src={assets.add_icon_green} // Using the new add to cart icon
+            src={assets.add_icon_green}
             alt="Add to cart"
+            onClick={handleAdd}
+            role="button"
           />
         ) : (
           <div className="food-item-counter">
             <img
-              onClick={() => handleRemoveFromCart(id)}
-              src={assets.remove_icon_red} // Using the new remove from cart icon
-              alt="Remove from cart"
+              src={assets.remove_icon_red}
+              alt="Remove one"
+              onClick={handleRemove}
+              role="button"
             />
-            <p>{cartItems[id]}</p>
+            <p>{quantity}</p>
             <img
-              onClick={() => handleAddToCart(id)}
-              src={assets.add_icon_green} // Using the new add more icon
-              alt="Add more"
+              src={assets.add_icon_green}
+              alt="Add one more"
+              onClick={handleAdd}
+              role="button"
             />
           </div>
         )}
       </div>
+
       <div className="food-item-info">
         <div className="food-item-name-rating">
           <p>{name}</p>
         </div>
         <p className="food-item-desc">{description}</p>
         <p className="food-item-weight">
-  {name.toLowerCase().includes('eggs') ? '1 dozen' : '500 g'}
-</p>
-
-        <p className="food-item-price">Rs.{price}</p>
+          {name.toLowerCase().includes("eggs") ? "1 dozen" : "500 g"}
+        </p>
+        <p className="food-item-price">Rs. {price}</p>
       </div>
     </div>
   );
 };
 
-// Adding prop types
 FoodItem.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
   description: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired
+  image: PropTypes.string.isRequired,
 };
 
 export default FoodItem;
