@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 //import Map from "../Map/Map";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./DeliveryAddress.css";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
@@ -26,12 +28,10 @@ const DeliveryAddress = ({ onSelectAddress }) => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const mobileNumber = storedUser?.mobileNumber;
-  
+
     if (mobileNumber) {
-      // Set userId directly from storedUser if available
       setUserId(storedUser._id || null);
-  
-      // ✅ Fetch addresses independently
+
       axios.get(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`)
         .then((res) => {
           console.log("✅ Fetched addresses:", res.data);
@@ -42,6 +42,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
         });
     }
   }, []);
+
   useEffect(() => {
     const storedSelected = localStorage.getItem("selectedAddress");
     setSelectedAddress(storedSelected ? JSON.parse(storedSelected) : null);
@@ -53,43 +54,57 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }
   }, [selectedAddress]);
 
+  const fetchAddresses = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const mobileNumber = storedUser?.mobileNumber;
+    if (mobileNumber) {
+      try {
+        const res = await axios.get(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`);
+        setAddresses(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("❌ Error fetching addresses:", err);
+      }
+    }
+  };
+
   const handleAddOrUpdateAddress = async () => {
     const { name, mobileNumber, address, city, state, pincode } = newAddress;
-  
+
     if (name && mobileNumber && address && city && state && pincode) {
       try {
         const sanitizedAddress = { ...newAddress };
-        if (!editIndex && sanitizedAddress._id) {
-          delete sanitizedAddress._id; // avoid duplicate _id
+         // If editing, we shouldn't pass the _id as part of the sanitized address
+         if (editIndex === null && sanitizedAddress._id) {
+          delete sanitizedAddress._id;
         }
-  
-        // 📌 Use the login mobile number as the owner
+
         const loginMobile = JSON.parse(localStorage.getItem("user"))?.mobileNumber;
-  
+
         const response = await axios.post("https://admin-92vt.onrender.com/api/address/save", {
           ownerId: userId,
           contactAddress: {
             ...sanitizedAddress,
             ownerMobile: loginMobile,
-          }, 
+          },
         });
-  
+
         const saved = response.data.address;
-  
         const updatedAddresses = [...addresses];
-        if (editIndex !== null) {
+
+        if (editIndex === null && sanitizedAddress._id) {
           updatedAddresses[editIndex] = saved;
-  
-          if (selectedAddress?.pincode === addresses[editIndex].pincode) {
+
+          if (selectedAddress?._id === addresses[editIndex]._id) {
             setSelectedAddress(saved);
             localStorage.setItem("selectedAddress", JSON.stringify(saved));
           }
         } else {
           updatedAddresses.push(saved);
         }
-  
-        setAddresses(updatedAddresses);
+
+        await fetchAddresses();
         setShowForm(false);
+        setEditIndex(null);
         setNewAddress({
           name: "",
           mobileNumber: "",
@@ -100,16 +115,16 @@ const DeliveryAddress = ({ onSelectAddress }) => {
           pincode: "",
           country: "India",
         });
-        setEditIndex(null);
+
+        toast.success("Address saved successfully!");
       } catch (err) {
         console.error("❌ Failed to save address:", err);
-        alert("Something went wrong while saving the address.");
+        toast.error("Something went wrong while saving the address.");
       }
     } else {
-      alert("Please fill in all required fields");
+      toast.warn("Please fill in all required fields.");
     }
   };
-  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -149,16 +164,26 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }
   };
 
-  const handleDeleteAddress = (index) => {
-    const updatedAddresses = addresses.filter((_, i) => i !== index);
-    setAddresses(updatedAddresses);
+  const handleDeleteAddress = async (index) => {
+    try {
+      const address = addresses[index];
+      const addressId = address._id;
+      const mobileNumber = address.ownerMobile;
 
-    if (selectedAddress && addresses[index]?._id === selectedAddress._id) {
-      setSelectedAddress(null);
-      localStorage.removeItem("selectedAddress");
+      const response = await axios.delete(
+        `http://localhost:5000/api/address/delete/${addressId}/${mobileNumber}`
+      );
+
+      if (response.data.success) {
+        toast.success("Address deleted successfully");
+        fetchAddresses();
+      } else {
+        toast.error("Failed to delete address");
+      }
+    } catch (error) {
+      console.error("❌ Error deleting address:", error);
+      toast.error("Error deleting address");
     }
-
-    // Optional: Delete from backend (not implemented in your backend yet)
   };
 
   const handleEditAddress = (index) => {
@@ -179,7 +204,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
                 type="radio"
                 name="selectedAddress"
                 className="radio-left"
-                //checked={selectedAddress?._id === addr._id}
+                checked={selectedAddress?._id === addr._id}
                 onChange={() => handleSelectAddress(addr)}
               />
               <div className="address-card">
@@ -197,6 +222,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
         ) : (
           <p>No addresses available. Please add one.</p>
         )}
+
         <div className="address-card add-new" onClick={() => setShowForm(true)}>
           <h4>Add New Address</h4>
           <p>Click here to add new address</p>
@@ -208,7 +234,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
         <div className="address-form">
           <h4>{editIndex !== null ? "Edit Address" : "Add New Address"}</h4>
 
-          <div>
+          <div className="locationRadio-btn">
             <label><input type="radio" name="type" value="Home" checked={newAddress.type === "Home"} onChange={handleInputChange} /> Home</label>
             <label><input type="radio" name="type" value="Office" checked={newAddress.type === "Office"} onChange={handleInputChange} /> Office</label>
             <label><input type="radio" name="type" value="Others" checked={newAddress.type === "Others"} onChange={handleInputChange} /> Others</label>
