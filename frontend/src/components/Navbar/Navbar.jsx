@@ -38,26 +38,18 @@ const Navbar = ({ setShowLogin }) => {
 
   const handleSelectLocation = () => setIsPopupOpen(true);
 
-  const onLocationSubmit = (message) => {
-    // Extract pincode using regex (first valid 6-digit pincode in the message)
-    const match = message.match(/\b\d{6}\b/);
-    const pincode = match?.[0];
-  
-    // Validate the extracted pincode
-    if (!pincode || message.length > 100 || message.length < 6) {
-      alert('Please enter a valid 6-digit pincode.');
-      return;
-    }
-  
-    // Set selected location for UI
-    setSelectedLocation(message);
+  const onLocationSubmit = (locationName) => {
+    // Set the selected location name in the UI
+    setSelectedLocation(locationName);
     setIsPopupOpen(false);
   
-    // Update user data in localStorage
+    // Save the full location name in localStorage user address
     const storedUser = JSON.parse(localStorage.getItem('user')) || {};
-    const updatedUser = { ...storedUser, address: pincode };
+    const updatedUser = { ...storedUser, address: locationName };
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
+  
+  
   
 
   const logout = () => {
