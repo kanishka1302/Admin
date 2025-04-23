@@ -38,6 +38,7 @@ const port = process.env.PORT || 5000;
 const allowedOrigins = [
   'https://frontend-31u7.onrender.com',  // Frontend domain
   'https://admin-1-55sr.onrender.com',   // Admin domain
+  'https://admin-92vt.onrender.com',
 ];
 
 // Path for uploads
