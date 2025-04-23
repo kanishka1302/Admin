@@ -7,8 +7,14 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
   const [fullAddress, setFullAddress] = useState('');
   const [showFullAddress, setShowFullAddress] = useState(false);
 
+  // Map pincodes to location names
+  const serviceableLocations = {
+    '500089': 'Manikonda, Telangana',
+    '500075': 'Narsingi, Telangana',
+  };
+
   const handlePinCodeChange = (e) => {
-    setPinCode(e.target.value);
+    const value = e.target.value;
     if (/^\d{0,6}$/.test(value)) {
       setPinCode(value);
     }
@@ -16,30 +22,32 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (pinCode.length === 6) {
-      // Handle valid pincode scenario
-      if (pinCode === "500089") {
-        onLocationSubmit("Manikonda, Telangana");
-        setLocationMessage(""); // Clear any previous error message
-        onClose(); // Close the popup
+      const location = serviceableLocations[pinCode];
+      if (location) {
+        onLocationSubmit(location); // ✅ Send location name
+        setLocationMessage('');
+        onClose();
       } else {
         setLocationMessage(
           <>
             ✨ We're not in your area yet, but we're growing! Currently, our
-            service is available in{" "}
-            <span className="highlight">Manikonda</span> and{" "}
+            service is available in{' '}
+            <span className="highlight">Manikonda</span> and{' '}
             <span className="highlight">Narsingi</span>. Stay tuned for updates! 🍽️
           </>
         );
       }
     } else {
-      // Handle invalid pincode length scenario
-      setLocationMessage(<span className="highlight">Please enter a valid 6-digit pincode.</span>);
+      setLocationMessage(
+        <span className="highlight">Please enter a valid 6-digit pincode.</span>
+      );
     }
   };
+
   const toggleAddressVisibility = () => {
-    setShowFullAddress((prevState) => !prevState);
+    setShowFullAddress((prev) => !prev);
   };
 
   return (
@@ -49,7 +57,7 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
           &times;
         </span>
         <h2>Select Location</h2>
-       
+
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -70,29 +78,23 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
         {fullAddress && (
           <div className="address-container">
             <p>
-              <strong>Address:</strong>
+              <strong>Address:</strong>{' '}
               {showFullAddress ? (
-                <span>
+                <>
                   {fullAddress}
-                  <span
-                    className="toggle-address"
-                    onClick={toggleAddressVisibility}
-                  >
+                  <span className="toggle-address" onClick={toggleAddressVisibility}>
                     {' '}
                     ^ Hide Full Address
                   </span>
-                </span>
+                </>
               ) : (
-                <span>
+                <>
                   {fullAddress.substring(0, 50)}...{' '}
-                  <span
-                    className="toggle-address"
-                    onClick={toggleAddressVisibility}
-                  >
+                  <span className="toggle-address" onClick={toggleAddressVisibility}>
                     {' '}
                     ^ Show Full Address
                   </span>
-                </span>
+                </>
               )}
             </p>
           </div>
