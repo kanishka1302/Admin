@@ -9,24 +9,33 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
 
   const handlePinCodeChange = (e) => {
     setPinCode(e.target.value);
+    if (/^\d{0,6}$/.test(value)) {
+      setPinCode(value);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (pinCode === "500089") {
-      onLocationSubmit("Manikonda, Telangana");
-      setLocationMessage("");
-      onClose();
+    
+    if (pinCode.length === 6) {
+      // Handle valid pincode scenario
+      if (pinCode === "500089") {
+        onLocationSubmit("Manikonda, Telangana");
+        setLocationMessage(""); // Clear any previous error message
+        onClose(); // Close the popup
+      } else {
+        setLocationMessage(
+          <>
+            ✨ We're not in your area yet, but we're growing! Currently, our
+            service is available in{" "}
+            <span className="highlight">Manikonda</span> and{" "}
+            <span className="highlight">Narsingi</span>. Stay tuned for updates! 🍽️
+          </>
+        );
+      }
     } else {
-      setLocationMessage(
-        <>
-          ✨ We're not in your area yet, but we're growing! Currently, our
-          service is available in{" "}
-          <span className="highlight">Manikonda</span> and{" "}
-          <span className="highlight">Narsingi</span>. Stay tuned for updates!
-          🍽️
-        </>
-      );
+      // Handle invalid pincode length scenario
+      setLocationMessage(<span className="highlight">Please enter a valid 6-digit pincode.</span>);
     }
   };
   const toggleAddressVisibility = () => {
@@ -44,10 +53,11 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Enter Pincode"
+            placeholder="Enter 6-Digit Pincode"
             value={pinCode}
             onChange={handlePinCodeChange}
             required
+            maxLength={6}
             className="pincode-input"
           />
           <button type="submit" className="otp-button">
