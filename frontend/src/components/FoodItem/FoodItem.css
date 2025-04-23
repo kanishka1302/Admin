@@ -1,114 +1,118 @@
 /* Container for food items */
 .food-item {
-  width: 300px; /* Set a fixed width for each item */
-  margin: 30px 0;
-  border-radius: 10px; /* Rounded corners for a smoother look */
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1); /* Soft shadow to create depth */
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth hover effect */
-  animation: fadeIn 1s ease-out; /* Fade-in animation */
+  width: 100%;
+  max-width: 300px;
+  margin: 1.5rem auto;
+  border-radius: 10px;
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeIn 0.8s ease-out;
   display: flex;
   flex-direction: column;
-  background: #fff; /* White background for the inner container */
-  overflow: hidden; /* Hide the content that overflows */
-  position: relative;
 }
 
-/* Outer container (double-layer effect) */
+.food-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient background outer layer */
 .food-item::before {
   content: "";
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  background: linear-gradient(145deg, #ffc1c1, #ff9999); /* Light red gradient for the outer layer */
-  border-radius: 12px; /* Rounded corners for the outer layer */
-  z-index: -1; /* Place the outer layer behind the inner container */
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2); /* Slight shadow around the outer container */
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  background: linear-gradient(135deg, #ffc1c1, #ff9999);
+  border-radius: 12px;
+  z-index: -1;
 }
 
-/* Food item image styling */
+/* Food image */
 .food-item-image {
   width: 100%;
-  height: 200px; /* Set a fixed height for consistency */
-  object-fit: cover; /* Crop the image to fit */
-  border-radius: 10px 10px 0 0; /* Rounded top corners */
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
   transition: transform 0.3s ease-in-out;
 }
 
-/* Hover effect for the image */
 .food-item:hover .food-item-image {
-  transform: scale(1.1); /* Zoom in the image on hover */
+  transform: scale(1.05);
 }
 
-/* Food item info section */
+/* Content section */
 .food-item-info {
-  padding: 15px;
-  color: #333; /* Dark text color */
+  padding: 1rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-/* Name and rating section */
 .food-item-name-rating {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .food-item-name-rating p {
-  font-size: 22px;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #222; /* Dark text for names */
+  color: #222;
 }
 
 .food-item-name-rating img {
-  max-width: 60px;
-  height: auto;
+  height: 24px;
+  object-fit: contain;
 }
 
-/* Description section */
 .food-item-desc {
-  color: #777; /* Light gray for description text */
-  font-size: 14px;
-  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #777;
+  line-height: 1.4;
 }
 
-/* Weight label style */
 .food-item-weight {
-  font-size: 18px;
-  font-weight: 500;
-  color: #444; /* Dark gray for weight */
-  margin: 5px 0;
+  font-size: 1rem;
+  color: #555;
 }
 
-/* Price styling */
 .food-item-price {
-  color: #FFD700; /* Gold color for price */
-  font-size: 28px;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin: 10px 0;
+  color: #FFD700;
 }
 
-/* Add to cart button styling */
+/* Add to Cart Button */
 .food-item-img-container .add {
-  width: 40px;
-  height: 40px;
   position: absolute;
   bottom: 20px;
   right: 20px;
-  cursor: pointer;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background-color: #B22222; /* Deep red button */
-  color: white;
-  font-size: 24px;
+  background-color: #b22222;
+  color: #fff;
+  font-size: 1.2rem;
   display: flex;
-  justify-content: center;
   align-items: center;
-  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow around button */
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Counter container style */
+.food-item-img-container .add:hover {
+  background-color: #a11a1a;
+  transform: scale(1.05);
+}
+
+/* Counter (if used) */
 .food-item-counter {
   position: absolute;
   bottom: 15px;
@@ -116,30 +120,43 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px;
-  border-radius: 30px;
+  padding: 5px 10px;
   background-color: #fff;
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for counter */
+  border-radius: 20px;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .food-item-counter img {
-  width: 35px;
+  width: 28px;
 }
 
-/* Footer styling */
-footer {
-  background-color: #8B0000; /* Deep red background for footer */
-  color: white;
-  text-align: center;
-  padding: 30px;
-  width: 100%;
-  position: relative;
-  margin-top: auto; /* Keeps footer at the bottom */
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Add spacing between the footer and content */
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ensure the footer is at the bottom of the page */
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .food-item {
+    margin: 1rem auto;
+  }
+
+  .food-item-image {
+    height: 160px;
+  }
+
+  .food-item-name-rating p {
+    font-size: 1rem;
+  }
+
+  .food-item-price {
+    font-size: 1.3rem;
+  }
 }
