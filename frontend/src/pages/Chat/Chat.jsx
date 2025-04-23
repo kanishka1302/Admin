@@ -22,7 +22,7 @@ const getInitialChatKey = () => {
   return "chatMessages_default";
 };
 
-const socket = io("https://admin-92vt.onrender.com");
+const socket = io("http://localhost:5000");
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -228,7 +228,7 @@ const Chat = () => {
       const parsedUser = JSON.parse(storedUser);
       const { mobileNumber } = parsedUser;
   
-      const response = await fetch("https://admin-92vt.onrender.comapi/tickets/create", {
+      const response = await fetch("http://localhost:5000/api/tickets/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ issue, mobileNumber }),
