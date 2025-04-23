@@ -9,7 +9,6 @@ import http from "http";
 import { Server } from "socket.io";
 import { generateOrderId } from "./utils/generateOrderId.js";
 
-
 // Config and DB
 import { connectDB } from "./config/db.js";
 
@@ -35,16 +34,17 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+const allowedOrigins = ['https://frontend-31u7.onrender.com'];
+
 // Path for uploads
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
 app.use(cors({
-  origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
+  origin: allowedOrigins,  // Allow only this frontend domain
   credentials: true,
 }));
-
 
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -63,16 +63,42 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+// ✅ Socket.IO Server Setup
+const server = http.createServer(app);
+export const io = new Server(server, {
+  cors: {
+    origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  },
+});
+
+// ✅ Handle socket connections
+io.on("connection", (socket) => {
+  console.log("🔥 Socket connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("❌ Socket disconnected:", socket.id);
+  });
+
+  // Custom listener for order updates (if needed)
+  socket.on("order-placed", (data) => {
+    console.log("📦 Order received via socket:", data);
+    io.emit("new-order", data); // Broadcast to all
+  });
+});
+
 // ✅ Razorpay Order Creation
 app.post("/api/order/razorpay", async (req, res) => {
   try {
     const { address, items, amount, userId, shopName, discountApplied, promoCode } = req.body;
-    if (!userId || !address || !items || !amount || isNaN(amount) || amount <= 0) {
+    if (!userId || !address || !items || amount <= 0) {
       return res.status(400).json({ error: "Invalid request data" });
     }
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // ✅ Convert to paise
+      amount: amount * 100, // Convert to paise
       currency: "INR",
       receipt: `order_rcptid_${Date.now()}`,
       notes: {
@@ -80,27 +106,26 @@ app.post("/api/order/razorpay", async (req, res) => {
         items: JSON.stringify(items),
       },
     });
-    
+
     if (!order) throw new Error("Razorpay order creation failed");
-    
+
     const newOrder = new orderModel({
       userId,
       address,
       items,
-      amount, // ✅ Store in rupees
+      amount, // Store in rupees
       orderId: order.id,
       paymentMethod: "razorpay",
       status: "Order Received",
       payment: false,
       shopName,
-      discountApplied, 
+      discountApplied,
       promoCode,
     });
-    
 
     await newOrder.save();
 
-    // ✅ Notify admin in real-time
+    // Notify admin in real-time
     io.emit("new-order", newOrder);
 
     res.json({ success: true, order });
@@ -110,7 +135,6 @@ app.post("/api/order/razorpay", async (req, res) => {
   }
 });
 
-// ✅ Razorpay Payment Verification
 // ✅ Razorpay Payment Verification
 app.post("/api/order/verify", async (req, res) => {
   try {
@@ -124,37 +148,31 @@ app.post("/api/order/verify", async (req, res) => {
       return res.status(400).json({ msg: "Transaction is not legit!" });
     }
 
-    // ✅ Find the order by Razorpay ID
     const existingOrder = await orderModel.findOne({ orderId: razorpay_order_id });
     if (!existingOrder) {
       return res.status(404).json({ msg: "Order not found" });
     }
 
-    // ✅ Generate your custom NV order ID
     const customOrderId = await generateOrderId();
 
-    // ✅ Update order's orderId and payment status
     existingOrder.orderId = customOrderId;
     existingOrder.payment = true;
     await existingOrder.save();
 
-    // ✅ Notify admin
+    // Notify admin
     io.emit("new-order", existingOrder);
 
-    // ✅ Send response with your custom orderId
     res.json({
       success: true,
       msg: "Payment verified successfully!",
       orderId: customOrderId,
       paymentId: razorpay_payment_id,
     });
-
   } catch (err) {
     console.error("Error verifying payment:", err.message);
     res.status(500).json({ error: "Verification failed" });
   }
 });
-
 
 // ✅ Cash On Delivery Order
 app.post("/api/order/cod", async (req, res) => {
@@ -174,13 +192,13 @@ app.post("/api/order/cod", async (req, res) => {
       status: "Order Received",
       payment: false,
       shopName,
-      discountApplied, 
+      discountApplied,
       promoCode,
     });
 
     await newOrder.save();
 
-    // ✅ Notify admin in real-time
+    // Notify admin in real-time
     io.emit("new-order", newOrder);
 
     res.json({ success: true, orderId, message: "COD Order placed successfully." });
@@ -230,12 +248,6 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
-app.post("/api/login/create", async (req, res) => {
-  const { phoneNumber, verificationId } = req.body;
-  console.log("OTP requested for:", phoneNumber, "Verification ID:", verificationId);
-  res.status(200).json({ message: "OTP request logged" });
-});
-
 // ✅ API Routes
 app.use("/api/user", userRouter);
 app.use("/api/food", foodRouter);
@@ -258,32 +270,6 @@ app.get("/", (req, res) => {
 app.use("*", (req, res) => {
   console.warn(`❗ Invalid route: ${req.method} ${req.originalUrl}`);
   res.status(404).send(`Cannot ${req.method} ${req.originalUrl}`);
-});
-
-// ✅ Socket.IO Server Setup
-const server = http.createServer(app);
-export const io = new Server(server, {
-  cors: {
-    origin: "https://frontend-31u7.onrender.com",  // Allow only this frontend domain
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  },
-});
-
-// ✅ Handle socket connections
-io.on("connection", (socket) => {
-  console.log("🔥 Socket connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
-  });
-
-  // Custom listener (if needed)
-  socket.on("order-placed", (data) => {
-    console.log("📦 Order received via socket:", data);
-    io.emit("new-order", data); // Broadcast to all
-  });
 });
 
 // ✅ Start Server
