@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [cartItems, setCartItems] = useState([]);
+    const [cartItems, setCartItems] = useState({});
     const history = useHistory();
 
     useEffect(() => {
