@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './ExploreMenu.css';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 import NavigationPopup from '../Navigationpopup/Navigationpopup';
+import { StoreContext } from '../../Context/StoreContext'; 
 
 const ExploreMenu = () => {
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pendingCategory, setPendingCategory] = useState(null);
+  const { setLocation } = useContext(StoreContext);
+
 
   const menuItems = [
     { menu_name: 'chicken', image: assets.chicken, label: 'Chicken' },
@@ -24,14 +27,8 @@ const ExploreMenu = () => {
   }, []);
 
   const handleNavigation = (menuName) => {
-    if (!isLoggedIn) {
-      setPendingCategory(menuName);
-      setShowPopup(true);
-      return;
-    }
-
-    navigate(`/shops?category=${menuName}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setPendingCategory(menuName);
+    setShowPopup(true); // Show popup always when "Add" is clicked
   };
 
   const handlePopupClose = () => {
@@ -41,6 +38,7 @@ const ExploreMenu = () => {
 
   const handleLocationSubmit = (location) => {
     console.log('Location selected:', location);
+    setLocation(location); 
     setShowPopup(false);
 
     if (pendingCategory) {
