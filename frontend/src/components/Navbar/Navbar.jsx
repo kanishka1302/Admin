@@ -16,6 +16,7 @@ const Navbar = ({ setShowLogin }) => {
   const [selectedLocation, setSelectedLocation] = useState('Select Location');
   const [showChat, setShowChat] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
 
   const { getTotalCartAmount, token, setToken, clearCart } = useContext(StoreContext);
   const navigate = useNavigate();
