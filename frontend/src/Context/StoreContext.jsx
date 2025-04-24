@@ -299,6 +299,7 @@ const StoreContextProvider = ({ children }) => {
       value={{
         food_list,
         cartItems,
+        setCartItems,
         addToCart,
         removeFromCart,
         getTotalCartAmount,
