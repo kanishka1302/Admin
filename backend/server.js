@@ -259,7 +259,7 @@ app.use("*", (req, res) => {
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "*", // Change to frontend URL in production
+    origin: "https://frontend-31u7.onrender.com", // Change to frontend URL in production
     methods: ["GET", "POST"],
   },
 });
