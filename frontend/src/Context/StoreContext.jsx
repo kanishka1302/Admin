@@ -3,13 +3,13 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
-export const socket = io("https://admin-92vt.onrender.com");  // replace with your server URL
+export const socket = io("http://localhost:5000");  // replace with your server URL
 
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = ({ children }) => {
-  const url = "https://admin-92vt.onrender.com";
+  const url = "http://localhost:5000";
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
   const [userId, setUserId] = useState("");
@@ -23,6 +23,7 @@ const StoreContextProvider = ({ children }) => {
   const deliveryCharge = 50;
   const [selectedShop, setSelectedShop] = useState(() => localStorage.getItem("selectedShop") || "");
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [location, setLocation] = useState('Select Location');
 
   const [cartItems, setCartItems] = useState(() => {
     const storedCartItems = localStorage.getItem("cartItems");
@@ -37,6 +38,13 @@ const StoreContextProvider = ({ children }) => {
   // 💰 Wallet-related state
   const [walletBalance, setWalletBalance] = useState(0);
   const [transactionHistory, setTransactionHistory] = useState([]);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser && storedUser.address) {
+      setLocation(storedUser.address);
+    }
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -326,7 +334,8 @@ const StoreContextProvider = ({ children }) => {
         fetchTransactions,
         handleWalletPaymentSuccess,
         notify,
-        placeOrderWithWallet
+        placeOrderWithWallet,
+        setLocation
       }}
     >
       {children}
