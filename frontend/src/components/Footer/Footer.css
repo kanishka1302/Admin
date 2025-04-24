@@ -193,3 +193,60 @@
 .chat-button:hover {
   background-color: #8f0f15;
 }
+@media (max-width: 768px) {
+  /* Vendors Heading */
+  .vendors-heading {
+    font-size: 1.6em;
+    margin: 20px 0;
+  }
+
+  /* Scrolling Images */
+  .scrolling-images img {
+    height: 70px;
+    margin: 0 15px;
+  }
+
+  /* Footer Layout */
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-content-left,
+  .footer-content-center,
+  .footer-content-right {
+    max-width: 100%;
+  }
+
+  .footer-logo-section {
+    justify-content: center;
+  }
+
+  .app-download-platforms {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0;
+    gap: 10px;
+  }
+
+  .footer-social-icons {
+    justify-content: center;
+  }
+
+  .footer-social-icons img {
+    margin-right: 45px;
+    
+  }
+
+  .footer-content-center h2,
+  .footer-content-right h2 {
+    font-size: 1.4em;
+  }
+
+  .footer-content-center li,
+  .footer-content-right li {
+    font-size: 1em;
+  }
+}
