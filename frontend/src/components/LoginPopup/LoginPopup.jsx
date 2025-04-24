@@ -11,6 +11,8 @@ import { assets } from "../../assets/assets";
 import { StoreContext } from "../../Context/StoreContext.jsx";
 import { auth } from "../../firebase";
 import RegisterPopup from "../Registerpopup/Registerpopup.jsx";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
@@ -22,7 +24,7 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const requestOtp = async () => {
     if (phoneNumber.length !== 10) {
-      alert("Please enter a valid 10-digit phone number");
+      toast.success("Please enter a valid 10-digit phone number");
       return;
     }
 
@@ -35,23 +37,23 @@ const LoginPopup = ({ setShowLogin }) => {
       const confirmationResult = await signInWithPhoneNumber(auth, `+91${phoneNumber}`, window.recaptchaVerifier);
       
       setVerificationId(confirmationResult.verificationId);
-      alert("OTP sent!");
+      toast.success("OTP sent successfully!");
 
       // Ensure the URL is correct
-      await axios.post("https://admin-92vt.onrender.com/api/login/create", {
+      await axios.post("http://localhost:5000/api/login/create", {
         phoneNumber,
         verificationId: confirmationResult.verificationId,
       });
 
     } catch (error) {
       console.error("OTP Request Error:", error);
-      alert("Failed to send OTP: " + error.message);
+      toast.success("Failed to send OTP: " + error.message);
     }
   };
 
   const verifyOtp = async () => {
     if (!verificationId) {
-      alert("OTP session expired. Please request OTP again.");
+      toast.success("OTP session expired. Please request OTP again.");
       return;
     }
   
@@ -60,10 +62,10 @@ const LoginPopup = ({ setShowLogin }) => {
       const result = await signInWithCredential(auth, credential);
   
       if (result.user) {
-        alert("Phone number verified successfully");
+        toast.success("Phone number verified successfully");
   
         // Fetch user details from database
-        const response = await axios.post("https://admin-92vt.onrender.com/api/profile/check", {
+        const response = await axios.post("http://localhost:5000/api/profile/check", {
           mobileNumber: phoneNumber,
         });
   
@@ -91,7 +93,7 @@ const LoginPopup = ({ setShowLogin }) => {
       }
     } catch (error) {
       console.error("OTP Verification Error:", error);
-      alert("OTP verification failed: " + (error.response?.data?.message || error.message));
+      toast.success("OTP verification failed ");
     }
   };
   
