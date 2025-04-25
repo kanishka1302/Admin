@@ -63,6 +63,8 @@ const UserInfo = () => {
 
     fetchAddresses();
   }, []);
+  
+  const defaultAddress = userAddresses.find(addr => addr.default);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -178,10 +180,23 @@ const UserInfo = () => {
           ) : user.mobileNumber}
         </p>
 
-        <p><strong>Address:</strong>{" "}
-          {isEditing ? (
-            <input type="text" name="address" value={formData.address} onChange={handleChange} />
-          ) : user.address || "Not provided"}
+         <p><strong>Address:</strong>{" "}
+        <div>
+            {defaultAddress ? (
+              <div className="address-card">
+                <p className="type"><strong>Type:</strong> {defaultAddress.type || "N/A"}</p>
+                <p><strong>Name:</strong> {defaultAddress.name}</p>
+                <p><strong>Mobile:</strong> {defaultAddress.mobileNumber}</p>
+                <p><strong>Address:</strong> {defaultAddress.address}</p>
+                <p><strong>City:</strong> {defaultAddress.city}</p>
+                <p><strong>State:</strong> {defaultAddress.state}</p>
+                <p><strong>Pin Code:</strong> {defaultAddress.pincode}</p>
+                <p><strong>Country:</strong> {defaultAddress.country || "India"}</p>
+              </div>
+            ) : (
+              <p>No default address found.</p>
+            )}
+            </div>
         </p>
 
         <p><strong>Wallet Balance:</strong> ₹{walletBalance.toFixed(2)}</p>
