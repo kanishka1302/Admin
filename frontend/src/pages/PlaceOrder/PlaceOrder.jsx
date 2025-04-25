@@ -51,10 +51,36 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     setAttemptedSubmit(true);
+  
+    // Fetch addresses from the database using the user's mobile number
+    const fetchAddresses = async () => {
+      const storedUser = safeLocalStorage.get("user");
+      const mobileNumber = storedUser?.mobileNumber;
+  
+      if (!mobileNumber) {
+        toast.error("Unable to fetch addresses. Please log in again.");
+        return;
+      }
+  
+      try {
+        const response = await axios.get(`${url}/api/address/user/${mobileNumber}`);
+        if (response.data) {
+          console.log("Fetched addresses from database:", response.data);
+          setAddressList(response.data); // Set the addressList state with data from the database
+        } else {
+          setAddressList([]);
+          toast.warn("No addresses found in the database.");
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+        toast.error("Failed to fetch delivery addresses. Please try again later.");
+      }
+    };
+  
+    fetchAddresses();
+  
+    // Set the selected address if available
     const savedAddress = safeLocalStorage.get("selectedAddress");
-    const storedAddresses = safeLocalStorage.get("savedAddresses") || [];
-    setAddressList(storedAddresses);
- 
     if (savedAddress) {
       setSelectedAddress(savedAddress);
       setData((prevData) => ({
@@ -69,7 +95,6 @@ const PlaceOrder = () => {
       }));
     }
   }, []);
-  
 
   useEffect(() => {
     if (!token) {
