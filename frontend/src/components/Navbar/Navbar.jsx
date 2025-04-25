@@ -18,7 +18,7 @@ const Navbar = ({ setShowLogin }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
 
-  const { getTotalCartAmount, token, setToken, clearCart } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, clearCart, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,12 +36,17 @@ const Navbar = ({ setShowLogin }) => {
       localStorage.setItem('locationPopupShown', 'true');
     }
   }, [setToken]);
+  useEffect(() => {
+    // Update selectedLocation whenever location from context changes
+    setSelectedLocation(location);
+  }, [location]);  
 
   const handleSelectLocation = () => setIsPopupOpen(true);
 
   const onLocationSubmit = (locationName) => {
     // Set the selected location name in the UI
     setSelectedLocation(locationName);
+    setLocation(locationName);
     setIsPopupOpen(false);
   
     // Save the full location name in localStorage user address
@@ -49,10 +54,6 @@ const Navbar = ({ setShowLogin }) => {
     const updatedUser = { ...storedUser, address: locationName };
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
-  
-  
-  
-
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('cartItems');
@@ -60,6 +61,8 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem('user');
     setToken(null);
     clearCart();
+    setLocation('');
+    setSelectedLocation('Select Location');
     navigate('/');
   };
 
@@ -142,7 +145,7 @@ const Navbar = ({ setShowLogin }) => {
         {/* Location */}
         <div className="select-location" onClick={handleSelectLocation}>
           <img src={locationIcon} alt="Location Icon" className="location-icon" />
-          <span>{selectedLocation}</span>
+          <span>{selectedLocation || 'select location'}</span>
         </div>
 
         {/* Cart */}
