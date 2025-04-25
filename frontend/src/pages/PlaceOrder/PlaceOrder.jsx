@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import orderConfirmGif from "../../assets/orderconfirmm.gif";
 import DeliveryAddress from "../DeliveryAddress/DeliveryAddress";
+import { safeLocalStorage } from "../../../../backend/utils/localStorageHelper";
+
 
 const PlaceOrder = () => {
   const location = useLocation();
@@ -49,8 +51,8 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     setAttemptedSubmit(true);
-    const savedAddress = JSON.parse(localStorage.getItem("selectedAddress"));
-    const storedAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
+    const savedAddress = safeLocalStorage.get("selectedAddress");
+    const storedAddresses = safeLocalStorage.get("savedAddresses") || [];
     setAddressList(storedAddresses);
  
     if (savedAddress) {
@@ -106,8 +108,6 @@ const PlaceOrder = () => {
       return;
     }
     
-   
-
     if (!isFormComplete) {
       toast.error("Please complete all required fields.");
       return;
@@ -121,7 +121,7 @@ const PlaceOrder = () => {
         shopName: shopNames[item._id] || selectedShop?.name || "Unknown Shop",
       }));
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = safeLocalStorage.get("user");
     const userId = storedUser?.userId || storedUser?._id;
 
     if (!userId) {
