@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./DeliveryAddress.css";
+import { safeLocalStorage } from "../../../../backend/utils/localStorageHelper";
 
 const DeliveryAddress = ({ onSelectAddress }) => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
   });
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedUser = safeLocalStorage.get("user");
     const mobileNumber = storedUser?.mobileNumber;
 
     if (mobileNumber) {
@@ -44,8 +45,9 @@ const DeliveryAddress = ({ onSelectAddress }) => {
   }, []);
 
   useEffect(() => {
-    const storedSelected = localStorage.getItem("selectedAddress");
-    setSelectedAddress(storedSelected ? JSON.parse(storedSelected) : null);
+    const storedSelected = safeLocalStorage.get("selectedAddress");
+    setSelectedAddress(storedSelected || null);
+
   }, []);
 
   useEffect(() => {
@@ -59,7 +61,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     const mobileNumber = storedUser?.mobileNumber;
     if (mobileNumber) {
       try {
-        const res = await axios.get(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`);
+        const res = await axios.get(`https://admin-92vt.onrender.comapi/address/user/${mobileNumber}`);
         setAddresses(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("❌ Error fetching addresses:", err);
@@ -96,7 +98,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
 
           if (selectedAddress?._id === addresses[editIndex]._id) {
             setSelectedAddress(saved);
-            localStorage.setItem("selectedAddress", JSON.stringify(saved));
+            safeLocalStorage.set("selectedAddress", address);
           }
         } else {
           updatedAddresses.push(saved);
