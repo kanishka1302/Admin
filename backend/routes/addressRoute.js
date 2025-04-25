@@ -4,15 +4,19 @@ import Order from "../models/orderModel.js";  // Import the Order model
 
 const addressRouter = express.Router();
 
-// Updated to use ownerMobile + contact address
+// Save Address
 addressRouter.post("/save", async (req, res) => {
   const { ownerId, contactAddress } = req.body;
 
   try {
-    let savedAddress;
+    if (!contactAddress.ownerMobile || !contactAddress.name || !contactAddress.address) {
+      return res.status(400).json({ error: "Missing required address fields." });
+    }
 
     // Log the received data to check if _id is passed correctly
     console.log("Received address for saving:", contactAddress);
+
+    let savedAddress;
 
     if (contactAddress._id) {
       // If _id exists, update the existing address
@@ -25,12 +29,22 @@ addressRouter.post("/save", async (req, res) => {
     } else {
       // If _id doesn't exist, create a new address
       console.log("Creating new address as _id is not provided.");
+      const existingAddresses = await Address.find({ ownerId });
+      let isDefault = existingAddresses.length === 0; // Set first address as default
+
       const newAddress = new Address({
         ...contactAddress,
         ownerId,
         ownerMobile: contactAddress.ownerMobile,
+        default: isDefault,
       });
       savedAddress = await newAddress.save();
+      if (isDefault) {
+        await Address.updateMany(
+          { ownerId, _id: { $ne: savedAddress._id } }, 
+          { default: false } // Set all other addresses to non-default
+        );
+      }
     }
 
     res.json({ address: savedAddress });
@@ -40,8 +54,7 @@ addressRouter.post("/save", async (req, res) => {
   }
 });
 
-
-// Get addresses by owner mobile number instead of userId
+// Fetch addresses by owner mobile
 addressRouter.get("/user/:mobileNumber", async (req, res) => {
   console.log("Fetching addresses for mobile:", req.params.mobileNumber);
 
@@ -54,13 +67,7 @@ addressRouter.get("/user/:mobileNumber", async (req, res) => {
   }
 });
 
-// Get all addresses for testing
-addressRouter.get("/all", async (req, res) => {
-  const addresses = await Address.find({});
-  res.json(addresses);
-});
-
-// DELETE specific address by ID and validate mobile number
+// Delete address by ID
 addressRouter.delete("/delete/:addressId/:mobileNumber", async (req, res) => {
   const { addressId, mobileNumber } = req.params;
 
@@ -97,5 +104,4 @@ addressRouter.delete("/delete/:addressId/:mobileNumber", async (req, res) => {
     });
   }
 });
-
 export default addressRouter;
