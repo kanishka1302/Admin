@@ -172,64 +172,47 @@ const PlaceOrder = () => {
 
     try {
       if (paymentMethod === "razorpay") {
-  // Step 1: Request backend to create Razorpay order (just for payment, not full app order)
-  const response = await axios.post(`${url}/api/order/razorpay`, { amount: Math.round(totalAmount + deliveryCharge) }, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (response.data.success) {
-    const options = {
-      key: "rzp_test_eRSHa1kaUjMssI",
-      amount: response.data.order.amount,
-      currency: response.data.order.currency,
-      name: "NoVeg Pvt. Ltd.",
-      description: "Order Payment",
-      image: assets.logo,
-      order_id: response.data.order.id,
-      handler: async (paymentResponse) => {
-        try {
-          // Step 2: After payment success, verify and place app order
-          const verifyResponse = await axios.post(`${url}/api/order/verify`, {
-            razorpay_order_id: paymentResponse.razorpay_order_id,
-            razorpay_payment_id: paymentResponse.razorpay_payment_id,
-            razorpay_signature: paymentResponse.razorpay_signature,
-            orderData, // Now send full orderData to backend AFTER successful payment
-          }, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-
-          if (verifyResponse.data.success) {
-            const finalOrderId = verifyResponse.data.orderId;
-            toast.success("Payment Verified & Order Placed!");
-            setNewOrder({ ...orderData, _id: finalOrderId });
-            setOrderPlaced(true);
-            setTimeout(() => {
-              clearCart();
-              setCartItems({});
-              navigate("/myorders", {
-                state: { newOrder: { ...orderData, _id: finalOrderId } },
-              });
-            }, 2000);
-          } else {
-            toast.error("Payment verification failed.");
-          }
-        } catch (err) {
-          console.error("Verification error:", err);
-          toast.error("Server error verifying payment.");
-        }
-      },
-      prefill: {
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        contact: data.phone,
-      },
-      notes: { address: data.street },
-    };
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
-  }
-}
-
+        // Step 1: Request backend to create Razorpay order (just for payment, not full app order)
+        const response = await axios.post(`${url}/api/order/razorpay`, { amount: Math.round(totalAmount + deliveryCharge) }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      
+        if (response.data.success) {
+          const options = {
+            key: "rzp_test_eRSHa1kaUjMssI",
+            amount: response.data.order.amount,
+            currency: response.data.order.currency,
+            name: "NoVeg Pvt. Ltd.",
+            description: "Order Payment",
+            image: assets.logo,
+            order_id: response.data.order.id,
+            handler: async (paymentResponse) => {
+              try {
+                // Step 2: After payment success, verify and place app order
+                const verifyResponse = await axios.post(`${url}/api/order/verify`, {
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                  orderData, // Now send full orderData to backend AFTER successful payment
+                }, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+      
+                if (verifyResponse.data.success) {
+                  const finalOrderId = verifyResponse.data.orderId;
+                  toast.success("Payment Verified & Order Placed!");
+                  setNewOrder({ ...orderData, _id: finalOrderId });
+                  setOrderPlaced(true);
+                  setTimeout(() => {
+                    clearCart();
+                    setCartItems({});
+                    navigate("/myorders", {
+                      state: { newOrder: { ...orderData, _id: finalOrderId } },
+                    });
+                  }, 2000);
+                } else {
+                  toast.error("Payment verification failed.");
+                }
               } catch (err) {
                 console.error("Verification error:", err);
                 toast.error("Server error verifying payment.");
@@ -245,24 +228,8 @@ const PlaceOrder = () => {
           const razorpay = new window.Razorpay(options);
           razorpay.open();
         }
-      } else {
-        const response = await axios.post(`${url}/api/order/cod`, orderData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.data.success) {
-          toast.success("Order placed successfully!");
-          setNewOrder({ ...orderData, _id: response.data.orderId });
-          setOrderPlaced(true);
-          setTimeout(() => {
-            clearCart();
-            setCartItems({});
-            navigate("/myorders", {
-              state: { newOrder: { ...orderData, _id: response.data.orderId } },
-            });
-          }, 2000);
-        }
       }
+      
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error("Order placement failed. Please try again.");
