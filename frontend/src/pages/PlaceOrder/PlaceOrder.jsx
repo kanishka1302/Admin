@@ -172,46 +172,42 @@ const PlaceOrder = () => {
 
     try {
       if (paymentMethod === "razorpay") {
-        const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data: razorpayData } = await axios.post(
+          `${url}/api/order/razorpay`,
+          orderData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        if (response.data.success) {
+        if (razorpayData?.success) {
           const options = {
-            key: "rzp_test_eRSHa1kaUjMssI",
-            amount: response.data.order.amount,
-            currency: response.data.order.currency,
+            key: razorpayData.key, // Get Razorpay public key from backend
+            amount: razorpayData.order.amount,
+            currency: razorpayData.order.currency,
             name: "NoVeg Pvt. Ltd.",
             description: "Order Payment",
             image: assets.logo,
-            order_id: response.data.order.id,
-            handler: async (response) => {
+            order_id: razorpayData.order.id,
+            handler: async (paymentResponse) => {
               try {
-                const verifyResponse = await axios.post(`${url}/api/order/verify`, {
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
+                const verifyPayload = {
+                  ...paymentResponse,
                   orderData,
-                }, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-
-                if (verifyResponse.data.success) {
-                  const finalOrderId = verifyResponse.data.orderId;
+                }; 
+                if (verifyData?.success) {
                   toast.success("Payment Verified & Order Placed!");
-                  setNewOrder({ ...orderData, _id: finalOrderId });
+                  setNewOrder({ ...orderData, _id: verifyData.orderId });
                   setOrderPlaced(true);
                   setTimeout(() => {
                     clearCart();
                     setCartItems({});
                     navigate("/myorders", {
-                      state: { newOrder: { ...orderData, _id: finalOrderId } },
+                      state: { newOrder: { ...orderData, _id: verifyData.orderId } },
                     });
                   }, 2000);
                 } else {
                   toast.error("Payment verification failed.");
                 }
-              } catch (err) {
+               } catch (err) {
                 console.error("Verification error:", err);
                 toast.error("Server error verifying payment.");
               }
@@ -222,33 +218,47 @@ const PlaceOrder = () => {
               contact: data.phone,
             },
             notes: { address: data.street },
+            theme: {
+              color: "#3399cc",
+            },
           };
-          const razorpay = new window.Razorpay(options);
-          razorpay.open();
-        }
-      } else {
-        const response = await axios.post(`${url}/api/order/cod`, orderData, {
-          headers: { Authorization: `Bearer ${token}` },
+          const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          toast.error("Payment failed. Please try again.");
+          console.error("Payment Failed:", response.error);
         });
-
-        if (response.data.success) {
-          toast.success("Order placed successfully!");
-          setNewOrder({ ...orderData, _id: response.data.orderId });
-          setOrderPlaced(true);
-          setTimeout(() => {
-            clearCart();
-            setCartItems({});
-            navigate("/myorders", {
-              state: { newOrder: { ...orderData, _id: response.data.orderId } },
-            });
-          }, 2000);
-        }
+        rzp.open();
+      } else {
+        toast.error("Failed to initiate Razorpay payment.");
       }
-    } catch (error) {
-      console.error("Error placing order:", error);
-      toast.error("Order placement failed. Please try again.");
+    } else {
+      // Cash on Delivery
+      const { data: codData } = await axios.post(
+        `${url}/api/order/cod`,
+        orderData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (codData?.success) {
+        toast.success("Order placed successfully!");
+        setNewOrder({ ...orderData, _id: codData.orderId });
+        setOrderPlaced(true);
+        setTimeout(() => {
+          clearCart();
+          setCartItems({});
+          navigate("/myorders", {
+            state: { newOrder: { ...orderData, _id: codData.orderId } },
+          });
+        }, 2000);
+      } else {
+        toast.error("Failed to place COD order.");
+      }
     }
-  };
+  } catch (error) {
+    console.error("Order placement error:", error);
+    toast.error("Failed to place order. Please try again.");
+  }
+};
 
   return (
     <div className="place-order">
