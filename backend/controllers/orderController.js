@@ -69,6 +69,8 @@ const placeOrderRazorpay = async (req, res) => {
     if (!userId || !items || !address || !shopName) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
+    const deliveryCharge = 40;
+    const currency = "INR"; 
 
     const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
 
@@ -85,14 +87,16 @@ const placeOrderRazorpay = async (req, res) => {
       receipt: `receipt_${orderId}`,
     });
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Razorpay Order Initialized",
-      orderId,
-      razorpayOrderId: razorpayOrder.id,
-      amount: totalAmountInPaise,
-      currency,
-      key: process.env.RAZORPAY_KEY_ID,
+      message: "Razorpay order initialized",
+      data: {
+        key: process.env.RAZORPAY_KEY_ID,    
+        orderId: orderId,                     
+        razorpayOrderId: razorpayOrder.id,     
+        amount: razorpayOrder.amount,          
+        currency: razorpayOrder.currency,     
+      },
     });
   } catch (error) {
     console.error("❌ Error initializing Razorpay order:", error);
