@@ -121,13 +121,16 @@ const placeOrder = async (req, res) => {
 const verifyOrder = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, address, items, shopName, discountApplied, promoCode } = req.body;
-
+    console.log("Received Payment Details:", razorpay_order_id, razorpay_payment_id, razorpay_signature);
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
-
+    console.log("Generated Digest:", digest);
+    console.log("Received Signature:", razorpay_signature);
+    
     if (digest !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Payment verification failed. Order not placed." });
+    console.error("❌ Payment verification failed");
+    return res.status(400).json({ success: false, message: "Payment verification failed." });
     }
 
     const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
