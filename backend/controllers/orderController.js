@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import { io } from '../server.js';
-import OrderModel from "../models/orderModel.js";
+
 
 dotenv.config();
 
@@ -71,76 +71,35 @@ const placeOrderRazorpay = async (req, res) => {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
-    // Validate item prices and quantities
-    for (const item of items) {
-      if (item.price > 10000 || item.quantity <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid price or quantity detected for item: ${item.name}`,
-        });
-      }
-    }
-
-    // 🧮 Calculate total amount in ₹
-    const totalAmountInRupees = items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    ) + deliveryCharge;
+    const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
 
     if (totalAmountInRupees <= 0) {
       return res.status(400).json({ success: false, message: "Total amount must be greater than 0." });
     }
 
-    console.log("🧾 Total Amount in ₹:", totalAmountInRupees);
-
-    // 💰 Convert to paise for Razorpay
     const totalAmountInPaise = totalAmountInRupees * 100;
 
-    // Generate unique orderId
     const orderId = await generateOrderId();
 
-    // 🔧 Create order on Razorpay
     const razorpayOrder = await razorpay.orders.create({
-      amount: totalAmountInRupees,
-      currency: "INR",
+      amount: totalAmountInPaise,
+      currency,
       receipt: `receipt_${orderId}`,
     });
 
-    // 📝 Save order in DB (in ₹)
-    const newOrder = new orderModel({
-      userId,
-      address,
-      items,
-      shopName,
-      amount: totalAmountInRupees,
-      orderId,
-      paymentMethod: "razorpay",
-      payment: false,
-      status: "Order Received",
-      razorpayOrderId: razorpayOrder.id,
-      discountApplied, 
-      promoCode,
-    });
-
-    await newOrder.save();
-
-    // 🛒 Clear user's cart
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
-
-    // 📤 Respond to frontend
+    // Respond to frontend without saving order in database yet
     res.json({
       success: true,
-      message: "Razorpay Order Placed Successfully",
+      message: "Razorpay Order Initialized",
       orderId,
       razorpayOrderId: razorpayOrder.id,
       amount: totalAmountInPaise,
-      currency: "INR",
+      currency,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
-
   } catch (error) {
-    console.error("❌ Error placing Razorpay order:", error);
-    res.status(500).json({ success: false, message: "Error placing order" });
+    console.error("❌ Error initializing Razorpay order:", error);
+    res.status(500).json({ success: false, message: "Error initializing order" });
   }
 };
 
@@ -161,41 +120,52 @@ const placeOrder = async (req, res) => {
 // Verify Razorpay Payment Signature
 const verifyOrder = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, address, items, shopName, discountApplied, promoCode } = req.body;
 
-    // Verify Razorpay signature
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
 
     if (digest !== razorpay_signature) {
-      return res.status(400).json({ msg: "Transaction is not legitimate!" });
+      return res.status(400).json({ success: false, message: "Payment verification failed. Order not placed." });
     }
 
-    // Retrieve existing order from database
-    const existingOrder = await orderModel.findOne({ razorpayOrderId: razorpay_order_id });
-    if (!existingOrder) {
-      return res.status(404).json({ msg: "Order not found" });
-    }
+    const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
+    const orderId = await generateOrderId();
 
-    // Update order status upon successful verification
-    existingOrder.payment = true;
-    await existingOrder.save();
+    const newOrder = new orderModel({
+      userId,
+      address,
+      items,
+      amount: totalAmount,
+      shopName,
+      orderId,
+      paymentMethod: "razorpay",
+      status: "Order Received",
+      payment: true,
+      razorpayOrderId: razorpay_order_id,
+      discountApplied,
+      promoCode,
+    });
 
-    // Notify via WebSocket (if applicable)
-    io.emit("new-order", existingOrder);
+    await newOrder.save();
+    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+    io.emit("new-order", newOrder);
 
     res.json({
       success: true,
-      msg: "Payment verified successfully!",
-      orderId: existingOrder.orderId,
+      message: "Payment verified successfully and order placed.",
+      orderId,
       paymentId: razorpay_payment_id,
+      data: newOrder,
     });
   } catch (error) {
-    console.error("❌ Error during payment verification:", error);
-    res.status(500).json({ success: false, message: "Error during payment verification" });
+    console.error("❌ Error verifying Razorpay payment:", error);
+    res.status(500).json({ success: false, message: "Error verifying payment" });
   }
 };
+
 // ✅ List All Orders (Admin)
 const listOrders = async (req, res) => {
   try {
@@ -337,5 +307,5 @@ export {
   updateOrderProgress,
   verifyOrder,
   generateAdminOrder,
-  updateOrderStatus
+  updateOrderStatus,
 };
