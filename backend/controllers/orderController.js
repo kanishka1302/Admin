@@ -5,8 +5,6 @@ import Razorpay from "razorpay";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import dotenv from "dotenv";
-import { io } from '../server.js';
-
 
 dotenv.config();
 
@@ -41,13 +39,14 @@ const placeOrderCod = async (req, res) => {
       paymentMethod: "cod",
       status: "Order Received",
       payment: false,
-      discountApplied, 
-      promoCode, 
+      discountApplied,
+      promoCode,
     });
 
     await newOrder.save();
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
+    const io = req.app.get("io");
     io.emit("new-order", newOrder);
 
     res.status(200).json({
@@ -78,7 +77,6 @@ const placeOrderRazorpay = async (req, res) => {
     }
 
     const totalAmountInPaise = totalAmountInRupees * 100;
-
     const orderId = await generateOrderId();
 
     const razorpayOrder = await razorpay.orders.create({
@@ -87,7 +85,6 @@ const placeOrderRazorpay = async (req, res) => {
       receipt: `receipt_${orderId}`,
     });
 
-    // Respond to frontend without saving order in database yet
     res.json({
       success: true,
       message: "Razorpay Order Initialized",
@@ -95,7 +92,7 @@ const placeOrderRazorpay = async (req, res) => {
       razorpayOrderId: razorpayOrder.id,
       amount: totalAmountInPaise,
       currency,
-      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      key: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     console.error("❌ Error initializing Razorpay order:", error);
@@ -103,34 +100,30 @@ const placeOrderRazorpay = async (req, res) => {
   }
 };
 
-
-// Entry Point for Orders
+// ✅ Entry Point
 const placeOrder = async (req, res) => {
   const { paymentMethod } = req.body;
   switch (paymentMethod) {
     case "cod":
-      return placeOrderCod(req, res); // Handle cash-on-delivery orders
+      return placeOrderCod(req, res);
     case "razorpay":
-      return placeOrderRazorpay(req, res); // Handle Razorpay orders
+      return placeOrderRazorpay(req, res);
     default:
       return res.status(400).json({ success: false, message: "Invalid payment method" });
   }
 };
 
-// Verify Razorpay Payment Signature
+// ✅ Verify Razorpay Payment
 const verifyOrder = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, address, items, shopName, discountApplied, promoCode } = req.body;
-    console.log("Received Payment Details:", razorpay_order_id, razorpay_payment_id, razorpay_signature);
+
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
-    console.log("Generated Digest:", digest);
-    console.log("Received Signature:", razorpay_signature);
-    
+
     if (digest !== razorpay_signature) {
-    console.error("❌ Payment verification failed");
-    return res.status(400).json({ success: false, message: "Payment verification failed." });
+      return res.status(400).json({ success: false, message: "Payment verification failed." });
     }
 
     const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
@@ -154,11 +147,12 @@ const verifyOrder = async (req, res) => {
     await newOrder.save();
     await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
+    const io = req.app.get("io");
     io.emit("new-order", newOrder);
 
     res.json({
       success: true,
-      message: "Payment verified successfully and order placed.",
+      message: "Payment verified and order placed.",
       orderId,
       paymentId: razorpay_payment_id,
       data: newOrder,
@@ -211,7 +205,6 @@ const userOrders = async (req, res) => {
 };
 
 // ✅ Update Status
-// In your orderController.js
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
@@ -224,8 +217,7 @@ const updateOrderStatus = async (req, res) => {
     order.status = status;
     await order.save();
 
-    // Emit status update to all clients
-    const io = req.app.get("io"); // Get Socket.IO instance
+    const io = req.app.get("io");
     io.emit("orderStatusUpdated", {
       _id: order._id,
       status: order.status,
@@ -233,12 +225,12 @@ const updateOrderStatus = async (req, res) => {
 
     res.json({ success: true, message: "Order status updated", data: order });
   } catch (error) {
-    console.error("Error updating order status:", error);
+    console.error("❌ Error updating order status:", error);
     res.status(500).json({ success: false, message: "Failed to update order status" });
   }
 };
 
-// Update Order Progress
+// ✅ Update Progress
 const updateOrderProgress = async (req, res) => {
   try {
     const { orderId, newStatus } = req.body;
@@ -248,17 +240,18 @@ const updateOrderProgress = async (req, res) => {
     }
 
     const order = await orderModel.findOne({ orderId });
-
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found." });
     }
 
-    // Update the status based on the newStatus
     order.status = newStatus;
     await order.save();
 
-    // Optionally, emit the new status via socket (for real-time updates on the admin side)
-    io.emit("orderStatusUpdated", { orderId, status: newStatus });
+    const io = req.app.get("io");
+    io.emit("orderStatusUpdated", {
+      orderId: order.orderId,
+      status: newStatus,
+    });
 
     res.json({
       success: true,
@@ -271,18 +264,21 @@ const updateOrderProgress = async (req, res) => {
   }
 };
 
-
 // ✅ Generate Admin Order
 const generateAdminOrder = async (req, res) => {
   try {
     const { customerOrderId } = req.body;
+
     const existingOrder = await orderModel.findOne({ orderId: customerOrderId });
-    if (!existingOrder) return res.status(404).json({ success: false, message: "Customer order not found" });
+    if (!existingOrder) {
+      return res.status(404).json({ success: false, message: "Customer order not found" });
+    }
 
     const newOrderId = await generateOrderId();
 
     const newAdminOrder = new orderModel({
       ...existingOrder.toObject(),
+      _id: undefined,
       orderId: newOrderId,
       createdAt: new Date(),
     });
