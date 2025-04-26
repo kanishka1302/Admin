@@ -43,14 +43,23 @@ export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, amount } = req.body;
 
+    // Step 1: Verify signature
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
 
     if (digest !== razorpay_signature) {
-      return res.status(400).json({ error: "Invalid transaction" });
+      return res.status(400).json({ error: "Invalid transaction signature" });
     }
 
+    // Step 2: Fetch payment details from Razorpay
+    const payment = await razorpay.payments.fetch(razorpay_payment_id);
+
+    if (payment.status !== "captured") {
+      return res.status(400).json({ error: "Payment not captured. Transaction may have failed or been cancelled." });
+    }
+
+    // Step 3: Update wallet if everything is valid
     let wallet = await WalletModel.findOne({ userId });
     if (!wallet) {
       wallet = new WalletModel({ userId, balance: 0, transactions: [] });
@@ -72,6 +81,7 @@ export const verifyPayment = async (req, res) => {
     res.status(500).json({ error: "Verification failed" });
   }
 };
+
 
 export const getWalletDetails = async (req, res) => {
   try {
