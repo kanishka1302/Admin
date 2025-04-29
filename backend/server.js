@@ -108,7 +108,7 @@ app.post("/api/order/razorpay", async (req, res) => {
 
 // ✅ Razorpay Payment Verification
 // ✅ Razorpay Payment Verification
-app.post("/api/order/verify", async (req, res) => {
+/* app.post("/api/order/verify", async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
@@ -149,7 +149,7 @@ app.post("/api/order/verify", async (req, res) => {
     console.error("Error verifying payment:", err.message);
     res.status(500).json({ error: "Verification failed" });
   }
-});
+}); */
 
 
 // ✅ Cash On Delivery Order
