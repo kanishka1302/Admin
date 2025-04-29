@@ -110,8 +110,14 @@ app.post("/api/order/razorpay", async (req, res) => {
 // ✅ Razorpay Payment Verification
 app.post("/api/order/verify", async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderData } = req.body;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      orderData, // sent from frontend
+    } = req.body;
 
+    // ✅ Verify the signature
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
@@ -120,28 +126,28 @@ app.post("/api/order/verify", async (req, res) => {
       return res.status(400).json({ msg: "Transaction is not legit!" });
     }
 
-    // ✅ Find the order by Razorpay ID
-    const existingOrder = await orderModel.findOne({ orderId: razorpay_order_id });
-    if (!existingOrder) {
-      return res.status(404).json({ msg: "Order not found" });
-    }
-
     // ✅ Generate your custom NV order ID
     const customOrderId = await generateOrderId();
 
-    // ✅ Update order's orderId and payment status
-    existingOrder.orderId = customOrderId;
-    existingOrder.payment = true;
-     existingOrder.status = "Payment Successful";
-    await existingOrder.save();
+    // ✅ Create and save the order (only now, after payment is verified)
+    const newOrder = new orderModel({
+      ...orderData,
+      orderId: customOrderId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      payment: true,
+      status: "Payment Successful",
+    });
+
+    await newOrder.save();
 
     // ✅ Notify admin
-    io.emit("new-order", existingOrder);
+    io.emit("new-order", newOrder);
 
-    // ✅ Send response with your custom orderId
+    // ✅ Send response
     res.json({
       success: true,
-      msg: "Payment verified successfully!",
+      msg: "Payment verified and order placed successfully!",
       orderId: customOrderId,
       paymentId: razorpay_payment_id,
     });
@@ -150,8 +156,7 @@ app.post("/api/order/verify", async (req, res) => {
     console.error("Error verifying payment:", err.message);
     res.status(500).json({ error: "Verification failed" });
   }
-}); 
-
+});
 
 // ✅ Cash On Delivery Order
 app.post("/api/order/cod", async (req, res) => {
