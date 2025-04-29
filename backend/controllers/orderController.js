@@ -38,7 +38,7 @@ const placeOrderCod = async (req, res) => {
       shopName,
       orderId,
       paymentMethod: "cod",
-      status: "Order Received",
+      status: "Payment Succcessful",
       payment: false,
       discountApplied,
       promoCode,
