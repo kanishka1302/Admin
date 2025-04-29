@@ -125,18 +125,19 @@ app.post("/api/order/verify", async (req, res) => {
     if (digest !== razorpay_signature) {
       return res.status(400).json({ msg: "Transaction is not legit!" });
     }
-      const existingOrder = await orderModel.findOne({ orderId: razorpay_order_id });
-    if (!existingOrder) {
-      return res.status(404).json({ msg: "Order not found" });
-    }
 
     // ✅ Generate your custom NV order ID
     const customOrderId = await generateOrderId();
 
-     existingOrder.orderId = customOrderId;
-    existingOrder.payment = true;
-    existingOrder.status = "Payment Successful"; // Update order status
-    await existingOrder.save();
+    // ✅ Create and save the order (only now, after payment is verified)
+    const newOrder = new orderModel({
+      ...orderData,
+      orderId: customOrderId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      payment: true,
+      status: "Payment Successful",
+    });
 
     await newOrder.save();
 
@@ -156,6 +157,7 @@ app.post("/api/order/verify", async (req, res) => {
     res.status(500).json({ error: "Verification failed" });
   }
 });
+
 
 // ✅ Cash On Delivery Order
 app.post("/api/order/cod", async (req, res) => {
