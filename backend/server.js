@@ -77,13 +77,14 @@ app.post("/api/order/razorpay", async (req, res) => {
     });
     
     if (!order) throw new Error("Razorpay order creation failed");
+    const orderId = await generateOrderId();
     
     const newOrder = new orderModel({
       userId,
       address,
       items,
       amount, // ✅ Store in rupees
-      orderId: order.id,
+      orderId,
       paymentMethod: "razorpay",
       status: "Order Received",
       payment: false,
