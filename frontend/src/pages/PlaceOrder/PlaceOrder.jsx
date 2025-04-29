@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import orderConfirmGif from "../../assets/orderconfirmm.gif";
 import DeliveryAddress from "../DeliveryAddress/DeliveryAddress";
-import { safeLocalStorage } from "../../../../backend/utils/localStorageHelper";
-
 
 const PlaceOrder = () => {
   const location = useLocation();
@@ -51,36 +49,10 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     setAttemptedSubmit(true);
-  
-    // Fetch addresses from the database using the user's mobile number
-    const fetchAddresses = async () => {
-      const storedUser = safeLocalStorage.get("user");
-      const mobileNumber = storedUser?.mobileNumber;
-  
-      if (!mobileNumber) {
-        toast.error("Unable to fetch addresses. Please log in again.");
-        return;
-      }
-  
-      try {
-        const response = await axios.get(`${url}/api/address/user/${mobileNumber}`);
-        if (response.data) {
-          console.log("Fetched addresses from database:", response.data);
-          setAddressList(response.data); // Set the addressList state with data from the database
-        } else {
-          setAddressList([]);
-          toast.warn("No addresses found in the database.");
-        }
-      } catch (error) {
-        console.error("Error fetching addresses:", error);
-        toast.error("Failed to fetch delivery addresses. Please try again later.");
-      }
-    };
-  
-    fetchAddresses();
-  
-    // Set the selected address if available
-    const savedAddress = safeLocalStorage.get("selectedAddress");
+    const savedAddress = JSON.parse(localStorage.getItem("selectedAddress"));
+    const storedAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
+    setAddressList(storedAddresses);
+ 
     if (savedAddress) {
       setSelectedAddress(savedAddress);
       setData((prevData) => ({
@@ -95,6 +67,7 @@ const PlaceOrder = () => {
       }));
     }
   }, []);
+  
 
   useEffect(() => {
     if (!token) {
@@ -133,6 +106,8 @@ const PlaceOrder = () => {
       return;
     }
     
+   
+
     if (!isFormComplete) {
       toast.error("Please complete all required fields.");
       return;
@@ -146,7 +121,7 @@ const PlaceOrder = () => {
         shopName: shopNames[item._id] || selectedShop?.name || "Unknown Shop",
       }));
 
-    const storedUser = safeLocalStorage.get("user");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     const userId = storedUser?.userId || storedUser?._id;
 
     if (!userId) {
@@ -172,42 +147,46 @@ const PlaceOrder = () => {
 
     try {
       if (paymentMethod === "razorpay") {
-        const { data: razorpayData } = await axios.post(
-          `${url}/api/order/razorpay`,
-          orderData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (razorpayData?.success) {
+        if (response.data.success) {
           const options = {
-            key: razorpayData.key, // Get Razorpay public key from backend
-            amount: razorpayData.order.amount,
-            currency: razorpayData.order.currency,
+            key: "rzp_test_eRSHa1kaUjMssI",
+            amount: response.data.order.amount,
+            currency: response.data.order.currency,
             name: "NoVeg Pvt. Ltd.",
             description: "Order Payment",
             image: assets.logo,
-            order_id: razorpayData.order.id,
-            handler: async (paymentResponse) => {
+            order_id: response.data.order.id,
+            handler: async (response) => {
               try {
-                const verifyPayload = {
-                  ...paymentResponse,
+                const verifyResponse = await axios.post(`${url}/api/order/verify`, {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
                   orderData,
-                }; 
-                if (verifyData?.success) {
+                }, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (verifyResponse.data.success) {
+                  const finalOrderId = verifyResponse.data.orderId;
                   toast.success("Payment Verified & Order Placed!");
-                  setNewOrder({ ...orderData, _id: verifyData.orderId });
+                  setNewOrder({ ...orderData, _id: finalOrderId });
                   setOrderPlaced(true);
                   setTimeout(() => {
                     clearCart();
                     setCartItems({});
                     navigate("/myorders", {
-                      state: { newOrder: { ...orderData, _id: verifyData.orderId } },
+                      state: { newOrder: { ...orderData, _id: finalOrderId } },
                     });
                   }, 2000);
                 } else {
                   toast.error("Payment verification failed.");
                 }
-               } catch (err) {
+              } catch (err) {
                 console.error("Verification error:", err);
                 toast.error("Server error verifying payment.");
               }
@@ -218,47 +197,33 @@ const PlaceOrder = () => {
               contact: data.phone,
             },
             notes: { address: data.street },
-            theme: {
-              color: "#3399cc",
-            },
           };
-          const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', function (response) {
-          toast.error("Payment failed. Please try again.");
-          console.error("Payment Failed:", response.error);
+          const razorpay = new window.Razorpay(options);
+          razorpay.open();
+        }
+      } else {
+        const response = await axios.post(`${url}/api/order/cod`, orderData, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        rzp.open();
-      } else {
-        toast.error("Failed to initiate Razorpay payment.");
-      }
-    } else {
-      // Cash on Delivery
-      const { data: codData } = await axios.post(
-        `${url}/api/order/cod`,
-        orderData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
 
-      if (codData?.success) {
-        toast.success("Order placed successfully!");
-        setNewOrder({ ...orderData, _id: codData.orderId });
-        setOrderPlaced(true);
-        setTimeout(() => {
-          clearCart();
-          setCartItems({});
-          navigate("/myorders", {
-            state: { newOrder: { ...orderData, _id: codData.orderId } },
-          });
-        }, 2000);
-      } else {
-        toast.error("Failed to place COD order.");
+        if (response.data.success) {
+          toast.success("Order placed successfully!");
+          setNewOrder({ ...orderData, _id: response.data.orderId });
+          setOrderPlaced(true);
+          setTimeout(() => {
+            clearCart();
+            setCartItems({});
+            navigate("/myorders", {
+              state: { newOrder: { ...orderData, _id: response.data.orderId } },
+            });
+          }, 2000);
+        }
       }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Order placement failed. Please try again.");
     }
-  } catch (error) {
-    console.error("Order placement error:", error);
-    toast.error("Failed to place order. Please try again.");
-  }
-};
+  };
 
   return (
     <div className="place-order">
