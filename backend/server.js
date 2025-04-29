@@ -136,7 +136,7 @@ app.post("/api/order/verify", async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       payment: true,
-      status: "Order Received",
+      status: "Payment Successful",
     });
 
     await newOrder.save();
