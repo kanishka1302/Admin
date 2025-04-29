@@ -125,19 +125,18 @@ app.post("/api/order/verify", async (req, res) => {
     if (digest !== razorpay_signature) {
       return res.status(400).json({ msg: "Transaction is not legit!" });
     }
+      const existingOrder = await orderModel.findOne({ orderId: razorpay_order_id });
+    if (!existingOrder) {
+      return res.status(404).json({ msg: "Order not found" });
+    }
 
     // ✅ Generate your custom NV order ID
     const customOrderId = await generateOrderId();
 
-    // ✅ Create and save the order (only now, after payment is verified)
-    const newOrder = new orderModel({
-      ...orderData,
-      orderId: customOrderId,
-      razorpay_order_id,
-      razorpay_payment_id,
-      payment: true,
-      status: "Payment Successful",
-    });
+     existingOrder.orderId = customOrderId;
+    existingOrder.payment = true;
+    existingOrder.status = "Payment Successful"; // Update order status
+    await existingOrder.save();
 
     await newOrder.save();
 
