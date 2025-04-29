@@ -45,9 +45,11 @@ const DeliveryAddress = ({ onSelectAddress }) => {
   }, []);
 
   useEffect(() => {
-    const storedSelected = safeLocalStorage.get("selectedAddress");
-    setSelectedAddress(storedSelected || null);
-
+    const shouldPreselect = false;
+    if (shouldPreselect) {
+      const storedSelected = safeLocalStorage.get("selectedAddress");
+      setSelectedAddress(storedSelected || null);
+    }
   }, []);
 
   useEffect(() => {
