@@ -5,6 +5,7 @@ import Razorpay from "razorpay";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import { io } from "../server.js";
 
 dotenv.config();
 
