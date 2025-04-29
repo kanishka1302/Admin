@@ -147,7 +147,7 @@ const verifyOrder = async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       payment: true,
-      status: "Payment Successful",
+      status: "Order Received",
     });
 
     await newOrder.save();
