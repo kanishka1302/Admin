@@ -150,7 +150,7 @@ app.post("/api/order/verify", async (req, res) => {
     console.error("Error verifying payment:", err.message);
     res.status(500).json({ error: "Verification failed" });
   }
-}); */
+}); 
 
 
 // ✅ Cash On Delivery Order
