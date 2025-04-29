@@ -159,7 +159,7 @@ const PlaceOrder = () => {
       shopName,
       amount: Math.round(totalAmount + deliveryCharge),
       paymentMethod,
-      status: "Processing",
+      status: "Pending",
       promoCode: promoCode || null,
       discountApplied: discountApplied || false
       
