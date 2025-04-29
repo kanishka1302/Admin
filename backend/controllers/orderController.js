@@ -173,8 +173,6 @@ const verifyOrder = async (req, res) => {
   }
 };
 
-module.exports = { verifyOrder };
-
 // ✅ List All Orders (Admin)
 const listOrders = async (req, res) => {
   try {
