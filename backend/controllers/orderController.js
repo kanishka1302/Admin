@@ -70,9 +70,9 @@ const placeOrderRazorpay = async (req, res) => {
     if (!userId || !items || !address || !shopName) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
-    const deliveryCharge = 40;
-    const currency = "INR"; 
 
+    const deliveryCharge = 40;
+    const currency = "INR";
     const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
 
     if (totalAmountInRupees <= 0) {
@@ -80,7 +80,7 @@ const placeOrderRazorpay = async (req, res) => {
     }
 
     const totalAmountInPaise = totalAmountInRupees * 100;
-    const orderId = await generateOrderId();
+    const orderId = generateOrderId();
 
     const razorpayOrder = await razorpay.orders.create({
       amount: totalAmountInPaise,
@@ -92,11 +92,11 @@ const placeOrderRazorpay = async (req, res) => {
       success: true,
       message: "Razorpay order initialized",
       data: {
-        key: process.env.RAZORPAY_KEY_ID,    
-        orderId,                     
-        razorpayOrderId: razorpayOrder.id,     
-        amount: razorpayOrder.amount,          
-        currency: razorpayOrder.currency,     
+        key: process.env.RAZORPAY_KEY_ID,
+        orderId,
+        razorpayOrderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
       },
     });
   } catch (error) {
@@ -104,6 +104,7 @@ const placeOrderRazorpay = async (req, res) => {
     res.status(500).json({ success: false, message: "Error initializing order" });
   }
 };
+
 
 // ✅ Entry Point
 const placeOrder = async (req, res) => {
