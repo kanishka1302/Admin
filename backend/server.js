@@ -77,7 +77,7 @@ app.post("/api/order/razorpay", async (req, res) => {
     });
     
     if (!order) throw new Error("Razorpay order creation failed");
-    const orderId = await generateOrderId();
+   /* const orderId = await generateOrderId();
     
     const newOrder = new orderModel({
       userId,
@@ -98,7 +98,7 @@ app.post("/api/order/razorpay", async (req, res) => {
 
     // ✅ Notify admin in real-time
     io.emit("new-order", newOrder);
-
+*/
     res.json({ success: true, order });
   } catch (err) {
     console.error("Error creating Razorpay order:", err.message);
