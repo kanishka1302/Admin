@@ -93,7 +93,7 @@ const placeOrderRazorpay = async (req, res) => {
       message: "Razorpay order initialized",
       data: {
         key: process.env.RAZORPAY_KEY_ID,    
-        orderId: orderId,                     
+        orderId,                     
         razorpayOrderId: razorpayOrder.id,     
         amount: razorpayOrder.amount,          
         currency: razorpayOrder.currency,     
