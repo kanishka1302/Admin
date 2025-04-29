@@ -121,52 +121,59 @@ const placeOrder = async (req, res) => {
 // ✅ Verify Razorpay Payment
 const verifyOrder = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, address, items, shopName, discountApplied, promoCode,  deliveryCharge = 50 } = req.body;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      orderData, // sent from frontend
+    } = req.body;
 
+    // ✅ Verify Razorpay Signature
     const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = sha.digest("hex");
 
     if (digest !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Payment verification failed." });
+      return res.status(400).json({ success: false, message: "Transaction is not legit!" });
     }
 
-    const totalAmount = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
-    const orderId = await generateOrderId();
+    // ✅ Generate NV Order ID
+    const customOrderId = generateOrderId();
 
+    // ✅ Create and Save Order
     const newOrder = new orderModel({
-      userId,
-      address,
-      items,
-      amount: totalAmount,
-      shopName,
-      orderId,
-      paymentMethod: "razorpay",
-      status: "Order Received",
+      ...orderData,
+      orderId: customOrderId,
+      razorpay_order_id,
+      razorpay_payment_id,
       payment: true,
-      razorpayOrderId: razorpay_order_id,
-      discountApplied,
-      promoCode,
+      status: "Payment Successful",
     });
 
     await newOrder.save();
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
+    // ✅ Clear User's Cart
+    await userModel.findByIdAndUpdate(orderData.userId, { cartData: {} });
+
+    // ✅ Emit Real-time Notification
     const io = req.app.get("io");
     io.emit("new-order", newOrder);
 
+    // ✅ Send Response
     res.json({
       success: true,
-      message: "Payment verified and order placed.",
-      orderId,
+      message: "Payment verified and order placed successfully!",
+      orderId: customOrderId,
       paymentId: razorpay_payment_id,
-      data: newOrder,
     });
+
   } catch (error) {
     console.error("❌ Error verifying Razorpay payment:", error);
     res.status(500).json({ success: false, message: "Error verifying payment" });
   }
 };
+
+module.exports = { verifyOrder };
 
 // ✅ List All Orders (Admin)
 const listOrders = async (req, res) => {
