@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import orderConfirmGif from "../../assets/orderconfirmm.gif";
 import DeliveryAddress from "../DeliveryAddress/DeliveryAddress";
+import { safeLocalStorage } from "../../../../backend/utils/localStorageHelper";
 
 const PlaceOrder = () => {
   const location = useLocation();
@@ -19,7 +20,6 @@ const PlaceOrder = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [addressList, setAddressList] = useState([]);
-
 
   const [data, setData] = useState({
     firstName: "",
@@ -49,26 +49,46 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     setAttemptedSubmit(true);
-    const savedAddress = JSON.parse(localStorage.getItem("selectedAddress"));
-    const storedAddresses = JSON.parse(localStorage.getItem("savedAddresses")) || [];
-    setAddressList(storedAddresses);
+      
+        const fetchAddresses = async () => {
+          const storedUser = safeLocalStorage.get("user");
+          const mobileNumber = storedUser?.mobileNumber;
+    
+          if (!mobileNumber) {
+            toast.error("Unable to fetch addresses. Please log in again.");
+            return;
+          }
+        try {
+                const response = await axios.get(`${url}/api/address/user/${mobileNumber}`);
+                if (response.data) {
+                  setAddressList(response.data);
+                } else {
+                  setAddressList([]);
+                  toast.warn("No addresses found in the database.");
+                }
+              } catch (error) {
+                console.error("Error fetching addresses:", error);
+                toast.error("Failed to fetch delivery addresses. Please try again later.");
+              }
+            };
+          fetchAddresses();
  
-    if (savedAddress) {
-      setSelectedAddress(savedAddress);
-      setData((prevData) => ({
-        ...prevData,
-        firstName: savedAddress.firstName || prevData.firstName,
-        lastName: savedAddress.lastName || prevData.lastName,
-        phone: savedAddress.mobileNumber || prevData.phone,
-        street: savedAddress.address || prevData.street,
-        city: savedAddress.city || prevData.city,
-        state: savedAddress.state || prevData.state,
-        zipcode: savedAddress.pincode || prevData.zipcode,
-      }));
-    }
-  }, []);
-  
-
+    const savedAddress = safeLocalStorage.get("selectedAddress");
+        if (savedAddress) {
+          setSelectedAddress(savedAddress);
+          setData((prevData) => ({
+            ...prevData,
+            firstName: savedAddress.firstName || prevData.firstName,
+            lastName: savedAddress.lastName || prevData.lastName,
+            phone: savedAddress.mobileNumber || prevData.phone,
+            street: savedAddress.address || prevData.street,
+            city: savedAddress.city || prevData.city,
+            state: savedAddress.state || prevData.state,
+            zipcode: savedAddress.pincode || prevData.zipcode,
+          }));
+        }
+      }, []);
+    
   useEffect(() => {
     if (!token) {
       toast.error("To place an order, sign in first.");
