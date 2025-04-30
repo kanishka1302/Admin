@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Footer.css';
 import { assets } from '../../assets/assets';
 import SugunaLogo from '../../assets/Suguna-Foods-Brand-Logo.png';
 import VencobbLogo from '../../assets/vencobb.jpg';
 import SnehaChickenLogo from '../../assets/sneha chicken.jpg';
 import { Link } from 'react-router-dom'; // Import Link
+import Chat from '../../pages/Chat/Chat.jsx';
 
 const Footer = () => {
+  const [showChat, setShowChat] = useState(false);
+  const handleChatClick = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setShowChat(!showChat);
+    } else {
+      alert("Please log in to chat.");
+    }
+  };
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -84,8 +94,8 @@ const Footer = () => {
             <h2>Get In Touch!!</h2>
             <ul>
               <li>Contact@noveg.pvt.ltd</li>
-              <li>
-                <Link to="/chat" className="chat-button"> Chat with us</Link>
+              <li onClick={handleChatClick} className="chat-button" style={{ cursor: 'pointer' }}>
+               Chat with us
               </li>
             </ul>
 
@@ -103,6 +113,8 @@ const Footer = () => {
           Copyright 2025 @ NoVeg.pvt.ltd - All Rights Reserved
         </p>
       </div>
+      {/* Show Chat component conditionally */}
+       {showChat && <Chat />}
     </div>
   );
 };
