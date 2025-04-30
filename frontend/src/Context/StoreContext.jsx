@@ -39,6 +39,7 @@ const StoreContextProvider = ({ children }) => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [transactionHistory, setTransactionHistory] = useState([]);
 
+    // 🧠 Restore user & location from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser && storedUser.address) {
@@ -61,52 +62,71 @@ const StoreContextProvider = ({ children }) => {
   }, []);
 
   // 🛒 Cart logic
-  const getTotalCartAmount = () => {
-    return Object.entries(cartItems).reduce((total, [id, quantity]) => {
-      const item = food_list.find((food) => food._id === id);
-      return total + (item?.price || 0) * quantity;
-    }, 0);
-  };
+  // 🛒 Cart logic
+const getTotalCartAmount = () => {
+  return Object.entries(cartItems).reduce((total, [id, quantity]) => {
+    const item = food_list.find((food) => food._id === id);
+    return total + (item?.price || 0) * quantity;
+  }, 0);
+};
 
-  const addToCart = (itemId, quantity = 1) => {
-    if (!userId) {
-      console.error("User must be logged in to add items to the cart.");
-      return;
-    }
-    setCartItems((prev) => {
-      const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
-      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
-      localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+const addToCart = (itemId, quantity = 1) => {
+  setCartItems((prev) => {
+    const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
 
-      if (!shopNames[itemId] && selectedShop?.name) {
-        setShopNameForItem(itemId, selectedShop.name);
-      }
-      return updatedCart;
-    });
-  };
-
-  const removeFromCart = (itemId) => {
-    if (!userId) return;
-
-    setCartItems((prev) => {
-      const updatedCart = { ...prev };
-      if (updatedCart[itemId] > 1) updatedCart[itemId] -= 1;
-      else delete updatedCart[itemId];
-      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
-      localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
-  };
-
-  const clearCart = () => {
+    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     if (userId) {
-      localStorage.removeItem(`cartItems_${userId}`);
+      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
     }
-    localStorage.removeItem("cartItems");
-    setCartItems({});
-    setPromoCode("");
-    setDiscountApplied(false);
-  };
+
+    if (!shopNames[itemId] && selectedShop?.name) {
+      setShopNameForItem(itemId, selectedShop.name);
+    }
+
+    return updatedCart;
+  });
+};
+
+const removeFromCart = (itemId) => {
+  setCartItems((prev) => {
+    const updatedCart = { ...prev };
+    if (updatedCart[itemId] > 1) updatedCart[itemId] -= 1;
+    else delete updatedCart[itemId];
+
+    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+    if (userId) {
+      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
+    }
+
+    return updatedCart;
+  });
+};
+
+const clearCart = () => {
+  setCartItems({});
+  setPromoCode("");
+  setDiscountApplied(false);
+  localStorage.removeItem("cartItems");
+  if (userId) {
+    localStorage.removeItem(`cartItems_${userId}`);
+  }
+};
+
+// 🧠 Merge guest cart into user cart after login
+useEffect(() => {
+  if (userId) {
+    const guestCart = JSON.parse(localStorage.getItem("cartItems")) || {};
+    const userCart = JSON.parse(localStorage.getItem(`cartItems_${userId}`)) || {};
+
+    // Merge both, prioritizing userCart
+    const mergedCart = { ...guestCart, ...userCart };
+
+    setCartItems(mergedCart);
+    localStorage.setItem("cartItems", JSON.stringify(mergedCart));
+    localStorage.setItem(`cartItems_${userId}`, JSON.stringify(mergedCart));
+  }
+}, [userId]);
+
 
   const setShopNameForItem = (itemId, shopName) => {
     setShopNames((prev) => {
