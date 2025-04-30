@@ -139,7 +139,7 @@ const verifyOrder = async (req, res) => {
     }
 
     // ✅ Generate NV Order ID
-    const customOrderId = generateOrderId();
+    const customOrderId = await generateOrderId();
 
     // ✅ Create and Save Order
     const newOrder = new orderModel({
