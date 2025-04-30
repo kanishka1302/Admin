@@ -71,20 +71,24 @@ const placeOrderRazorpay = async (req, res) => {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
-    const deliveryCharge = 50;
-    const currency = "INR";
-    const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
+    // ✅ Calculate total amount in rupees and paise
+    const totalAmountInRupees = parseFloat(
+      items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    ) + deliveryCharge;
 
     if (totalAmountInRupees <= 0) {
       return res.status(400).json({ success: false, message: "Total amount must be greater than 0." });
     }
 
-    const totalAmountInPaise = totalAmountInRupees * 100;
+    const totalAmountInPaise = Math.round(totalAmountInRupees * 100); // Razorpay expects amount in paise
+
+    // ✅ Generate custom order ID
     const orderId = await generateOrderId();
 
+    // ✅ Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({
       amount: totalAmountInPaise,
-      currency,
+      currency, // uses global constant
       receipt: `receipt_${orderId}`,
       notes: {
         address: JSON.stringify(address),
@@ -95,11 +99,12 @@ const placeOrderRazorpay = async (req, res) => {
       }
     });
 
+    // ✅ Return Razorpay order details to frontend
     res.status(200).json({
       success: true,
       message: "Razorpay order initialized",
       data: {
-        key: process.env.RAZORPAY_KEY_ID,
+        key: process.env.RAZORPAY_KEY_ID, // Safe to expose
         orderId,
         razorpayOrderId: razorpayOrder.id,
         amount: razorpayOrder.amount,
@@ -107,7 +112,7 @@ const placeOrderRazorpay = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error initializing Razorpay order:", error);
+    console.error("❌ Error initializing Razorpay order:", error?.message || error);
     res.status(500).json({ success: false, message: "Error initializing order" });
   }
 };
@@ -166,6 +171,7 @@ const verifyOrder = async (req, res) => {
 
     // ✅ Emit Real-time Notification
     const io = req.app.get("io");
+    
     io.emit("new-order", newOrder);
 
     // ✅ Send Response
