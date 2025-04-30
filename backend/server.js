@@ -62,49 +62,57 @@ const razorpay = new Razorpay({
 app.post("/api/order/razorpay", async (req, res) => {
   try {
     const { address, items, amount, userId, shopName, discountApplied, promoCode } = req.body;
+
+    // Validation for required fields
     if (!userId || !address || !items || !amount || isNaN(amount) || amount <= 0) {
       return res.status(400).json({ error: "Invalid request data" });
     }
 
+    const deliveryCharge = 50;
+    const currency = "INR";
+
+    // Calculate total amount based on items and add delivery charge
+    const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
+
+    if (totalAmountInRupees <= 0) {
+      return res.status(400).json({ success: false, message: "Total amount must be greater than 0." });
+    }
+
+    // Convert total amount to paise for Razorpay (1 INR = 100 paise)
+    const totalAmountInPaise = totalAmountInRupees * 100;
+
+    // Generate order ID for your system
+    const orderId = await generateOrderId();
+
+    // Create the Razorpay order
     const order = await razorpay.orders.create({
-      amount: amount * 100, // ✅ Convert to paise
-      currency: "INR",
-      receipt: `order_rcptid_${Date.now()}`,
+      amount: totalAmountInPaise, // Use calculated amount
+      currency: currency,
+      receipt: `order_rcptid_${orderId}`, // Use the generated orderId
       notes: {
         address: JSON.stringify(address),
         items: JSON.stringify(items),
       },
     });
-    
-    if (!order) throw new Error("Razorpay order creation failed");
-   /* const orderId = await generateOrderId();
-    
-    const newOrder = new orderModel({
-      userId,
-      address,
-      items,
-      amount, // ✅ Store in rupees
-      orderId,
-      paymentMethod: "razorpay",
-      status: "Order Received",
-      payment: false,
-      shopName,
-      discountApplied, 
-      promoCode,
+    // Send response with Razorpay order details
+    res.json({
+      success: true,
+      message: "Razorpay order initialized",
+      data: {
+        key: process.env.RAZORPAY_KEY_ID,
+        orderId,
+        razorpayOrderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+      },
     });
-    
 
-    await newOrder.save();
-
-    // ✅ Notify admin in real-time
-    io.emit("new-order", newOrder);
-*/
-    res.json({ success: true, order });
   } catch (err) {
     console.error("Error creating Razorpay order:", err.message);
     res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 });
+
 
 // ✅ Razorpay Payment Verification
 // ✅ Razorpay Payment Verification
