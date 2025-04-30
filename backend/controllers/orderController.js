@@ -80,7 +80,7 @@ const placeOrderRazorpay = async (req, res) => {
     }
 
     const totalAmountInPaise = totalAmountInRupees * 100;
-    const orderId = generateOrderId();
+    const orderId = await  generateOrderId();
 
     const razorpayOrder = await razorpay.orders.create({
       amount: totalAmountInPaise,
