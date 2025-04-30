@@ -16,10 +16,21 @@ const Navbar = ({ setShowLogin }) => {
   const [selectedLocation, setSelectedLocation] = useState('Select Location');
   const [showChat, setShowChat] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
 
   const { getTotalCartAmount, token, setToken, clearCart, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasShownPopup = localStorage.getItem("locationPopupShown");
+  
+    // Only show popup if the user is logged in and the popup hasn't been shown yet
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && !hasShownPopup) {
+      setShowLocationPopup(true);
+      localStorage.setItem("locationPopupShown", "true");
+    }
+  }, []);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -59,6 +70,7 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem('cartItems');
     localStorage.removeItem('locationPopupShown');
     localStorage.removeItem('user');
+    localStorage.removeItem('selectedLocation');
     setToken(null);
     clearCart();
     setLocation('');
