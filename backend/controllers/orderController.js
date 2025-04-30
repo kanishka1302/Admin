@@ -86,6 +86,12 @@ const placeOrderRazorpay = async (req, res) => {
       amount: totalAmountInPaise,
       currency,
       receipt: `receipt_${orderId}`,
+      notes: {
+        address: JSON.stringify(address),
+        items: JSON.stringify(items),
+        shopName,
+        discountApplied,
+        promoCode
     });
 
     res.status(200).json({
