@@ -170,16 +170,16 @@ const PlaceOrder = () => {
         const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+        console.log("Razorpay response:", response.data); 
         if (response.data.success) {
           const options = {
-            key: "rzp_test_eRSHa1kaUjMssI",
-            amount: response.data.order.amount,
-            currency: response.data.order.currency,
+            key: response.data.data.key, // Correct key
+            amount: response.data.data.amount, // Correct path to amount
+            currency: response.data.data.currency,
             name: "NoVeg Pvt. Ltd.",
             description: "Order Payment",
             image: assets.logo,
-            order_id: response.data.order.id,
+            order_id:  response.data.data.razorpayOrderId, 
             handler: async (response) => {
               try {
                 const verifyResponse = await axios.post(`${url}/api/order/verify`, {
@@ -218,8 +218,15 @@ const PlaceOrder = () => {
             },
             notes: { address: data.street },
           };
-          const razorpay = new window.Razorpay(options);
-          razorpay.open();
+          console.log("opening razorpay");
+          if (window.Razorpay) {
+            console.log("opened");
+            const razorpay = new window.Razorpay(options);
+            razorpay.open();
+          } else {
+            console.error("Razorpay script not loaded properly.");
+            toast.error("Razorpay script is not loaded. Please try again later.");
+          }
         }
       } else {
         const response = await axios.post(`${url}/api/order/cod`, orderData, {
