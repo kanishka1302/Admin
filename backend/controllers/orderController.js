@@ -71,7 +71,7 @@ const placeOrderRazorpay = async (req, res) => {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
-    const deliveryCharge = 40;
+    const deliveryCharge = 50;
     const currency = "INR";
     const totalAmountInRupees = items.reduce((acc, item) => acc + item.price * item.quantity, 0) + deliveryCharge;
 
