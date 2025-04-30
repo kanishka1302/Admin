@@ -40,7 +40,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://frontend-31u7.onrender.com'],
+  credentials: true
+}));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/images", express.static("uploads"));
@@ -58,6 +61,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+// ✅ Razorpay Order Creation
 // ✅ Razorpay Order Creation
 app.post("/api/order/razorpay", async (req, res) => {
   try {
@@ -94,6 +98,7 @@ app.post("/api/order/razorpay", async (req, res) => {
         items: JSON.stringify(items),
       },
     });
+
     // Send response with Razorpay order details
     res.json({
       success: true,
@@ -112,6 +117,7 @@ app.post("/api/order/razorpay", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 });
+
 
 
 // ✅ Razorpay Payment Verification
@@ -275,7 +281,7 @@ app.use("*", (req, res) => {
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: "https://frontend-31u7.onrender.com", // Change to frontend URL in production
+    origin: ["https://frontend-31u7.onrender.com",'http://localhost:5173'], // Change to frontend URL in production
     methods: ["GET", "POST"],
   },
 });
