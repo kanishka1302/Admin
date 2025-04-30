@@ -76,7 +76,7 @@
 }
 
 .food-item {
-  width: 80%; /* Full width */
+  width: 100%; /* Full width */
   height: 350px; /* Adjusted height for mobile */
   margin: 5px;
   border-radius: 8px; /* Reduced border radius */
