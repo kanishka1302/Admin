@@ -422,6 +422,9 @@ button:focus, input[type="radio"]:focus {
   .delivery-address {
     padding: 10px;
   }
+    .address-card{
+    width:200px;
+  }
 
   .address-form {
     padding: 12px;
