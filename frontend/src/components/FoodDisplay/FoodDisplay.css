@@ -1,250 +1,203 @@
 /* ============================================
-   Main Section
+   Main Section - Mobile Responsive Adjustments
 ============================================ */
 .food-display-wrapper .food-display {
-  margin-top: 30px;
-  padding: 40px;
-  background: #fce4e4; /* Light pinkish background */
-  border-radius: 20px;
-  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  max-width: 1400px;
-  margin: 0 auto; /* Center the section */
-  color: #8b0000; /* Deep red text color */
+  padding: 20px; /* Reduced padding for smaller screens */
+  margin-top: 10px;
+  background: #fce4e4;
+  border-radius: 10px; /* Reduced border radius for mobile */
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  max-width: 100%; /* Allow full-width container */
+  margin: 0 auto;
+  color: #8b0000;
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  align-items: flex-start;
-  min-height: 100vh; /* Ensure it takes full height */
-  padding-bottom: 100px;
+  gap: 20px;
+  min-height: 100vh;
+  padding-bottom: 50px; /* Reduced padding at the bottom */
   box-sizing: border-box;
-  flex-grow: 1; /* Allow the content to take up remaining space */
+  flex-grow: 1;
+  width: 100%; /* Ensure it's full-width on mobile */
 }
 
 /* ============================================
-   Section Header
+   Section Header - Mobile Adjustments
 ============================================ */
-.food-display-wrapper .food-display-header {
-  text-align: center;
-}
-
 .food-display-wrapper .food-display-header h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  padding: 20px 0;
-  background: #8b0000; /* Deep red background */
-  border-radius: 20px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Header shadow */
+  font-size: 1.8rem; /* Smaller font size */
+  margin-left: 0; /* Remove left margin */
+  padding: 10px 0; /* Reduced padding */
+  background: #8b0000;
+  border-radius: 10px; /* Reduced border radius */
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-left: 350px;
+  letter-spacing: 1px;
 }
 
 .food-display-wrapper .food-display-header p {
-  font-size: 1rem;
-  color: #8b0000; /* Deep red text color */
+  font-size: 0.9rem; /* Smaller font size */
   margin: 10px auto;
-  max-width: 800px;
-  margin-left: 350px;
+  max-width: 100%;
+  margin-left: 0; /* Removed left margin */
+  text-align: center; /* Center the text */
 }
 
 /* ============================================
-   Category Cards Section
+   Category Cards Section - Mobile Adjustments
 ============================================ */
 .food-display-wrapper .food-display-list {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping */
-  gap: 40px;
-  justify-content: space-between;
-  margin-left: 80px;
+  flex-wrap: wrap;
+  gap: 20px; /* Reduced gap */
+  justify-content: center; /* Center align the items */
+  margin-left: 0; /* Removed left margin */
 }
 
-/* Category Card */
 .food-category-card {
-  width: 110%; /* Increase width of category card */
-  background-color: #fff; /* White background for the card */
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for card */
-  margin-bottom: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-}
-
-/* Hidden Category Card */
-.food-category-card.hidden {
-  display: none; /* Hide categories not in view */
-}
-
-/* Category Title */
-.food-category-card .food-category h3 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #8b0000; /* Deep red text color */
-  text-align: center;
+  width: 100%; /* Full width for smaller screens */
+  max-width: 300px; /* Limit max width */
   margin-bottom: 20px;
-  padding: 10px 0;
-  background: #ffebd9; /* Light background for category name */
-  border-radius: 10px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1); /* Shadow for category */
+}
+
+.food-category-card .food-category h3 {
+  font-size: 1.5rem; /* Smaller font size */
+  padding: 8px 0;
+  margin-bottom: 15px;
+  background: #ffebd9;
 }
 
 /* ============================================
-   Food Items Section
+   Food Items Section - Mobile Adjustments
 ============================================ */
 .food-items {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three items per row */
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr); /* 2 items per row on mobile */
+  gap: 15px; /* Smaller gap */
   justify-items: center;
 }
 
-/* Food Item Container */
 .food-item {
-  width: 100%; /* Takes full width of the grid column */
-  height: 400px; /* Fixed height for items */
-  margin: 10px;
-  border-radius: 10px;
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  animation: fadeIn 1s ease-out; /* Fade-in animation */
-  display: flex;
-  flex-direction: column;
-  background: #fff; /* White background */
-  overflow: hidden;
-  position: relative;
-  box-sizing: border-box;
+  width: 75%; /* Full width */
+  height: 350px; /* Adjusted height for mobile */
+  margin: 5px;
+  border-radius: 8px; /* Reduced border radius */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1); /* Softer shadow */
 }
 
-/* Outer Container for Double-Layer Effect */
-.food-item::before {
-  content: "";
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  background: linear-gradient(145deg, #ffc1c1, #ff9999); /* Light red gradient */
-  border-radius: 12px;
-  z-index: -1; /* Outer layer behind the inner container */
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Food Item Image Styling */
 .food-item-image {
-  width: 100%;
-  height: 200px; /* Fixed height */
-  object-fit: cover;
-  border-radius: 10px 10px 0 0;
-  transition: transform 0.3s ease-in-out;
+  height: 150px; /* Smaller image height */
 }
 
-/* Hover Effect for the Image */
-.food-item:hover .food-item-image {
-  transform: scale(1.1); /* Zoom effect */
-}
-
-/* Food Item Info Section */
 .food-item-info {
-  padding: 15px;
-  color: #8b0000; /* Deep red text color */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Food Item Name and Rating Section */
-.food-item-name-rating {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  padding: 10px; /* Reduced padding */
 }
 
 .food-item-name-rating p {
-  font-size: 22px;
-  font-weight: 600;
-  color: #8b0000; /* Deep red text color */
+  font-size: 18px; /* Smaller font size */
 }
 
-.food-item-name-rating img {
-  max-width: 60px;
-  height: auto;
-}
-
-/* Food Item Description */
 .food-item-desc {
-  color: #8b0000; /* Deep red text color */
-  font-size: 14px;
-  margin-bottom: 10px;
+  font-size: 12px; /* Smaller description font size */
 }
 
-/* Food Item Weight Label */
 .food-item-weight {
-  font-size: 18px;
-  font-weight: 500;
-  color: #8b0000; /* Deep red text color */
-  margin: 5px 0;
+  font-size: 14px; /* Smaller weight font size */
 }
 
-/* Food Item Price Styling */
 .food-item-price {
-  color: #ffd700; /* Gold color */
-  font-size: 28px;
-  font-weight: 600;
-  margin: 10px 0;
+  font-size: 22px; /* Smaller price font size */
 }
 
-/* Add to Cart Button */
 .food-item-img-container .add {
-  width: 40px;
-  height: 40px;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  cursor: pointer;
-  border-radius: 50%;
-  background-color: #b22222; /* Deep red button */
-  color: white;
-  font-size: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 35px; /* Smaller button */
+  height: 35px;
+  font-size: 20px;
 }
 
 /* ============================================
-   Footer
+   Footer - Mobile Adjustments
 ============================================ */
 footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  padding: 20px;
-  background: #8b0000; /* Deep red background */
-  color: white;
-  text-align: center;
-  font-size: 1rem;
-  margin-top: auto; /* Push footer to the bottom */
+  font-size: 0.9rem; /* Smaller footer text */
 }
 
 /* ============================================
-   Banner Container
+   Banner - Mobile Adjustments
 ============================================ */
-.banner-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .comingsoon-banner {
-  width: 100%;
-  max-width: 1400px;
+  max-width: 100%; /* Full-width banner */
   height: auto;
 }
 
+/* ============================================
+   Mobile-Specific Styles
+============================================ */
+@media (max-width: 768px) {
+  .food-display-wrapper .food-display-header h2 {
+    font-size: 2rem;
+    padding: 15px 0;
+  }
+
+  .food-category-card {
+    width: 48%; /* Two cards per row on tablets */
+  }
+
+  .food-items {
+    grid-template-columns: repeat(2, 1fr); /* Two items per row on tablets */
+  }
+
+  .food-item {
+    height: 350px; /* Adjusted height */
+  }
+
+  .food-item-image {
+    height: 180px; /* Larger image height */
+  }
+
+  .food-item-name-rating p {
+    font-size: 20px; /* Adjusted size */
+  }
+
+  .food-item-price {
+    font-size: 24px; /* Larger font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .food-display-wrapper .food-display {
+    padding: 15px; /* Reduced padding for very small screens */
+    width: 100%; /* Ensure full width on smaller screens */
+  }
+
+  .food-display-wrapper .food-display-header h2 {
+    font-size: 1.6rem; /* Smaller font size */
+  }
+
+  .food-category-card {
+    width: 100%; /* Full width on mobile */
+    max-width: none; /* Remove max-width constraint */
+  }
+
+  .food-items {
+    grid-template-columns: repeat(1, 1fr); /* One item per row on phones */
+  }
+
+  .food-item {
+    height: 320px; /* Slightly smaller height */
+  }
+
+  .food-item-image {
+    height: 150px; /* Smaller image height */
+  }
+
+  .food-item-name-rating p {
+    font-size: 18px; /* Adjusted size */
+  }
+
+  .food-item-price {
+    font-size: 20px; /* Smaller font size */
+  }
+
+  footer {
+    font-size: 0.85rem; /* Smaller footer text */
+  }
+}
