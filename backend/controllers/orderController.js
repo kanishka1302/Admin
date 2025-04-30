@@ -80,7 +80,7 @@ const placeOrderRazorpay = async (req, res) => {
     }
 
     const totalAmountInPaise = totalAmountInRupees * 100;
-    const orderId = await  generateOrderId();
+    const orderId = await generateOrderId();
 
     const razorpayOrder = await razorpay.orders.create({
       amount: totalAmountInPaise,
@@ -92,6 +92,7 @@ const placeOrderRazorpay = async (req, res) => {
         shopName,
         discountApplied,
         promoCode
+      }
     });
 
     res.status(200).json({
@@ -110,6 +111,7 @@ const placeOrderRazorpay = async (req, res) => {
     res.status(500).json({ success: false, message: "Error initializing order" });
   }
 };
+
 
 
 // ✅ Entry Point
