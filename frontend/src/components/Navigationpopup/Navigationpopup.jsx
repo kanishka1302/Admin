@@ -26,7 +26,8 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
     if (pinCode.length === 6) {
       const location = serviceableLocations[pinCode];
       if (location) {
-        onLocationSubmit(location); // ✅ Send location name
+        localStorage.setItem('selectedLocation', location); // ✅ Save to localStorage
+        onLocationSubmit(location);
         setLocationMessage('');
         onClose();
       } else {
