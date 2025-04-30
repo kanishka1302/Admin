@@ -3,13 +3,14 @@ import './ExploreMenu.css';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 import NavigationPopup from '../Navigationpopup/Navigationpopup';
-import { StoreContext } from '../../Context/StoreContext'; 
+import { StoreContext } from '../../Context/StoreContext';
 
 const ExploreMenu = () => {
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pendingCategory, setPendingCategory] = useState(null);
+  const [locationSelected, setLocationSelected] = useState(false);
   const { setLocation } = useContext(StoreContext);
 
 
@@ -24,11 +25,22 @@ const ExploreMenu = () => {
   useEffect(() => {
     const user = localStorage.getItem('user');
     setIsLoggedIn(!!user);
+    
+    const selectedLocation = localStorage.getItem('selectedLocation');
+    if (selectedLocation) {
+      setLocationSelected(true); // If location is selected, we don't need to ask again
+    }
   }, []);
 
   const handleNavigation = (menuName) => {
-    setPendingCategory(menuName);
-    setShowPopup(true); // Show popup always when "Add" is clicked
+    if (!isLoggedIn || !locationSelected) {
+      setPendingCategory(menuName);
+      setShowPopup(true); // Show location popup before login or when location isn't selected
+      return;
+    }
+
+    navigate(`/shops?category=${menuName}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePopupClose = () => {
@@ -38,15 +50,23 @@ const ExploreMenu = () => {
 
   const handleLocationSubmit = (location) => {
     console.log('Location selected:', location);
-    setLocation(location); 
+    localStorage.setItem('selectedLocation', location); // Store raw location
+    setLocation(location); // ✅ Update context so Navbar gets updated
+  
+    // Optionally update user object if your app relies on it elsewhere
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const updatedUser = { ...user, address: location };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  
     setShowPopup(false);
-
+  
     if (pendingCategory) {
       navigate(`/shops?category=${pendingCategory}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPendingCategory(null);
     }
   };
+  
 
   return (
     <div className="explore-menu" id="explore-menu">
