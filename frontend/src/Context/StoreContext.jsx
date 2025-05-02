@@ -3,13 +3,13 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
-export const socket = io("https://admin-92vt.onrender.com");  // replace with your server URL
+export const socket = io("https://socket1-8bma.onrender.com");  // replace with your server URL
 
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = ({ children }) => {
-  const url = "https://socket1-8bma.onrender.com";
+  const url = "https://admin-92vt.onrender.com";
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
   const [userId, setUserId] = useState("");
