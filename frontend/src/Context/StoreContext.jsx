@@ -9,7 +9,7 @@ export const socket = io("https://admin-92vt.onrender.com");  // replace with yo
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = ({ children }) => {
-  const url = "https://admin-92vt.onrender.com";
+  const url = "https://socket1-8bma.onrender.com";
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
   const [userId, setUserId] = useState("");
