@@ -23,8 +23,7 @@ const getInitialChatKey = () => {
 };
 
 const socket = io("https://socket1-8bma.onrender.com", {
-  transports: ["websocket"],
-  upgrade: false,
+  withCredentials: true,
 });
 
 
