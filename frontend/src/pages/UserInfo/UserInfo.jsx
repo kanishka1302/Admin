@@ -15,6 +15,8 @@ const UserInfo = () => {
   });
 
   const { walletBalance, fetchWalletDetails } = useContext(StoreContext);
+  const firstSavedAddress = userAddresses[0];  // This will always give the first address
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -63,8 +65,17 @@ const UserInfo = () => {
 
     fetchAddresses();
   }, []);
-  
+
   const defaultAddress = userAddresses.find(addr => addr.default);
+
+  useEffect(() => {
+    if (defaultAddress && defaultAddress.address !== formData.address) {
+      setFormData((prevData) => ({
+        ...prevData,
+        address: defaultAddress.address, // Update form data address only if it is different from the current one
+      }));
+    }
+  }, [defaultAddress]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -100,6 +111,7 @@ const UserInfo = () => {
     setUser(updatedUser);
     setFormData(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
+
 
     try {
       const response = await fetch("/api/updateUser", {
@@ -180,18 +192,18 @@ const UserInfo = () => {
           ) : user.mobileNumber}
         </p>
 
-         <p><strong>Address:</strong>{" "}
+        <p><strong>Address:</strong>{" "}
         <div>
-            {defaultAddress ? (
+            {firstSavedAddress ? (
               <div className="address-card">
-                <p className="type"><strong>Type:</strong> {defaultAddress.type || "N/A"}</p>
-                <p><strong>Name:</strong> {defaultAddress.name}</p>
-                <p><strong>Mobile:</strong> {defaultAddress.mobileNumber}</p>
-                <p><strong>Address:</strong> {defaultAddress.address}</p>
-                <p><strong>City:</strong> {defaultAddress.city}</p>
-                <p><strong>State:</strong> {defaultAddress.state}</p>
-                <p><strong>Pin Code:</strong> {defaultAddress.pincode}</p>
-                <p><strong>Country:</strong> {defaultAddress.country || "India"}</p>
+                <p className="type"><strong>Type:</strong> {firstSavedAddress.type || "N/A"}</p>
+                <p><strong>Name:</strong> {firstSavedAddress.name}</p>
+                <p><strong>Mobile:</strong> {firstSavedAddress.mobileNumber}</p>
+                <p><strong>Address:</strong> {firstSavedAddress.address}</p>
+                <p><strong>City:</strong> {firstSavedAddress.city}</p>
+                <p><strong>State:</strong> {firstSavedAddress.state}</p>
+                <p><strong>Pin Code:</strong> {firstSavedAddress.pincode}</p>
+                <p><strong>Country:</strong> {firstSavedAddress.country || "India"}</p>
               </div>
             ) : (
               <p>No default address found.</p>
