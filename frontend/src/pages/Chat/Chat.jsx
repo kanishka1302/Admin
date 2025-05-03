@@ -199,7 +199,7 @@ const Chat = () => {
       const parsedUser = JSON.parse(storedUser);
       const { mobileNumber } = parsedUser;
 
-      const response = await fetch("http://localhost:4000/api/tickets/create", {
+      const response = await fetch("https://admin-92vt.onrender.com/api/tickets/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ issue, mobileNumber }),
