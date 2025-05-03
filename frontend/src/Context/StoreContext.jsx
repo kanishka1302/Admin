@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 
-const socket = io("https://socket1-8bma.onrender.com
+const socket = io("https://socket1-8bma.onrender.com");
 
 export const StoreContext = createContext(null);
 
