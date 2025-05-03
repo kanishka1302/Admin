@@ -285,7 +285,8 @@ export const io = new Server(server, {
     origin: [
       "https://frontend-31u7.onrender.com",
       "http://localhost:5173",
-      "https://admin-1-55sr.onrender.com"
+      "https://admin-1-55sr.onrender.com",
+      "https://customer-desk-frontend.onrender.com"
     ],
     methods: ["GET", "POST"],
     credentials: true  // ✅ Add this line
