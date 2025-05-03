@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./Chat.css";
 import chaticon from "../../assets/chaticon.png";
 
-
-
-// Helper: Get unique chat key per user
 const getInitialChatKey = () => {
   const storedUser = localStorage.getItem("user");
   if (storedUser) {
@@ -22,10 +19,7 @@ const getInitialChatKey = () => {
   return "chatMessages_default";
 };
 
-const socket = io("https://socket1-8bma.onrender.com", {
-  withCredentials: true,
-});
-
+const socket = io("https://socket1-8bma.onrender.com");
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -37,10 +31,9 @@ const Chat = () => {
   const ticketIdRef = useRef(ticketId);
   const [userName, setUserName] = useState("User");
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isChatVisible, setIsChatVisible] = useState(true); // New state to control visibility
+  const [isChatVisible, setIsChatVisible] = useState(true);
   const messagesEndRef = useRef(null);
   const [conversationState, setConversationState] = useState("initial");
-  const location = useLocation();
 
   useEffect(() => {
     ticketIdRef.current = ticketId;
@@ -69,15 +62,6 @@ const Chat = () => {
     }
   }, [chatKey]);
 
-  
-  useEffect(() => {
-    if (location.pathname === "/chat") {
-      setIsChatVisible(true);
-      setIsMinimized(false); // optional: un-minimize when navigating back
-    }
-  }, [location]);
-
-
   useEffect(() => {
     const persistable = messages.filter((msg) => typeof msg.text === "string");
     localStorage.setItem(chatKey, JSON.stringify(persistable));
@@ -104,28 +88,11 @@ const Chat = () => {
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-      if (data.ticketId === ticketIdRef.current) {
-        setMessages((prev) => {
-          if (!prev.some((msg) => msg.text === data.message && msg.sender === data.sender)) {
-            return [...prev, { sender: data.sender, text: data.message }];
-          }
-          return prev;
-        });
-
-        if (data.sender === "agent" && data.message.toLowerCase() === "solved") {
-          setTimeout(() => {
-            setMessages((prev) => [
-              ...prev,
-              { sender: "bot", text: "Thank you, have a good day!" },
-              { sender: "system", text: "Live chat ended. Start a new issue to reopen support." }
-            ]);
-            setConversationState("post_solved");
-            setAgentConnected(false);
-            const identifier = chatKey.split("_")[1];
-            localStorage.removeItem(`ticketId_${identifier}`);
-            setTicketId(null);
-          }, 500);
-        }
+      if (data.ticketId === ticketIdRef.current && data.sender !== "user") {
+        setMessages((prev) => [
+          ...prev,
+          { sender: data.sender, text: data.message },
+        ]);
       }
     };
 
@@ -152,7 +119,8 @@ const Chat = () => {
     const userInput = msgToSend.toLowerCase();
     setInput("");
 
-    updateMessages({ sender: "user", text: msgToSend });
+    const newMessage = { sender: "user", text: msgToSend };
+    updateMessages(newMessage);
 
     if (userInput === "solved") {
       updateMessages({ sender: "bot", text: "Thank you, have a good day!" });
@@ -166,7 +134,7 @@ const Chat = () => {
     }
 
     if (agentConnected && ticketId) {
-      socket.emit("sendMessage", { ticketId, sender: "user", message: msgToSend });
+      socket.emit("sendMessage", { ticketId, sender: "user", message: msgToSend, timestamp: new Date().toISOString() });
       return;
     }
 
@@ -215,7 +183,7 @@ const Chat = () => {
     setAgentConnected(true);
     socket.emit("joinRoom", ticketRoom || ticketId);
     updateMessages({
-      sender: "agent",
+      sender: "support",
       text: "Hello, I am here to help you with your issue. How can I assist further?",
     });
   };
@@ -227,40 +195,40 @@ const Chat = () => {
         updateMessages({ sender: "bot", text: "User data not found. Please log in again." });
         return;
       }
-  
+
       const parsedUser = JSON.parse(storedUser);
       const { mobileNumber } = parsedUser;
-  
-      const response = await fetch("https://admin-92vt.onrender.com/api/tickets/create", {
+
+      const response = await fetch("http://localhost:4000/api/tickets/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ issue, mobileNumber }),
       });
-  
+
       if (!response.ok) throw new Error("Failed to create ticket");
-  
+
       const data = await response.json();
       const generatedTicketId = data?.ticket?.ticketId;
-      
+
       if (generatedTicketId) {
         setTicketId(generatedTicketId);
         const identifier = chatKey.split("_")[1];
         localStorage.setItem(`ticketId_${identifier}`, generatedTicketId);
-  
+
         updateMessages({
           sender: "bot",
           text: `Your ticket ID is ${generatedTicketId}. Please wait while we process your request.`,
         });
-  
+
         socket.emit("joinRoom", generatedTicketId);
-  
+
         setTimeout(() => {
           updateMessages({ sender: "bot", text: "Chat with our live customer agent." });
           setTimeout(() => {
             connectAgent(generatedTicketId);
           }, 2000);
         }, 2000);
-  
+
         setConversationState("active_ticket");
       } else {
         updateMessages({ sender: "bot", text: "Ticket created but ID missing. Please try again." });
@@ -270,7 +238,6 @@ const Chat = () => {
       updateMessages({ sender: "bot", text: "Something went wrong while creating ticket." });
     }
   };
-  
 
   const navigateHome = () => {
     navigate("/");
@@ -281,7 +248,7 @@ const Chat = () => {
   };
 
   const handleClose = () => {
-    setIsChatVisible(false); // Close the chat when "X" is clicked
+    setIsChatVisible(false);
   };
 
   return (
