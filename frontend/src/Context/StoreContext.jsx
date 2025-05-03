@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 
 const socket = io("https://socket1-8bma.onrender.com", {
+  transports: ["polling"], // force polling only
   withCredentials: true,
-  transports: ["websocket", "polling"]
 });
 
 export const StoreContext = createContext(null);
