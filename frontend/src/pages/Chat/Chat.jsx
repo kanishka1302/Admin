@@ -19,7 +19,7 @@ const getInitialChatKey = () => {
   return "chatMessages_default";
 };
 
-const socket = io("https://socket1-8bma.onrender.com"
+const socket = io("https://socket1-8bma.onrender.com");
 
 const Chat = () => {
   const navigate = useNavigate();
