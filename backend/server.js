@@ -278,13 +278,18 @@ app.use("*", (req, res) => {
 });
 
 // ✅ Socket.IO Server Setup
-const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: ["https://frontend-31u7.onrender.com",'http://localhost:5173','https://admin-1-55sr.onrender.com'], // Change to frontend URL in production
+    origin: [
+      "https://frontend-31u7.onrender.com",
+      "http://localhost:5173",
+      "https://admin-1-55sr.onrender.com"
+    ],
     methods: ["GET", "POST"],
+    credentials: true  // ✅ Add this line
   },
 });
+
 
 // ✅ Handle socket connections
 io.on("connection", (socket) => {
