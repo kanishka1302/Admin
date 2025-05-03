@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 
 // ✅ Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://frontend-31u7.onrender.com'],
+  origin: ['http://localhost:5173', 'https://frontend-31u7.onrender.com','https://admin-1-55sr.onrender.com'],
   credentials: true
 }));
 app.use(express.json());
@@ -281,7 +281,7 @@ app.use("*", (req, res) => {
 const server = http.createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin: ["https://frontend-31u7.onrender.com",'http://localhost:5173','https://admin-1-55sr.onrender.com'], // Change to frontend URL in production
+    origin: ["https://frontend-31u7.onrender.com",'http://localhost:5173'], // Change to frontend URL in production
     methods: ["GET", "POST"],
   },
 });
