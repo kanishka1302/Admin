@@ -277,6 +277,8 @@ app.use("*", (req, res) => {
   res.status(404).send(`Cannot ${req.method} ${req.originalUrl}`);
 });
 
+const server = http.createServer(app);
+
 // ✅ Socket.IO Server Setup
 export const io = new Server(server, {
   cors: {
