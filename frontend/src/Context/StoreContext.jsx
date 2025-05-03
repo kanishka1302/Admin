@@ -3,8 +3,11 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
-export const socket = io("https://socket1-8bma.onrender.com");  // replace with your server URL
 
+const socket = io("https://socket1-8bma.onrender.com", {
+  withCredentials: true,
+  transports: ["websocket", "polling"]
+});
 
 export const StoreContext = createContext(null);
 
