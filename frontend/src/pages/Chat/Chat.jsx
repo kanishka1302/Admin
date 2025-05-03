@@ -20,9 +20,10 @@ const getInitialChatKey = () => {
 };
 
 const socket = io("https://socket1-8bma.onrender.com", {
+  transports: ["polling"], // force polling only
   withCredentials: true,
-  transports: ["websocket", "polling"]
 });
+
 
 const Chat = () => {
   const navigate = useNavigate();
