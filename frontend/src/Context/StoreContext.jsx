@@ -3,8 +3,8 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
+export const socket = io("https://socket1-8bma.onrender.com");  // replace with your server URL
 
-const socket = io("https://socket1-8bma.onrender.com");
 
 export const StoreContext = createContext(null);
 
@@ -39,13 +39,39 @@ const StoreContextProvider = ({ children }) => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [transactionHistory, setTransactionHistory] = useState([]);
 
-    // 🧠 Restore user & location from localStorage
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.address) {
-      setLocation(storedUser.address);
+   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    setToken(localStorage.getItem("token") || "");
+
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUserId(parsedUser?.userId || parsedUser?._id || "");
+      } catch (error) {
+        console.error("Error parsing user data from localStorage:", error);
+      }
     }
   }, []);
+
+  const userMobile = localStorage.getItem("userMobile");
+
+  useEffect(() => {
+    if (userMobile) {
+      axios.post(`${url}/api/cart/get`, { mobileNumber: userMobile })
+        .then((res) => {
+          if (res.data.success) {
+            const dbCart = {};
+            res.data.cart.items.forEach(item => {
+              dbCart[item.productId] = item.quantity;
+            });
+            setCartItems(dbCart);
+            localStorage.setItem("cartItems", JSON.stringify(dbCart));
+            localStorage.setItem(`cartItems_${userMobile}`, JSON.stringify(dbCart));
+          }
+        }).catch(err => console.error("Fetch user cart error:", err));
+    }
+  }, [userMobile]);
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -62,7 +88,6 @@ const StoreContextProvider = ({ children }) => {
   }, []);
 
   // 🛒 Cart logic
-  // 🛒 Cart logic
 const getTotalCartAmount = () => {
   return Object.entries(cartItems).reduce((total, [id, quantity]) => {
     const item = food_list.find((food) => food._id === id);
@@ -70,39 +95,76 @@ const getTotalCartAmount = () => {
   }, 0);
 };
 
-const addToCart = (itemId, quantity = 1) => {
+const addToCart = async (itemId, quantity = 1) => {
   setCartItems((prev) => {
     const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
 
+    // Update localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     if (userId) {
       localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
     }
 
+    // Update shop name for the item
     if (!shopNames[itemId] && selectedShop?.name) {
       setShopNameForItem(itemId, selectedShop.name);
     }
 
-    return updatedCart;
-  });
-};
-
-const removeFromCart = (itemId) => {
-  setCartItems((prev) => {
-    const updatedCart = { ...prev };
-    if (updatedCart[itemId] > 1) updatedCart[itemId] -= 1;
-    else delete updatedCart[itemId];
-
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+    // Update cart in the database (only if user is logged in)
     if (userId) {
-      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
+      axios.post('https://admin-92vt.onrender.com/api/cart/add', {
+        mobileNumber: userId, // Assuming userId is the mobile number or a unique identifier
+        productId: itemId,
+        quantity,
+      })
+      .then((response) => {
+        console.log('Cart updated in the database:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error updating cart in DB:', error);
+      });
     }
 
     return updatedCart;
   });
 };
 
-const clearCart = () => {
+const removeFromCart = async (itemId) => {
+  setCartItems((prev) => {
+    const updatedCart = { ...prev };
+    
+    // Remove or update item quantity in the cart
+    if (updatedCart[itemId] > 1) {
+      updatedCart[itemId] -= 1;
+    } else {
+      delete updatedCart[itemId];
+    }
+
+    // Update localStorage
+    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+    if (userId) {
+      localStorage.setItem(`cartItems_${userId}`, JSON.stringify(updatedCart));
+    }
+
+    // Update cart in the database (only if user is logged in)
+    if (userId) {
+      axios.post('https://admin-92vt.onrender.com/api/cart/remove', {
+        mobileNumber: userId, // Assuming userId is the mobile number or unique identifier
+        productId: itemId,
+      })
+      .then((response) => {
+        console.log('Cart updated in the database:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error updating cart in DB:', error);
+      });
+    }
+
+    return updatedCart;
+  });
+};
+
+const clearCart = async () => {
   setCartItems({});
   setPromoCode("");
   setDiscountApplied(false);
@@ -112,21 +174,16 @@ const clearCart = () => {
   }
 };
 
-// 🧠 Merge guest cart into user cart after login
 useEffect(() => {
   if (userId) {
     const guestCart = JSON.parse(localStorage.getItem("cartItems")) || {};
     const userCart = JSON.parse(localStorage.getItem(`cartItems_${userId}`)) || {};
-
-    // Merge both, prioritizing userCart
     const mergedCart = { ...guestCart, ...userCart };
-
     setCartItems(mergedCart);
     localStorage.setItem("cartItems", JSON.stringify(mergedCart));
     localStorage.setItem(`cartItems_${userId}`, JSON.stringify(mergedCart));
   }
 }, [userId]);
-
 
   const setShopNameForItem = (itemId, shopName) => {
     setShopNames((prev) => {
