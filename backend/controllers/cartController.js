@@ -1,68 +1,137 @@
-import userModel from "../models/userModel.js"
+import Cart from '../models/cartModel.js'; // Assuming a Cart model is used to store cart items
 
-//Add Items to user cart
+// Add item to the cart
+export const addToCart = async (req, res) => {
+  try {
+    const { mobileNumber, productId, quantity } = req.body;
 
-const addToCart = async (req, res) => {
-    try {
-        let userData = await userModel.findById( req.body.userId );
-
-        if (!userData) {
-            return res.json({ success: false, message: "User not found" });
-        }
-
-        let cartData = userData.cartData || {};  // Default to an empty object if cartData doesn't exist
-
-        // Increment the item quantity or initialize it
-        if (!cartData[req.body.itemId]) {
-            cartData[req.body.itemId] = 1;
-        } else {
-            cartData[req.body.itemId] += 1;
-        }
-
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData });
-
-        res.json({ success: true, message: "Added to Cart" });
-
-    } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message || "Error occurred while adding to cart" });
+    // Validate request data
+    if (!mobileNumber || !productId || !quantity || quantity <= 0) {
+      return res.status(400).json({ message: 'Invalid request data' });
     }
+
+    // Find existing cart for the user or create a new one
+    let cart = await Cart.findOne({ mobileNumber });
+
+    if (!cart) {
+      // If no cart exists, create a new cart
+      cart = new Cart({ mobileNumber, items: [{ productId, quantity }] });
+    } else {
+      // If cart exists, update the items
+      const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+      if (itemIndex !== -1) {
+        // Item already exists in cart, update quantity
+        cart.items[itemIndex].quantity += quantity;
+      } else {
+        // Item doesn't exist, add new item
+        cart.items.push({ productId, quantity });
+      }
+    }
+
+    await cart.save();
+    res.status(200).json({ success: true, message: 'Item added to cart', cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to add item to cart' });
+  }
 };
 
+// Get the user's cart
+export const getCart = async (req, res) => {
+  try {
+    const { mobileNumber } = req.body;
 
-//Remove items from user cart
-
-const removeFromCart = async (req,res)=>{
-    try{
-        let userData = await userModel.findById(req.body.userId);
-        let cartData = await userData.cartData;
-        if (cartData[req.body.itemId]>0){
-            cartData[req.body.itemId] -=1;
-
-        }
-        await userModel.findByIdAndUpdate(req.body.userId,{cartData});
-        res.json({success:true,message:"Removed from Cart"})
-    } catch (error){
-        console.log(error);
-        res.json({success:false,message:"Error"})
+    // Validate request data
+    if (!mobileNumber) {
+      return res.status(400).json({ message: 'Mobile number is required' });
     }
-}
 
-//Fetch user cart data
+    // Find cart for the user
+    const cart = await Cart.findOne({ mobileNumber });
 
-const getCart = async (req,res)=>{
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    res.status(200).json({ success: true, cart });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch cart' });
+  }
+};
+
+// Remove item from the cart
+export const removeFromCart = async (req, res) => {
     try {
-        let userData = await userModel.findById(req.body.userId);
-        let cartData = await userData.cartData;
-        res.json({success:true,cartData})
+      const { mobileNumber, productId } = req.body;
+  
+      // Validate request data
+      if (!mobileNumber || !productId) {
+        return res.status(400).json({ message: 'Mobile number and product ID are required' });
+      }
+  
+      // Find cart for the user
+      const cart = await Cart.findOne({ mobileNumber });
+  
+      if (!cart) {
+        return res.status(404).json({ message: 'Cart not found' });
+      }
+  
+      // Remove the item from the cart
+      cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+  
+      // If no items left in the cart, delete the entire cart from the database
+      if (cart.items.length === 0) {
+        await Cart.deleteOne({ mobileNumber });
+        return res.status(200).json({ success: true, message: 'Cart is empty now and deleted from the database' });
+      }
+  
+      await cart.save();
+      res.status(200).json({ success: true, message: 'Item removed from cart', cart });
     } catch (error) {
-        console.log(error);
-        res.json({success:false,message:"Error"})
-        
+      console.error(error);
+      res.status(500).json({ message: 'Failed to remove item from cart' });
     }
+  };
+  
 
+export const clearCart = async (req, res) => {
+    try {
+      const { mobileNumber } = req.body;
+  
+      if (!mobileNumber) {
+        return res.status(400).json({ message: 'Mobile number is required' });
+      }
+  
+      const cart = await Cart.findOne({ mobileNumber });
+  
+      if (!cart) {
+        return res.status(404).json({ message: 'Cart not found' });
+      }
+  
+      cart.items = []; // Clear all items
+      await cart.save();
+  
+      res.status(200).json({ success: true, message: 'Cart cleared successfully' });
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      res.status(500).json({ message: 'Server error while clearing cart' });
+    }
+  };
 
+  // Delete the cart after an order is placed
+export const deleteCartAfterOrder = async (mobileNumber) => {
+  try {
+    // Find and delete the cart for the user
+    const cart = await Cart.findOne({ mobileNumber });
 
-}
-
-export {addToCart,removeFromCart,getCart}
+    if (cart) {
+      await Cart.deleteOne({ mobileNumber });
+      console.log(`Cart deleted for user: ${mobileNumber}`);
+    } else {
+      console.log(`No cart found for user: ${mobileNumber}`);
+    }
+  } catch (error) {
+    console.error('Error deleting cart after order:', error);
+  }
+};
