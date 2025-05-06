@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import cartModel from "../models/cartModel.js";
 import { generateOrderId } from "../utils/generateOrderId.js";
 import Razorpay from "razorpay";
 import mongoose from "mongoose";
@@ -45,7 +46,13 @@ const placeOrderCod = async (req, res) => {
     });
 
     await newOrder.save();
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    // 🔥 Delete cart items for this user after placing the order
+    await cartModel.deleteMany({ userId });
+
+    // Clear User's Cart
+    await userModel.findByIdAndUpdate(userId, { $set: { cartData: {} } });
+
+    io.emit("cartUpdated", { userId, cartData: {} });
 
     const io = req.app.get("io");
     io.emit("new-order", newOrder);
@@ -55,6 +62,7 @@ const placeOrderCod = async (req, res) => {
       message: "COD Order Placed Successfully",
       orderId,
       data: newOrder,
+      cartStatus: "Cart is empty now and deleted from the database",
     });
   } catch (error) {
     console.error("❌ Error placing COD order:", error);
@@ -166,8 +174,13 @@ const verifyOrder = async (req, res) => {
 
     await newOrder.save();
 
-    // ✅ Clear User's Cart
-    await userModel.findByIdAndUpdate(orderData.userId, { cartData: {} });
+     // 🔥 Delete cart items for this user after placing the order
+     await cartModel.deleteMany({ userId });
+
+     // Clear User's Cart
+     await userModel.findByIdAndUpdate(orderData.userId, { $set: { cartData: {} } });
+ 
+     io.emit("cartUpdated", { userId: orderData.userId, cartData: {} });
 
     // ✅ Emit Real-time Notification
     const io = req.app.get("io");
@@ -180,6 +193,7 @@ const verifyOrder = async (req, res) => {
       message: "Payment verified and order placed successfully!",
       orderId: customOrderId,
       paymentId: razorpay_payment_id,
+      cartStatus: "Cart is empty now and deleted from the database",
     });
 
   } catch (error) {
