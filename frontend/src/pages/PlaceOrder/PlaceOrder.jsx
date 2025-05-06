@@ -196,6 +196,11 @@ const PlaceOrder = () => {
                   toast.success("Payment Verified & Order Placed!");
                   setNewOrder({ ...orderData, _id: finalOrderId });
                   setOrderPlaced(true);
+                  await axios.post(`${url}/api/cart/order/placed`, {
+                    mobileNumber: userId,
+                  }, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });                  
                   setTimeout(() => {
                     clearCart();
                     setCartItems({});
@@ -237,6 +242,12 @@ const PlaceOrder = () => {
           toast.success("Order placed successfully!");
           setNewOrder({ ...orderData, _id: response.data.orderId });
           setOrderPlaced(true);
+          await axios.post(`${url}/api/cart/order/placed`, {
+            mobileNumber: userId,
+          }, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          
           setTimeout(() => {
             clearCart();
             setCartItems({});
