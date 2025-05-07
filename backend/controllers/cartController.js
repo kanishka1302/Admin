@@ -1,137 +1,178 @@
-import Cart from '../models/cartModel.js'; // Assuming a Cart model is used to store cart items
+import Cart from '../models/cartModel.js';
+import Profile from '../models/profileModel.js';
 
-// Add item to the cart
+// Get profile by mobileNumber or email
+const getProfile = async (identifier) => {
+  console.log(`Looking for profile with identifier: ${identifier}`);
+  return await Profile.findOne({
+    $or: [{ mobileNumber: identifier }, { email: identifier }],
+  });
+};
+
 export const addToCart = async (req, res) => {
   try {
-    const { mobileNumber, productId, quantity } = req.body;
+    const { mobileOrEmail, productId, quantity } = req.body;
+    console.log('addToCart called with:', req.body);
 
-    // Validate request data
-    if (!mobileNumber || !productId || !quantity || quantity <= 0) {
+    // Validation
+    if (!mobileOrEmail || !productId || typeof quantity !== 'number' || quantity <= 0) {
+      console.log('Invalid request data');
       return res.status(400).json({ message: 'Invalid request data' });
     }
 
-    // Find existing cart for the user or create a new one
-    let cart = await Cart.findOne({ mobileNumber });
+    // Find user profile
+    const profile = await getProfile(mobileOrEmail);  // You should pass either mobile or email
+    if (!profile) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
 
+    // Cart logic
+    let cart = await Cart.findOne({ profile: profile._id });
     if (!cart) {
-      // If no cart exists, create a new cart
-      cart = new Cart({ mobileNumber, items: [{ productId, quantity }] });
+      console.log('No existing cart found, creating new cart');
+      cart = new Cart({
+        profile: profile._id,
+        items: [{ productId, quantity }],
+      });
     } else {
-      // If cart exists, update the items
+      console.log('Existing cart found');
       const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
       if (itemIndex !== -1) {
-        // Item already exists in cart, update quantity
+        console.log('Item already in cart, updating quantity');
         cart.items[itemIndex].quantity += quantity;
       } else {
-        // Item doesn't exist, add new item
+        console.log('Item not in cart, adding new item');
         cart.items.push({ productId, quantity });
       }
     }
 
     await cart.save();
+    console.log('Cart saved successfully');
     res.status(200).json({ success: true, message: 'Item added to cart', cart });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error('addToCart error:', err);
     res.status(500).json({ message: 'Failed to add item to cart' });
   }
 };
 
-// Get the user's cart
 export const getCart = async (req, res) => {
   try {
-    const { mobileNumber } = req.body;
+    const { mobileOrEmail } = req.body;
+    console.log('getCart called with:', mobileOrEmail);
 
-    // Validate request data
-    if (!mobileNumber) {
-      return res.status(400).json({ message: 'Mobile number is required' });
+    if (!mobileOrEmail) {
+      console.log('Identifier missing');
+      return res.status(400).json({ message: 'Identifier required' });
     }
 
-    // Find cart for the user
-    const cart = await Cart.findOne({ mobileNumber });
+    // Find user profile
+    const profile = await getProfile(mobileOrEmail);
+    if (!profile) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
 
+    const cart = await Cart.findOne({ profile: profile._id }).populate('items.productId');
     if (!cart) {
+      console.log('Cart not found');
       return res.status(404).json({ message: 'Cart not found' });
     }
 
+    console.log('Cart fetched successfully');
     res.status(200).json({ success: true, cart });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error('getCart error:', err);
     res.status(500).json({ message: 'Failed to fetch cart' });
   }
 };
 
-// Remove item from the cart
 export const removeFromCart = async (req, res) => {
-    try {
-      const { mobileNumber, productId } = req.body;
-  
-      // Validate request data
-      if (!mobileNumber || !productId) {
-        return res.status(400).json({ message: 'Mobile number and product ID are required' });
-      }
-  
-      // Find cart for the user
-      const cart = await Cart.findOne({ mobileNumber });
-  
-      if (!cart) {
-        return res.status(404).json({ message: 'Cart not found' });
-      }
-  
-      // Remove the item from the cart
-      cart.items = cart.items.filter(item => item.productId.toString() !== productId);
-  
-      // If no items left in the cart, delete the entire cart from the database
-      if (cart.items.length === 0) {
-        await Cart.deleteOne({ mobileNumber });
-        return res.status(200).json({ success: true, message: 'Cart is empty now and deleted from the database' });
-      }
-  
-      await cart.save();
-      res.status(200).json({ success: true, message: 'Item removed from cart', cart });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Failed to remove item from cart' });
+  try {
+    const { mobileOrEmail, productId } = req.body;
+    console.log('removeFromCart called with:', req.body);
+
+    if (!mobileOrEmail || !productId) {
+      console.log('Identifier or productId missing');
+      return res.status(400).json({ message: 'Identifier and productId required' });
     }
-  };
-  
+
+    // Find user profile
+    const profile = await getProfile(mobileOrEmail);
+    if (!profile) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const cart = await Cart.findOne({ profile: profile._id });
+    if (!cart) {
+      console.log('Cart not found');
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    const initialLength = cart.items.length;
+    cart.items = cart.items.filter(item => item.productId.toString() !== productId);
+    console.log(`Removed ${initialLength - cart.items.length} item(s)`);
+
+    if (cart.items.length === 0) {
+      console.log('Cart is empty after removal, deleting cart');
+      await Cart.deleteOne({ profile: profile._id });
+      return res.status(200).json({ success: true, message: 'Cart deleted' });
+    }
+
+    await cart.save();
+    console.log('Item removed and cart updated');
+    res.status(200).json({ success: true, message: 'Item removed from cart', cart });
+  } catch (err) {
+    console.error('removeFromCart error:', err);
+    res.status(500).json({ message: 'Failed to remove item' });
+  }
+};
 
 export const clearCart = async (req, res) => {
-    try {
-      const { mobileNumber } = req.body;
-  
-      if (!mobileNumber) {
-        return res.status(400).json({ message: 'Mobile number is required' });
-      }
-  
-      const cart = await Cart.findOne({ mobileNumber });
-  
-      if (!cart) {
-        return res.status(404).json({ message: 'Cart not found' });
-      }
-  
-      cart.items = []; // Clear all items
-      await cart.save();
-  
-      res.status(200).json({ success: true, message: 'Cart cleared successfully' });
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-      res.status(500).json({ message: 'Server error while clearing cart' });
-    }
-  };
-
-  // Delete the cart after an order is placed
-export const deleteCartAfterOrder = async (mobileNumber) => {
   try {
-    // Find and delete the cart for the user
-    const cart = await Cart.findOne({ mobileNumber });
+    const { mobileOrEmail } = req.body;
+    console.log('clearCart called with:', mobileOrEmail);
 
-    if (cart) {
-      await Cart.deleteOne({ mobileNumber });
-      console.log(`Cart deleted for user: ${mobileNumber}`);
-    } else {
-      console.log(`No cart found for user: ${mobileNumber}`);
+    if (!mobileOrEmail) {
+      console.log('Identifier missing');
+      return res.status(400).json({ message: 'Identifier required' });
     }
-  } catch (error) {
-    console.error('Error deleting cart after order:', error);
+
+    // Find user profile
+    const profile = await getProfile(mobileOrEmail);
+    if (!profile) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const cart = await Cart.findOne({ profile: profile._id });
+    if (!cart) {
+      console.log('Cart not found');
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    cart.items = [];
+    await cart.save();
+    console.log('Cart cleared');
+    res.status(200).json({ success: true, message: 'Cart cleared' });
+  } catch (err) {
+    console.error('clearCart error:', err);
+    res.status(500).json({ message: 'Error clearing cart' });
+  }
+};
+
+export const deleteCartAfterOrder = async (mobileOrEmail) => {
+  try {
+    console.log('deleteCartAfterOrder called for:', mobileOrEmail);
+    const profile = await getProfile(mobileOrEmail);
+    if (profile) {
+      await Cart.deleteOne({ profile: profile._id });
+      console.log('Cart deleted after order');
+    } else {
+      console.log('Profile not found for deleting cart');
+    }
+  } catch (err) {
+    console.error('Error deleting cart after order:', err);
   }
 };
