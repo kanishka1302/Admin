@@ -81,7 +81,7 @@ useEffect(() => {
           console.log("✅ Cart fetch successful:", response.data);
   
           if (response.data?.cartData) {
-            setCartItems(response.data.cartData);
+              setCartItems(response.data.cart.items); 
             localStorage.setItem("cartItems", JSON.stringify(response.data.cartData));
             console.log("💾 Cart data stored in localStorage");
           } else {
