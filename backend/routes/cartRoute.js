@@ -12,7 +12,7 @@ cartRouter.post('/order/placed', async (req, res) => {
 });
 
 
-cartRouter.post("/get", getCart);
+cartRouter.get("/get", getCart);
 cartRouter.post("/add", addToCart);
 cartRouter.post("/remove", removeFromCart);
 cartRouter.post("/clear", clearCart);
