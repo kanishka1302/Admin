@@ -76,7 +76,7 @@ useEffect(() => {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
       // Send mobileOrEmail instead of userMobile
-      axios.get(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
+      axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
         .then((response) => {
           console.log("✅ Cart fetch successful:", response.data);
   
@@ -184,27 +184,33 @@ const removeFromCart = async (itemId) => {
 };
 
 
-const clearCart = async () => {
-  console.log("🧹 Clearing cart");
+const clearCartLocallyOnly = () => {
+  console.log("🧹 Clearing cart locally only");
+
   setCartItems({});
   setPromoCode("");
   setDiscountApplied(false);
   localStorage.removeItem("cartItems");
+
   if (userMobileNumber) {
     localStorage.removeItem(`cartItems_${userMobileNumber}`);
   }
+};
 
-  if (userMobileNumber) {
-    try {
-      await axios.post(`${url}/api/cart/clear`, {
-        mobileOrEmail: userMobileNumber,
-      });
-      console.log('Cart cleared in the database');
-    } catch (error) {
-      console.error('Error clearing cart in DB:', error);
-    }
+const fetchCartAfterLogin = async (mobileNumber) => {
+  try {
+    const response = await axios.post(`${url}/api/cart/get`, {
+      mobileOrEmail: mobileNumber,
+    });
+    const items = response.data.cart?.items || {};
+    setCartItems(items);
+    localStorage.setItem(`cartItems_${mobileNumber}`, JSON.stringify(items));
+    console.log("✅ Cart restored from DB after login");
+  } catch (error) {
+    console.error("❌ Failed to restore cart after login:", error);
   }
 };
+
 
 useEffect(() => {
   if (userId) {
@@ -430,7 +436,8 @@ useEffect(() => {
         orders,
         setOrders,
         fetchOrders,
-        clearCart,
+        fetchCartAfterLogin,
+        clearCartLocallyOnly,
         selectedAddress,
         setSelectedAddress,
         groupItemsByShop,
