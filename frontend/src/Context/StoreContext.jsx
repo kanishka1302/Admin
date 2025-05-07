@@ -76,7 +76,7 @@ useEffect(() => {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
       // Send mobileOrEmail instead of userMobile
-      axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
+      axios.post('https://admin-92vt.onrender.com/api/cart/get', { mobileOrEmail: userMobileNumber })
         .then((response) => {
           console.log("✅ Cart fetch successful:", response.data);
   
@@ -132,7 +132,7 @@ const addToCart = async (itemId, quantity = 1) => {
 
     // Update cart in the database (only if user is logged in)
     if (userMobileNumber) {
-      axios.post(`${url}/api/cart/add`, {
+      axios.post('https://admin-92vt.onrender.com/api/cart/add', {
         mobileOrEmail: userMobileNumber,  // Send mobileNumber (or email) here
         productId: itemId,
         quantity,
@@ -167,7 +167,7 @@ const removeFromCart = async (itemId) => {
     }
 
     if (userMobileNumber) {
-      axios.post(`${url}/api/cart/remove`, {
+      axios.post('https://admin-92vt.onrender.com/api/cart/remove', {
         mobileOrEmail: userMobileNumber,
         productId: itemId,
       })
@@ -196,7 +196,7 @@ const clearCart = async () => {
 
   if (userMobileNumber) {
     try {
-      await axios.post(`${url}/api/cart/clear`, {
+      await axios.post('https://admin-92vt.onrender.com/api/cart/clear', {
         mobileOrEmail: userMobileNumber,
       });
       console.log('Cart cleared in the database');
