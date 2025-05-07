@@ -18,7 +18,7 @@ const Navbar = ({ setShowLogin }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
 
-  const { getTotalCartAmount, token, setToken, clearCart, location, setLocation } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, clearCartLocallyOnly, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('selectedLocation');
     setToken(null);
-    clearCart();
+    clearCartLocallyOnly();
     setLocation('');
     setSelectedLocation('Select Location');
     navigate('/');
@@ -182,10 +182,11 @@ const Navbar = ({ setShowLogin }) => {
                 <img src={assets.bag_icon} alt="Orders Icon" />
                 <p>Orders</p>
               </li>
+              {/* 
               <li onClick={() => navigate('/wallet')}>
                 <img src={assets.wallet_icon} alt="Wallet Icon" />
                 <p>Wallet</p>
-              </li>
+              </li> */}
               <li onClick={handleProfileClick}>
                 <img src={profileIcon} alt="Profile Icon" />
                 <p>Profile</p>
