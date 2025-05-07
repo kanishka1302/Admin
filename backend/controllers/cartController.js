@@ -139,14 +139,15 @@ export const clearCart = async (req, res) => {
       return res.status(400).json({ message: 'Identifier required' });
     }
 
-    // Find user profile
+    // Resolve profile
     const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const cart = await Cart.findOne({ profile: profile._id });
+    // ✅ Use mobileNumber for consistency
+    const cart = await Cart.findOne({ mobileNumber: profile.mobileNumber });
     if (!cart) {
       console.log('Cart not found');
       return res.status(404).json({ message: 'Cart not found' });
@@ -161,6 +162,7 @@ export const clearCart = async (req, res) => {
     res.status(500).json({ message: 'Error clearing cart' });
   }
 };
+
 
 export const deleteCartAfterOrder = async (mobileOrEmail) => {
   try {
