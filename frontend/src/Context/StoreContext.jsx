@@ -76,12 +76,12 @@ useEffect(() => {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
       // Send mobileOrEmail instead of userMobile
-      axios.post('https://admin-92vt.onrender.com/api/cart/get', { mobileOrEmail: userMobileNumber })
+      axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
         .then((response) => {
           console.log("✅ Cart fetch successful:", response.data);
   
           if (response.data?.cartData) {
-              setCartItems(response.data.cart.items); 
+            setCartItems(response.data.cartData);
             localStorage.setItem("cartItems", JSON.stringify(response.data.cartData));
             console.log("💾 Cart data stored in localStorage");
           } else {
@@ -132,7 +132,7 @@ const addToCart = async (itemId, quantity = 1) => {
 
     // Update cart in the database (only if user is logged in)
     if (userMobileNumber) {
-      axios.post('https://admin-92vt.onrender.com/api/cart/add', {
+      axios.post(`${url}/api/cart/add`, {
         mobileOrEmail: userMobileNumber,  // Send mobileNumber (or email) here
         productId: itemId,
         quantity,
@@ -167,7 +167,7 @@ const removeFromCart = async (itemId) => {
     }
 
     if (userMobileNumber) {
-      axios.post('https://admin-92vt.onrender.com/api/cart/remove', {
+      axios.post(`${url}/api/cart/remove`, {
         mobileOrEmail: userMobileNumber,
         productId: itemId,
       })
@@ -196,7 +196,7 @@ const clearCart = async () => {
 
   if (userMobileNumber) {
     try {
-      await axios.post('https://admin-92vt.onrender.com/api/cart/clear', {
+      await axios.post(`${url}/api/cart/clear`, {
         mobileOrEmail: userMobileNumber,
       });
       console.log('Cart cleared in the database');
