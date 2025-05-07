@@ -76,7 +76,7 @@ useEffect(() => {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
       // Send mobileOrEmail instead of userMobile
-      axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
+      axios.get(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
         .then((response) => {
           console.log("✅ Cart fetch successful:", response.data);
   
