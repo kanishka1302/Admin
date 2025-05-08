@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Map from "../Map/Map";
+//import Map from "../Map/Map";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./DeliveryAddress.css";
