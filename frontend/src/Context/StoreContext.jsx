@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState,  useRef } from "react";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
@@ -25,6 +25,7 @@ const StoreContextProvider = ({ children }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [location, setLocation] = useState(localStorage.getItem('location') || '');
   const [userMobileNumber, setUserMobileNumber] = useState(null);
+  const hasFetchedCart = useRef(false);
 
 // Set userMobileNumber when the user logs in or on page load if available
 useEffect(() => {
@@ -48,6 +49,17 @@ useEffect(() => {
   // 💰 Wallet-related state
   const [walletBalance, setWalletBalance] = useState(0);
   const [transactionHistory, setTransactionHistory] = useState([]);
+
+  const formatCartArrayToObject = (cartArray = []) => {
+    const cartObj = {};
+    cartArray.forEach((item) => {
+      if (item.productId && item.quantity !== undefined) {
+        cartObj[item.productId] = item.quantity;
+      }
+    });
+    return cartObj;
+  };
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -75,24 +87,27 @@ useEffect(() => {
     if (userMobileNumber) {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
-      // Send mobileOrEmail instead of userMobile
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem(`cartItems_${userMobileNumber}`);
+  
       axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
         .then((response) => {
           console.log("✅ Cart fetch successful:", response.data);
   
-          if (response.data?.cartData) {
-            setCartItems(response.data.cartData);
-            localStorage.setItem("cartItems", JSON.stringify(response.data.cartData));
+          if (response.data?.cart) {
+            setCartItems(response.data.cart.items);
+            localStorage.setItem("cartItems", JSON.stringify(response.data.cart.items));
             console.log("💾 Cart data stored in localStorage");
           } else {
-            console.warn("⚠️ cartData not found in response");
+            console.warn("⚠️ Cart data not found for this user");
           }
         })
         .catch((err) => {
           console.error("❌ Error fetching cart:", err);
+          alert("Error fetching cart. Please try again.");
         });
     } else {
-      console.warn("⚠️ userMobileNumber not found, cart data will not be fetched from DB.");
+      console.warn("⚠️ userMobileNumber is undefined or null, cart data will not be fetched.");
     }
   }, [userMobileNumber]);
   
@@ -197,33 +212,74 @@ const clearCartLocallyOnly = () => {
   }
 };
 
-const fetchCartAfterLogin = async (mobileNumber) => {
-  try {
-    const response = await axios.post(`${url}/api/cart/get`, {
-      mobileOrEmail: mobileNumber,
-    });
-    const items = response.data.cart?.items || {};
-    setCartItems(items);
-    localStorage.setItem(`cartItems_${mobileNumber}`, JSON.stringify(items));
-    console.log("✅ Cart restored from DB after login");
-  } catch (error) {
-    console.error("❌ Failed to restore cart after login:", error);
-  }
-};
+// Fetch and set the cart items when the userMobileNumber changes
+useEffect(() => {
+  const fetchAndSetCart = async () => {
+    if (!userMobileNumber) {
+      console.warn("⚠️ userMobileNumber is undefined. Cart fetch skipped.");
+      return;
+    }
+    if (hasFetchedCart.current) return; // Avoid fetching again if already fetched
+
+    try {
+      console.log("📡 Fetching cart for:", userMobileNumber);
+      
+      // Fetch cart from backend
+      const response = await axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber});
+      
+      if (
+        response.data &&
+        response.data.cart &&
+        Array.isArray(response.data.cart.items) &&
+        response.data.cart.items.length > 0
+      ) {
+        const formattedCart = formatCartArrayToObject(response.data.cart.items);
+        localStorage.setItem("cartItems", JSON.stringify(formattedCart));
+        setCartItems(formattedCart);
+        console.log("💾 Cart data stored in localStorage");
+      } else {
+        const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
+        if (savedCart) {
+          setCartItems(JSON.parse(savedCart));
+        }
+      }      
+
+      // Set flag after fetch
+      hasFetchedCart.current = true;
+    } catch (err) {
+      console.error("❌ Error fetching cart:", err);
+    }
+  };
+
+  fetchAndSetCart();
+}, [userMobileNumber]);  // Ensure that userMobileNumber is available when this runs
 
 
 useEffect(() => {
-  if (userId) {
-    console.log("🔁 Merging local cart with DB cart for user:", userId);
-    const guestCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-    const userCart = JSON.parse(localStorage.getItem(`cartItems_${userId}`)) || {};
-    const mergedCart = { ...guestCart, ...userCart };
-    setCartItems(mergedCart);
-    localStorage.setItem("cartItems", JSON.stringify(mergedCart));
-    localStorage.setItem(`cartItems_${userId}`, JSON.stringify(mergedCart));
-    console.log("✅ Merged cart:", mergedCart);
+  if (userMobileNumber) {
+    console.log("🔁 Checking local cart for new user:", userMobileNumber);
+
+    // Fetch the guest cart and store it temporarily
+    const guestCart = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+    // Check if there's any data for the current user (do not merge if it's a new user)
+    const userCart = JSON.parse(localStorage.getItem(`cartItems_${userMobileNumber}`)) || [];
+
+    if (guestCart.length > 0 && userCart.length === 0) {
+      // If there is guest cart data but no user cart, set guest cart as current cart
+      setCartItems(guestCart);
+    } else {
+      // If there's no guest cart or user cart, initialize an empty cart
+      setCartItems(userCart);
+    }
+
+    // Store the user's cart in localStorage (if new)
+    localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(userCart));
+
+    console.log("✅ Cart set for user:", userMobileNumber);
   }
-}, [userId]);
+}, [userMobileNumber]);
+
 
   const setShopNameForItem = (itemId, shopName) => {
     setShopNames((prev) => {
@@ -273,9 +329,12 @@ useEffect(() => {
   const logoutUser = () => {
     setToken("");
     setUserId("");
+    setUserMobileNumber("");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("cartItems");
+    localStorage.removeItem("mobileOrEmail");
+    localStorage.removeItem("userMobileNumber");
     setCartItems({});
     setOrders([]);
     setWalletBalance(0);
@@ -293,14 +352,14 @@ useEffect(() => {
   };
 
   useEffect(() => {
-    if (userId) {
-      const savedCart = localStorage.getItem(`cartItems_${userId}`);
+    if (userMobileNumber) {
+      const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
       if (savedCart) {
         setCartItems(JSON.parse(savedCart));
       }
     }
-  }, [userId]);
-
+  }, [userMobileNumber]);
+  
   const groupItemsByShop = () => {
     const groupedItems = {};
     Object.entries(cartItems).forEach(([itemId, quantity]) => {
@@ -419,6 +478,7 @@ useEffect(() => {
         setCartItems,
         addToCart,
         removeFromCart,
+
         getTotalCartAmount,
         promoCode,
         applyPromoCode,
@@ -436,7 +496,7 @@ useEffect(() => {
         orders,
         setOrders,
         fetchOrders,
-        fetchCartAfterLogin,
+        
         clearCartLocallyOnly,
         selectedAddress,
         setSelectedAddress,
