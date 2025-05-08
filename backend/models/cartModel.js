@@ -6,7 +6,10 @@ const cartSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Profile',
     required: true,
-    unique: true,
+  },
+  mobileNumber: {
+    type: String,
+    required: true, // Make sure the mobileNumber is required
   },
   items: [
     {
@@ -26,4 +29,3 @@ const cartSchema = new mongoose.Schema({
 
 const Cart = mongoose.model('Cart', cartSchema);
 export default Cart;
-
