@@ -104,7 +104,6 @@ useEffect(() => {
         })
         .catch((err) => {
           console.error("❌ Error fetching cart:", err);
-          alert("Error fetching cart. Please try again.");
         });
     } else {
       console.warn("⚠️ userMobileNumber is undefined or null, cart data will not be fetched.");
