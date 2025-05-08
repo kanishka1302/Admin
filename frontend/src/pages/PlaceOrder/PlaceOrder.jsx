@@ -42,7 +42,7 @@ const PlaceOrder = () => {
     setCartItems,
     currency,
     deliveryCharge,
-    clearCart,
+    clearCartLocallyOnly,
     shopNames,
     selectedShop,
   } = useContext(StoreContext);
@@ -151,19 +151,25 @@ const PlaceOrder = () => {
 
     const shopName = orderItems[0]?.shopName || selectedShop?.name || "Unknown Shop";
 
+    const subtotal = getTotalCartAmount();
+    const delivery = deliveryCharge || 50;
+    const totalAmountFinal = Math.round(
+      discountApplied ? (subtotal + delivery) * 0.9 : subtotal + delivery
+    );
+    
     const orderData = {
       userId,
       name: `${data.firstName} ${data.lastName}`,
       address: data,
       items: orderItems,
       shopName,
-      amount: Math.round(totalAmount + deliveryCharge),
+      amount: totalAmountFinal,
       paymentMethod,
       status: "Pending",
       promoCode: promoCode || null,
       discountApplied: discountApplied || false
-      
     };
+    
 
     try {
       if (paymentMethod === "razorpay") {
@@ -197,12 +203,12 @@ const PlaceOrder = () => {
                   setNewOrder({ ...orderData, _id: finalOrderId });
                   setOrderPlaced(true);
                   await axios.post(`${url}/api/cart/order/placed`, {
-                    mobileNumber: userId,
+                    mobileOrEmail: storedUser?.mobileNumber || storedUser?.email,
                   }, {
                     headers: { Authorization: `Bearer ${token}` },
                   });                  
                   setTimeout(() => {
-                    clearCart();
+                    clearCartLocallyOnly();
                     setCartItems({});
                     navigate("/myorders", {
                       state: { newOrder: { ...orderData, _id: finalOrderId } },
@@ -243,13 +249,13 @@ const PlaceOrder = () => {
           setNewOrder({ ...orderData, _id: response.data.orderId });
           setOrderPlaced(true);
           await axios.post(`${url}/api/cart/order/placed`, {
-            mobileNumber: userId,
+            mobileOrEmail: storedUser?.mobileNumber || storedUser?.email,
           }, {
             headers: { Authorization: `Bearer ${token}` },
           });
           
           setTimeout(() => {
-            clearCart();
+            clearCartLocallyOnly();
             setCartItems({});
             navigate("/myorders", {
               state: { newOrder: { ...orderData, _id: response.data.orderId } },
