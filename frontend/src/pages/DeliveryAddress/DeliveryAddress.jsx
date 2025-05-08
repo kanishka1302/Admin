@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-//import Map from "../Map/Map";
+import Map from "../Map/Map";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./DeliveryAddress.css";
@@ -33,7 +33,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     if (mobileNumber) {
       setUserId(storedUser._id || null);
 
-      axios.get(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`)
+      axios.get(`http://localhost:4000/api/address/user/${mobileNumber}`)
         .then((res) => {
           console.log("✅ Fetched addresses:", res.data);
           setAddresses(Array.isArray(res.data) ? res.data : []);
@@ -45,11 +45,9 @@ const DeliveryAddress = ({ onSelectAddress }) => {
   }, []);
 
   useEffect(() => {
-    const shouldPreselect = false;
-    if (shouldPreselect) {
-      const storedSelected = safeLocalStorage.get("selectedAddress");
-      setSelectedAddress(storedSelected || null);
-    }
+    const storedSelected = safeLocalStorage.get("selectedAddress");
+    setSelectedAddress(storedSelected || null);
+
   }, []);
 
   useEffect(() => {
@@ -63,7 +61,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     const mobileNumber = storedUser?.mobileNumber;
     if (mobileNumber) {
       try {
-        const res = await axios.get(`https://admin-92vt.onrender.comapi/address/user/${mobileNumber}`);
+        const res = await axios.get(`http://localhost:4000/api/address/user/${mobileNumber}`);
         setAddresses(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("❌ Error fetching addresses:", err);
@@ -84,7 +82,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
 
         const loginMobile = JSON.parse(localStorage.getItem("user"))?.mobileNumber;
 
-        const response = await axios.post("https://admin-92vt.onrender.com/api/address/save", {
+        const response = await axios.post("http://localhost:4000/api/address/save", {
           ownerId: userId,
           contactAddress: {
             ...sanitizedAddress,
@@ -175,7 +173,7 @@ const DeliveryAddress = ({ onSelectAddress }) => {
       const mobileNumber = address.ownerMobile;
 
       const response = await axios.delete(
-        `https://admin-92vt.onrender.com/api/address/delete/${addressId}/${mobileNumber}`
+        `http://localhost:4000/api/address/delete/${addressId}/${mobileNumber}`
       );
 
       if (response.data.success) {
