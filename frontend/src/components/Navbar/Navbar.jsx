@@ -69,6 +69,7 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('cartItems');
     localStorage.removeItem('locationPopupShown');
+    localStorage.removeItem("mobileOrEmail");
     localStorage.removeItem('user');
     localStorage.removeItem('selectedLocation');
     setToken(null);
