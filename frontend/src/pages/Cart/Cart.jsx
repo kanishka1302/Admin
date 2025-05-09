@@ -133,7 +133,7 @@ const Cart = () => {
                       }}
                     />
                     <p>{item.name}</p>
-                    <p>Price: {currency}{item.price.toFixed(2)}</p>
+                    <p>Price: {currency}{(item.price * cartItems[item._id]).toFixed(2)}</p>
                     <p>Quantity: {cartItems[item._id]}</p>
                     <p>Weight: {getItemWeight(item, cartItems[item._id])}</p> {/* New column */}
                   </div>
