@@ -376,19 +376,25 @@ useEffect(() => {
     return groupedItems;
   };
 
-  // 💸 Wallet Functions
-  const fetchWalletBalance = async () => {
-    if (!token || !userId) return;
+   // 💸 Wallet Function
+   const fetchWalletBalance = async () => {
+    if (!userId) return;  // Make sure userId is available
+
     try {
-      const res = await axios.get(`${url}/api/wallet/balance/${userId}`);
-      if (res.data.success) {
-        setWalletBalance(res.data.balance);
-      }
+      const res = await axios.get(`${url}/api/wallet/total/${userId}`);
+      console.log("✅ Wallet total response:", res.data); // Debug line
+      setWalletBalance(res.data.totalCreditedAmount || 0);
     } catch (err) {
       console.error("Error fetching wallet balance:", err.message);
     }
   };
-
+   // Fetch wallet balance whenever userId changes
+   useEffect(() => {
+    if (userId) {
+      fetchWalletBalance();
+    }
+  }, [userId]);
+  
   const addToWallet = async (amount) => {
     if (!token || !userId) return;
     try {
@@ -399,7 +405,7 @@ useEffect(() => {
       );
       if (res.data.success) {
         setWalletBalance(res.data.updatedBalance);
-        fetchTransactions();
+        //fetchTransactions();
         notify("Amount added to wallet!");
       }
     } catch (err) {
@@ -407,7 +413,7 @@ useEffect(() => {
     }
   };
 
-  const fetchTransactions = async () => {
+  { /*const fetchTransactions = async () => {
     if (!token || !userId) return;
     try {
       const res = await axios.get(`${url}/api/wallet/transactions/${userId}`);
@@ -417,7 +423,7 @@ useEffect(() => {
     } catch (err) {
       console.error("Error fetching transaction history:", err.message);
     }
-  };
+  }; */}
 
   const placeOrderWithWallet = async (orderData) => {
     if (!token || !userId) return;
@@ -453,7 +459,7 @@ useEffect(() => {
     if (token) {
       fetchOrders();
       fetchWalletBalance();
-      fetchTransactions();
+      //fetchTransactions();
     }
   }, [token]);
 
@@ -477,7 +483,7 @@ useEffect(() => {
         setCartItems,
         addToCart,
         removeFromCart,
-
+        fetchWalletBalance,
         getTotalCartAmount,
         promoCode,
         applyPromoCode,
@@ -486,6 +492,7 @@ useEffect(() => {
         deliveryCharge,
         token,
         userId,
+        setUserId,
         setToken,
         url,
         selectedShop,
@@ -495,7 +502,6 @@ useEffect(() => {
         orders,
         setOrders,
         fetchOrders,
-        
         clearCartLocallyOnly,
         selectedAddress,
         setSelectedAddress,
@@ -509,7 +515,7 @@ useEffect(() => {
         fetchWalletBalance,
         fetchWalletDetails: fetchWalletBalance, // ✅ Expose this correctly
         addToWallet,
-        fetchTransactions,
+        //fetchTransactions,
         handleWalletPaymentSuccess,
         notify,
         placeOrderWithWallet,
