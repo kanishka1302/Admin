@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./UserInfo.css";
 import { StoreContext } from "../../Context/StoreContext";
+import axios from "axios";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
@@ -14,10 +15,17 @@ const UserInfo = () => {
     address: "",
   });
 
-  const { walletBalance, fetchWalletDetails } = useContext(StoreContext);
+  // State for storing the credited amount
+  const [creditedAmount, setCreditedAmount] = useState(null);
+
+  // Get user data from localStorage
+  const storedUser = localStorage.getItem("user");
+  const userId = storedUser ? JSON.parse(storedUser).userId : null; // Extract userId from localStorage
+
+  const { walletBalance, setUserId, fetchWalletBalance } = useContext(StoreContext);
   const firstSavedAddress = userAddresses[0];  // This will always give the first address
 
-
+  // Fetch user data from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -27,6 +35,7 @@ const UserInfo = () => {
     }
   }, []);
 
+  // Update address data when user data changes
   useEffect(() => {
     if (user && user.address !== formData.address) {
       setFormData((prevData) => ({
@@ -36,12 +45,14 @@ const UserInfo = () => {
     }
   }, [user]);
 
+  // Fetch wallet balance
   useEffect(() => {
-    if (user) {
-      fetchWalletDetails();
+    if (userId) {
+      fetchWalletBalance(); // Fetch balance when userId is available
     }
-  }, [user, fetchWalletDetails]);
+  }, [userId]);
 
+  // Fetch user addresses from the API
   useEffect(() => {
     const fetchAddresses = async () => {
       const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -66,16 +77,26 @@ const UserInfo = () => {
     fetchAddresses();
   }, []);
 
-  const defaultAddress = userAddresses.find(addr => addr.default);
-
+  // Fetch credited amount for the user
   useEffect(() => {
-    if (defaultAddress && defaultAddress.address !== formData.address) {
-      setFormData((prevData) => ({
-        ...prevData,
-        address: defaultAddress.address, // Update form data address only if it is different from the current one
-      }));
-    }
-  }, [defaultAddress]);
+    const fetchCreditedAmount = async () => {
+      if (user && user.email) {
+        try {
+          const response = await axios.get(`https://admin-92vt.onrender.com/api/history/user/${user.email}`);
+          const creditedAmount = response.data.creditedAmount;
+          setCreditedAmount(typeof creditedAmount === "number" ? creditedAmount : 0);
+        } catch (err) {
+          console.error("Error fetching credited amount:", err);
+          setCreditedAmount(0); // Fallback value in case of an error
+        }
+      }
+    };
+  
+    fetchCreditedAmount();
+  }, [user]);
+  
+
+  const defaultAddress = userAddresses.find(addr => addr.default);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -111,7 +132,6 @@ const UserInfo = () => {
     setUser(updatedUser);
     setFormData(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
-
 
     try {
       const response = await fetch("/api/updateUser", {
@@ -193,7 +213,7 @@ const UserInfo = () => {
         </p>
 
         <p><strong>Address:</strong>{" "}
-        <div>
+          <div>
             {firstSavedAddress ? (
               <div className="address-card">
                 <p className="type"><strong>Type:</strong> {firstSavedAddress.type || "N/A"}</p>
@@ -208,10 +228,11 @@ const UserInfo = () => {
             ) : (
               <p>No default address found.</p>
             )}
-            </div>
+          </div>
         </p>
 
-        <p><strong>Wallet Balance:</strong> ₹{walletBalance.toFixed(2)}</p>
+        <p><strong>Wallet Balance:</strong>₹{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
+        
 
         {isEditing ? (
           <button className="save-button" onClick={handleSaveClick}>Save</button>
