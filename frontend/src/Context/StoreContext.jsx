@@ -83,46 +83,7 @@ useEffect(() => {
   }, []);
   
 
-  { /* useEffect(() => {
-    if (userMobileNumber) {
-      console.log("📡 Fetching cart for:", userMobileNumber);
   
-      localStorage.removeItem("cartItems");
-      localStorage.removeItem(`cartItems_${userMobileNumber}`);
-  
-      axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber })
-        .then((response) => {
-          console.log("✅ Cart fetch successful:", response.data);
-  
-          if (response.data?.cart) {
-            setCartItems(response.data.cart.items);
-            localStorage.setItem("cartItems", JSON.stringify(response.data.cart.items));
-            console.log("💾 Cart data stored in localStorage");
-          } else {
-            console.warn("⚠️ Cart data not found for this user");
-          }
-        })
-        .catch((err) => {
-          console.error("❌ Error fetching cart:", err);
-        });
-    } else {
-      console.warn("⚠️ userMobileNumber is undefined or null, cart data will not be fetched.");
-    }
-  }, [userMobileNumber]); 
-  
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setToken(localStorage.getItem("token") || "");
-
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUserId(parsedUser?.userId || parsedUser?._id || "");
-      } catch (error) {
-        console.error("❌ Error parsing user data from localStorage:", error);
-      }
-    }
-  }, []); */ }
 
   // 🛒 Cart logic
 const getTotalCartAmount = () => {
@@ -377,55 +338,6 @@ useEffect(() => {
     return groupedItems;
   };
 
-   // 💸 Wallet Function
-   const fetchWalletBalance = async () => {
-    if (!userId) return;  // Make sure userId is available
-
-    try {
-      const res = await axios.get(`${url}/api/wallet/total/${userId}`);
-      console.log("✅ Wallet total response:", res.data); // Debug line
-      setWalletBalance(res.data.totalCreditedAmount || 0);
-    } catch (err) {
-      console.error("Error fetching wallet balance:", err.message);
-    }
-  };
-   // Fetch wallet balance whenever userId changes
-   useEffect(() => {
-    if (userId) {
-      fetchWalletBalance();
-    }
-  }, [userId]);
-  
-  const addToWallet = async (amount) => {
-    if (!token || !userId) return;
-    try {
-      const res = await axios.post(
-        `${url}/api/wallet/add`,
-        { userId, amount },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.data.success) {
-        setWalletBalance(res.data.updatedBalance);
-        //fetchTransactions();
-        notify("Amount added to wallet!");
-      }
-    } catch (err) {
-      console.error("Error adding to wallet:", err.message);
-    }
-  };
-
-  { /*const fetchTransactions = async () => {
-    if (!token || !userId) return;
-    try {
-      const res = await axios.get(`${url}/api/wallet/transactions/${userId}`);
-      if (res.data.success) {
-        setTransactionHistory(res.data.transactions);
-      }
-    } catch (err) {
-      console.error("Error fetching transaction history:", err.message);
-    }
-  }; */}
-
   const placeOrderWithWallet = async (orderData) => {
     if (!token || !userId) return;
     try {
@@ -449,7 +361,7 @@ useEffect(() => {
     clearCart();
     setOrderPlaced(true);
     fetchOrders();
-    fetchWalletBalance();
+    //fetchWalletBalance();
     notify("Order placed using Wallet!");
   };
 
@@ -459,7 +371,7 @@ useEffect(() => {
     fetchFoodList();
     if (token) {
       fetchOrders();
-      fetchWalletBalance();
+      //fetchWalletBalance();
       //fetchTransactions();
     }
   }, [token]);
@@ -512,8 +424,8 @@ useEffect(() => {
         walletBalance,
         setWalletBalance,
         transactionHistory,
-        fetchWalletBalance,
-        addToWallet,
+        //fetchWalletBalance,
+        //addToWallet,
         //fetchTransactions,
         handleWalletPaymentSuccess,
         notify,
