@@ -22,9 +22,33 @@ const Cart = () => {
   const [discountApplied, setDiscountApplied] = useState(false);
   const navigate = useNavigate();
 
+  // Load promoCode and discountApplied from localStorage
+  useEffect(() => {
+    const savedPromoCode = localStorage.getItem("promoCode");
+    const savedDiscount = localStorage.getItem("discountApplied") === "true";
+
+    if (savedPromoCode) setPromoCode(savedPromoCode);
+    if (savedDiscount) setDiscountApplied(true);
+    console.log("Loaded from localStorage:");
+    console.log("promoCode:", savedPromoCode);
+    console.log("discountApplied:", savedDiscount);
+  }, []);
+
+  // Save promoCode and discountApplied to localStorage
+  useEffect(() => {
+     console.log("Saving to localStorage:");
+    console.log("promoCode:", promoCode);
+    console.log("discountApplied:", discountApplied);
+
+    localStorage.setItem("promoCode", promoCode);
+    localStorage.setItem("discountApplied", discountApplied);
+  }, [promoCode, discountApplied]);
+
+
   const handlePromoCodeChange = (e) => setPromoCode(e.target.value);
 
   const handlePromoSubmit = () => {
+    console.log("Submitting promo code:", promoCode);
     if (promoCode.trim() === "DISCOUNT10") {
       toast.success("Promo code applied successfully!");
       setDiscountApplied(true);
@@ -70,31 +94,41 @@ const Cart = () => {
   const { groupedItems, warnings } = useMemo(() => {
     const groups = {};
     const warn = [];
-
+  
     food_list.forEach((item) => {
       if (cartItems[item._id] > 0) {
-        let shopName = shopNames[item._id];
-
+        const shopNameFromMap = shopNames[item._id];
+        const shopNameFromItem =
+          item.shopName || item.shop || "Default Shop";
+        
+        console.log("Checking item:", item.name);
+        console.log("Item ID:", item._id);
+        console.log("shopNames[item._id]:", shopNameFromMap);
+        console.log("item.shopName or item.shop:", shopNameFromItem);
+  
         let finalShopName =
-          typeof shopName === "string"
-            ? shopName.trim()
-            : typeof shopName === "object" && shopName?.name
-            ? shopName.name.trim()
-            : "Unknown Shop";
+        shopNameFromMap || // First check the shopNames map
+        item.shopName ||   // Fallback to item.shopName
+        item.shop ||       // Then fallback to item.shop
+        "Unknown Shop";   
+        console.log("Item before adding to cart:", item);
+localStorage.setItem('cart', JSON.stringify(cartItems)); // or however you save the cart
 
         if (finalShopName === "Unknown Shop") {
+          console.warn(`⚠️ Missing shop name for item: ${item.name} (ID: ${item._id})`);
           warn.push(`Missing shop name for item: ${item.name}`);
         }
-
+  
         if (!groups[finalShopName]) {
           groups[finalShopName] = [];
         }
         groups[finalShopName].push(item);
       }
     });
-
+  
     return { groupedItems: groups, warnings: warn };
   }, [cartItems, food_list, shopNames]);
+  
 
   // Show toast errors after render
   useEffect(() => {
