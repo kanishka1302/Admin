@@ -91,8 +91,10 @@ const UserInfo = () => {
       if (user && user.email) {
         try {
           const response = await axios.get(`https://admin-92vt.onrender.com/api/history/user/${user.email}`);
+          console.log("Wallet API Response:", response.data);
           const creditedAmount = response.data.creditedAmount;
           setCreditedAmount(typeof creditedAmount === "number" ? creditedAmount : 0);
+          //fetchWalletBalance();
         } catch (err) {
           console.error("Error fetching credited amount:", err);
           setCreditedAmount(0); // Fallback value in case of an error
@@ -153,7 +155,7 @@ const UserInfo = () => {
     }
 
     try {
-      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/${userId}`, {
+      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/profile/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -278,10 +280,10 @@ const UserInfo = () => {
           ) : user.mobileNumber}
         </p>
 
-        <p><strong>Address:</strong> 
+        <p className="address"><strong>Address:</strong> 
           {isEditing ? (
             <>
-              <input
+              <input className="text"
                 type="text"
                 name="address"
                 value={formData.address}
