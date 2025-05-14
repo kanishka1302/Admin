@@ -54,10 +54,14 @@ export const getAllHistory = async (req, res) => {
 export const getUserHistory = async (req, res) => {
   try {
     const { userEmail } = req.params;
-    const logs = await History.find({ userEmail: userEmail }).sort({ creditedAt: -1 });
-    
-    // Sum the creditedAmount for all history logs for the user
-    const creditedAmount = logs.reduce((total, log) => total + log.creditedAmount, 0);
+
+    const logs = await History.find({ userEmail }).sort({ creditedAt: -1 });
+    console.log("History logs for user:", userEmail, logs);
+
+    const creditedAmount = logs.reduce((total, log) => {
+      const amount = typeof log.creditedAmount === 'number' ? log.creditedAmount : 0;
+      return total + amount;
+    }, 0);
 
     res.status(200).json({ creditedAmount });
   } catch (err) {
@@ -65,3 +69,4 @@ export const getUserHistory = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
