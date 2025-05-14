@@ -13,6 +13,10 @@ const UserInfo = () => {
     email: "",
     mobileNumber: "",
     address: "",
+    city: "",
+    state: "",
+    pincode: "",
+    country: "", // Added fields for address
   });
 
   // State for storing the credited amount
@@ -31,26 +35,19 @@ const UserInfo = () => {
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      setFormData(parsedUser);
-    }
-  }, []);
-
-  // Update address data when user data changes
-  useEffect(() => {
-    if (user && user.address !== formData.address) {
-      setFormData((prevData) => ({
-        ...prevData,
-        address: user.address,
+      setFormData((prev) => ({
+        ...prev,
+        name: parsedUser.name ?? "",
+        email: parsedUser.email ?? "",
+        mobileNumber: parsedUser.mobileNumber ?? "",
+        address: parsedUser.address ?? "",
+        city: parsedUser.city ?? "",
+        state: parsedUser.state ?? "",
+        pincode: parsedUser.pincode ?? "",
+        country: parsedUser.country ?? "", // Initialize country field
       }));
     }
-  }, [user]);
-
-  // Fetch wallet balance
-  useEffect(() => {
-    if (userId) {
-      fetchWalletBalance(); // Fetch balance when userId is available
-    }
-  }, [userId]);
+  }, []);
 
   // Fetch user addresses from the API
   useEffect(() => {
@@ -66,9 +63,20 @@ const UserInfo = () => {
 
         if (Array.isArray(data)) {
           setUserAddresses(data);
-        } else {
-          console.warn("Expected array of addresses, got:", data);
+
+          // Also set the first address into formData if not already set
+          if (data.length > 0 && !formData.address) {
+            setFormData((prev) => ({
+              ...prev,
+              address: data[0].address || "",
+              city: data[0].city || "",
+              state: data[0].state || "",
+              pincode: data[0].pincode || "",
+              country: data[0].country || "India", // Set default country
+            }));
+          }
         }
+
       } catch (err) {
         console.error("Error fetching addresses:", err);
       }
@@ -91,10 +99,9 @@ const UserInfo = () => {
         }
       }
     };
-  
+
     fetchCreditedAmount();
   }, [user]);
-  
 
   const defaultAddress = userAddresses.find(addr => addr.default);
 
@@ -104,11 +111,17 @@ const UserInfo = () => {
   };
 
   const handleSaveClick = async () => {
+    console.log("formData before save:", formData);
+
     if (
-      formData.name.trim() === "" ||
-      formData.email.trim() === "" ||
-      formData.mobileNumber.trim() === "" ||
-      formData.address.trim() === ""
+      (formData.name ?? "").trim() === "" ||
+      (formData.email ?? "").trim() === "" ||
+      (formData.mobileNumber ?? "").trim() === "" ||
+      (formData.address ?? "").trim() === "" ||
+      (formData.city ?? "").trim() === "" ||
+      (formData.state ?? "").trim() === "" ||
+      (formData.pincode ?? "").trim() === "" ||
+      (formData.country ?? "").trim() === ""
     ) {
       alert("Please fill out all fields before saving.");
       return;
@@ -126,6 +139,7 @@ const UserInfo = () => {
 
     const updatedUser = {
       ...user,
+      userId: user._id,
       ...formData,
     };
 
@@ -133,13 +147,22 @@ const UserInfo = () => {
     setFormData(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
+    if (!userId) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+
     try {
-      const response = await fetch("/api/updateUser", {
-        method: "POST",
+      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/profile/${userId}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedUser),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          mobileNumber: formData.mobileNumber,
+        }),
       });
 
       if (response.ok) {
@@ -151,6 +174,49 @@ const UserInfo = () => {
       console.error("Error updating user:", error);
       alert("An error occurred while updating user data.");
     }
+     // ✅ Also update the address in Address collection
+  if (firstSavedAddress?._id) {
+    try {
+      console.log("Attempting to update address with ID:", firstSavedAddress._id);
+      const res = await fetch(`https://admin-92vt.onrender.com/api/address/${firstSavedAddress._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          country: formData.country,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update address.");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+    }
+  }
+
+  // ✅ Optionally re-fetch updated address
+  const fetchAddresses = async () => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const mobileNumber = storedUser?.mobileNumber;
+
+    if (!mobileNumber) return;
+
+    try {
+      const res = await fetch(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setUserAddresses(data);
+      }
+    } catch (err) {
+      console.error("Error fetching addresses:", err);
+    }
+  };
+
+  await fetchAddresses(); // Refresh updated address list
 
     setIsEditing(false);
   };
@@ -212,28 +278,58 @@ const UserInfo = () => {
           ) : user.mobileNumber}
         </p>
 
-        <p><strong>Address:</strong>{" "}
-          <div>
-            {firstSavedAddress ? (
-              <div className="address-card">
-                <p className="type"><strong>Type:</strong> {firstSavedAddress.type || "N/A"}</p>
-                <p><strong>Name:</strong> {firstSavedAddress.name}</p>
-                <p><strong>Mobile:</strong> {firstSavedAddress.mobileNumber}</p>
-                <p><strong>Address:</strong> {firstSavedAddress.address}</p>
-                <p><strong>City:</strong> {firstSavedAddress.city}</p>
-                <p><strong>State:</strong> {firstSavedAddress.state}</p>
-                <p><strong>Pin Code:</strong> {firstSavedAddress.pincode}</p>
-                <p><strong>Country:</strong> {firstSavedAddress.country || "India"}</p>
-              </div>
-            ) : (
-              <p>No default address found.</p>
-            )}
-          </div>
+        <p><strong>Address:</strong> 
+          {isEditing ? (
+            <>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter address"
+              />
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="Enter city"
+              />
+              <input
+                type="text"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                placeholder="Enter state"
+              />
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                placeholder="Enter pin code"
+              />
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                placeholder="Enter country"
+              />
+            </>
+          ) : (
+            <>
+              <p>{formData.address}</p>
+              <p>{formData.city}</p>
+              <p>{formData.state}</p>
+              <p>{formData.pincode}</p>
+              <p>{formData.country || "India"}</p>
+            </>
+          )}
         </p>
 
         <p><strong>Wallet Balance:</strong>₹{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
         
-
         {isEditing ? (
           <button className="save-button" onClick={handleSaveClick}>Save</button>
         ) : (
