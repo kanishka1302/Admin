@@ -153,7 +153,7 @@ const UserInfo = () => {
     }
 
     try {
-      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/profile/${userId}`, {
+      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
