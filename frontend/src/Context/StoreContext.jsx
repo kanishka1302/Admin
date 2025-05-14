@@ -83,7 +83,7 @@ useEffect(() => {
   }, []);
   
 
-  useEffect(() => {
+  { /* useEffect(() => {
     if (userMobileNumber) {
       console.log("📡 Fetching cart for:", userMobileNumber);
   
@@ -108,7 +108,7 @@ useEffect(() => {
     } else {
       console.warn("⚠️ userMobileNumber is undefined or null, cart data will not be fetched.");
     }
-  }, [userMobileNumber]);
+  }, [userMobileNumber]); 
   
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -122,7 +122,7 @@ useEffect(() => {
         console.error("❌ Error parsing user data from localStorage:", error);
       }
     }
-  }, []);
+  }, []); */ }
 
   // 🛒 Cart logic
 const getTotalCartAmount = () => {
@@ -132,30 +132,40 @@ const getTotalCartAmount = () => {
   }, 0);
 };
 
-const addToCart = async (itemId, quantity = 1) => {
+const addToCart = async (itemId, quantity = 1, shopName = null) => {
   setCartItems((prev) => {
     console.log(`🛒 addToCart called with itemId: ${itemId}, quantity: ${quantity}`);
     const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
     console.log("🗂 Updated cartItems state:", updatedCart);
-    // Update localStorage
+
+    // Save cart to localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-    if (userMobileNumber) {  // Check if userMobileNumber is defined
+    if (userMobileNumber) {
       localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
       console.log(`💾 Saved to localStorage for user ${userMobileNumber}`);
     }
 
-    // Update cart in the database (only if user is logged in)
+    // Also store shop name if provided
+    if (shopName) {
+      setShopNames((prev) => {
+        const updatedShopNames = { ...prev, [itemId]: shopName };
+        localStorage.setItem("shopNames", JSON.stringify(updatedShopNames));
+        return updatedShopNames;
+      });
+    }
+
+    // Send to backend
     if (userMobileNumber) {
       axios.post(`${url}/api/cart/add`, {
-        mobileOrEmail: userMobileNumber,  // Send mobileNumber (or email) here
+        mobileOrEmail: userMobileNumber,
         productId: itemId,
         quantity,
       })
       .then((response) => {
-        console.log('Cart updated in the database:', response.data);
+        console.log('✅ Cart updated in the database:', response.data);
       })
       .catch((error) => {
-        console.error('Error updating cart in DB:', error);
+        console.error('❌ Error updating cart in DB:', error);
       });
     }
 
@@ -255,38 +265,29 @@ useEffect(() => {
 
 
 useEffect(() => {
-  if (userMobileNumber) {
-    console.log("🔁 Checking local cart for new user:", userMobileNumber);
+  if (!userMobileNumber) return;
 
-    // Fetch the guest cart and store it temporarily
-    const guestCart = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const guestCart = JSON.parse(localStorage.getItem("cartItems")) || {};
+  const userCart = JSON.parse(localStorage.getItem(`cartItems_${userMobileNumber}`)) || {};
 
-    // Check if there's any data for the current user (do not merge if it's a new user)
-    const userCart = JSON.parse(localStorage.getItem(`cartItems_${userMobileNumber}`)) || [];
+  const hasGuestItems = Object.keys(guestCart).length > 0;
+  const hasUserItems = Object.keys(userCart).length > 0;
 
-    if (guestCart.length > 0 && userCart.length === 0) {
-      // If there is guest cart data but no user cart, set guest cart as current cart
-      setCartItems(guestCart);
-    } else {
-      // If there's no guest cart or user cart, initialize an empty cart
-      setCartItems(userCart);
-    }
-
-    // Store the user's cart in localStorage (if new)
-    localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(userCart));
-
-    console.log("✅ Cart set for user:", userMobileNumber);
+  if (hasGuestItems && !hasUserItems) {
+    setCartItems(guestCart);
+    localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(guestCart));
+  } else {
+    setCartItems(userCart);
   }
 }, [userMobileNumber]);
 
+useEffect(() => {
+  const savedShopNames = localStorage.getItem("shopNames");
+  if (savedShopNames) {
+    setShopNames(JSON.parse(savedShopNames));
+  }
+}, []);
 
-  const setShopNameForItem = (itemId, shopName) => {
-    setShopNames((prev) => {
-      const updatedShopNames = { ...prev, [itemId]: shopName };
-      localStorage.setItem("shopNames", JSON.stringify(updatedShopNames));
-      return updatedShopNames;
-    });
-  };
 
   const fetchFoodList = async () => {
     try {
@@ -483,7 +484,6 @@ useEffect(() => {
         setCartItems,
         addToCart,
         removeFromCart,
-        fetchWalletBalance,
         getTotalCartAmount,
         promoCode,
         applyPromoCode,
@@ -513,7 +513,6 @@ useEffect(() => {
         setWalletBalance,
         transactionHistory,
         fetchWalletBalance,
-        fetchWalletDetails: fetchWalletBalance, // ✅ Expose this correctly
         addToWallet,
         //fetchTransactions,
         handleWalletPaymentSuccess,
