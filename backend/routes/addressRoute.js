@@ -104,4 +104,24 @@ addressRouter.delete("/delete/:addressId/:mobileNumber", async (req, res) => {
     });
   }
 });
+
+// Update address explicitly via PUT
+addressRouter.put("/:addressId", async (req, res) => {
+  const { addressId } = req.params;
+  const updatedData = req.body;
+
+  try {
+     console.log("Updating address with ID:", addressId); 
+    const updated = await Address.findByIdAndUpdate(addressId, updatedData, { new: true });
+    if (!updated) {
+      return res.status(404).json({ error: "Address not found" });
+    }
+    res.json({ address: updated });
+  } catch (err) {
+    console.error("Error updating address:", err);
+    res.status(500).json({ error: "Failed to update address" });
+  }
+});
+
+
 export default addressRouter;
