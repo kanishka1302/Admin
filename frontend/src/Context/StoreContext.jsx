@@ -83,8 +83,6 @@ useEffect(() => {
   }, []);
   
 
-  
-
   // 🛒 Cart logic
 const getTotalCartAmount = () => {
   return Object.entries(cartItems).reduce((total, [id, quantity]) => {
@@ -93,40 +91,30 @@ const getTotalCartAmount = () => {
   }, 0);
 };
 
-const addToCart = async (itemId, quantity = 1, shopName = null) => {
+const addToCart = async (itemId, quantity = 1) => {
   setCartItems((prev) => {
     console.log(`🛒 addToCart called with itemId: ${itemId}, quantity: ${quantity}`);
     const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
     console.log("🗂 Updated cartItems state:", updatedCart);
-
-    // Save cart to localStorage
+    // Update localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-    if (userMobileNumber) {
+    if (userMobileNumber) {  // Check if userMobileNumber is defined
       localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
       console.log(`💾 Saved to localStorage for user ${userMobileNumber}`);
     }
 
-    // Also store shop name if provided
-    if (shopName) {
-      setShopNames((prev) => {
-        const updatedShopNames = { ...prev, [itemId]: shopName };
-        localStorage.setItem("shopNames", JSON.stringify(updatedShopNames));
-        return updatedShopNames;
-      });
-    }
-
-    // Send to backend
+    // Update cart in the database (only if user is logged in)
     if (userMobileNumber) {
       axios.post(`${url}/api/cart/add`, {
-        mobileOrEmail: userMobileNumber,
+        mobileOrEmail: userMobileNumber,  // Send mobileNumber (or email) here
         productId: itemId,
         quantity,
       })
       .then((response) => {
-        console.log('✅ Cart updated in the database:', response.data);
+        console.log('Cart updated in the database:', response.data);
       })
       .catch((error) => {
-        console.error('❌ Error updating cart in DB:', error);
+        console.error('Error updating cart in DB:', error);
       });
     }
 
@@ -242,13 +230,13 @@ useEffect(() => {
   }
 }, [userMobileNumber]);
 
-useEffect(() => {
-  const savedShopNames = localStorage.getItem("shopNames");
-  if (savedShopNames) {
-    setShopNames(JSON.parse(savedShopNames));
-  }
-}, []);
-
+  const setShopNameForItem = (itemId, shopName) => {
+    setShopNames((prev) => {
+      const updatedShopNames = { ...prev, [itemId]: shopName };
+      localStorage.setItem("shopNames", JSON.stringify(updatedShopNames));
+      return updatedShopNames;
+    });
+  };
 
   const fetchFoodList = async () => {
     try {
@@ -337,6 +325,8 @@ useEffect(() => {
     });
     return groupedItems;
   };
+
+
 
   const placeOrderWithWallet = async (orderData) => {
     if (!token || !userId) return;
