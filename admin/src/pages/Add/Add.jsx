@@ -76,7 +76,7 @@ const Add = ({ url }) => {
     formData.append("image", image);
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin-92vt.onrender.com";
       const response = await axios.post(`${BASE_URL}/api/food/add`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
