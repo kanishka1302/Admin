@@ -2,15 +2,16 @@ import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
 import foodModel from "../models/foodModel.js";
+import Shop from "../models/shopModel.js";
 
-// Get directory name
+// Get current directory path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define upload directory
 const uploadDir = path.join(__dirname, "../../uploads");
 
-// Add food item
+// ✅ Add food item
 const addFood = async (req, res) => {
     console.log("Form Data:", req.body);
     console.log("Uploaded File:", req.file);
@@ -24,10 +25,10 @@ const addFood = async (req, res) => {
         const food = new foodModel({
             name: req.body.name,
             description: req.body.description,
-            price: req.body.price,
+            price:req.body.price,
             category: req.body.category,
             image: req.file.filename,
-            shopId: req.body.shopId, // Ensure shopId is saved
+            shopId: req.body.shopId, // Ensure shopId is linked
         });
 
         await food.save();
@@ -38,26 +39,35 @@ const addFood = async (req, res) => {
     }
 };
 
-// List all food items with optional search query
 const listFood = async (req, res) => {
-    const { query } = req.query; // Extract the search query
+  const { query, shopId } = req.query;
 
-    try {
-        // Search food by name (case insensitive) if query exists
-        const filter = query ? { name: { $regex: query, $options: "i" } } : {};
+  try {
+    let filter = {};
 
-        // Fetch food items from the database
-        const foods = await foodModel.find(filter);
-        res.json({ success: true, data: foods });
-    } catch (error) {
-        console.error("Error retrieving foods:", error);
-        res.status(500).json({ success: false, message: "Error retrieving foods." });
+    // Filter by name if 'query' is provided
+    if (query) {
+      filter.name = { $regex: query, $options: "i" };
     }
+
+    // Filter by shopId if provided
+    if (shopId) {
+      filter.shopId = shopId;
+    }
+
+    // Fetch food items based on filter
+    const foods = await foodModel.find(filter).populate('shopId', 'name');  // You can add populate if needed
+
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    console.error("Error retrieving foods:", error);
+    res.status(500).json({ success: false, message: "Error retrieving foods." });
+  }
 };
 
-// Remove food item
+// ✅ Remove food item (DB delete + image cleanup)
 const removeFood = async (req, res) => {
-    const { id } = req.params; // Use params instead of body
+    const { id } = req.params;
 
     try {
         const food = await foodModel.findById(id);
@@ -65,15 +75,15 @@ const removeFood = async (req, res) => {
             return res.status(404).json({ success: false, message: "Food item not found." });
         }
 
-        // Delete image file if it exists
         const imagePath = path.join(uploadDir, food.image);
         if (fs.existsSync(imagePath)) {
             fs.unlink(imagePath, (err) => {
-                if (err) console.error("Error deleting image:", err);
+                if (err) {
+                    console.error("Error deleting image:", err);
+                }
             });
         }
 
-        // Delete the food item from the database
         await foodModel.findByIdAndDelete(id);
         res.status(200).json({ success: true, message: "Food item removed successfully." });
     } catch (error) {
