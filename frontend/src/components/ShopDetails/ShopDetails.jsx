@@ -27,24 +27,27 @@ const ShopDetails = () => {
   }, [selectedShopId, selectedCategory]);
 
   const fetchFoodItems = async (shopId, category) => {
-    setLoading(true);
-    try {
-      const { data } = await axios.get(`${API_BASE_URL}/api/food/list?shopId=${shopId}`);
-      if (data.success) {
-        const filtered = data.data.filter(
-          item => item.category.toLowerCase() === category.toLowerCase()
-        );
-        setFoodItems(filtered);
-      } else {
-        toast.error("Failed to fetch food items.");
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error("Something went wrong while loading food items.");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const { data } = await axios.get(`${API_BASE_URL}/api/food/list?shopId=${shopId}`);
+    console.log('All items received from backend:', data.data);
+    if (data.success) {
+      const filtered = data.data.filter(
+        item => item.category.toLowerCase() === category.toLowerCase()
+      );
+      console.log('Filtered items (category):', filtered); 
+      setFoodItems(filtered);
+    } else {
+      toast.error("Failed to fetch food items.");
     }
-  };
+  } catch (error) {
+    console.error("Fetch error:", error);
+    toast.error("Something went wrong while loading food items.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleAddToCart = (itemId) => {
     addToCart(itemId, 1);
