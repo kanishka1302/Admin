@@ -13,5 +13,4 @@ router.get('/', getAllHistory);
 router.get('/user/:userEmail', getUserHistory);
 
 
-
 export { router as historyRoutes };
