@@ -5,23 +5,19 @@ import { addFood, listFood, removeFood } from "../controllers/foodController.js"
 
 const foodRouter = express.Router();
 
-// Ensure 'uploads' folder exists
+// Ensure 'uploads' directory exists
 const uploadDir = "uploads";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer Storage Configuration
+// Multer storage engine configuration
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 
-// File filter to allow only images
+// File filter to accept only images
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -30,14 +26,16 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ 
-  storage, 
+// Multer middleware with file size limit (5MB)
+const upload = multer({
+  storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
-// API Routes
+// API Endpoints
 foodRouter.get("/list", listFood);
+
 foodRouter.post("/add", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
@@ -49,6 +47,7 @@ foodRouter.post("/add", upload.single("image"), async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+
 foodRouter.delete("/remove/:id", async (req, res) => {
   try {
     await removeFood(req, res);
