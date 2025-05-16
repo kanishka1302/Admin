@@ -7,12 +7,37 @@ import { toast } from "react-toastify";
 const Add = ({ url }) => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null); // For Image Preview
+  const [shops, setShops] = useState([]); 
   const [data, setData] = useState({
     name: "",
     description: "",
     price: "",
     category: "Chicken",
+    shopId: "",
   });
+
+  useEffect(() => {
+    // 🆕 Fetch shop list
+    const fetchShops = async () => {
+      try {
+        const res = await axios.get(`https://admin-92vt.onrender.com/api/shops/shopnames`);
+         console.log("✅ Shop fetch response:", res.data); // full response
+        console.log("✅ Shops array:", res.data.data); 
+        if (res.data.success) {
+        const shopNames = res.data.data.map(shop => ({
+          _id: shop._id,
+          shopName: shop.name
+        }));
+        console.log("✅ Filtered shops (only _id & name):", shopNames);
+        setShops(shopNames);
+      }
+    } catch (err) {
+      console.error("❌ Failed to fetch shops", err);
+      toast.error("Error loading shop list");
+    }
+  };
+    fetchShops();
+  }, []);
 
   useEffect(() => {
     if (image) {
@@ -47,16 +72,17 @@ const Add = ({ url }) => {
     formData.append("description", data.description);
     formData.append("price", Number(data.price));
     formData.append("category", data.category);
+    formData.append("shopId", data.shopId);
     formData.append("image", image);
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://admin-92vt.onrender.com";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
       const response = await axios.post(`${BASE_URL}/api/food/add`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.data.success) {
-        setData({ name: "", description: "", price: "", category: "Chicken" });
+        setData({ name: "", description: "", price: "", category: "Chicken", shopId:"" });
         setImage(null);
         setPreview(null);
         toast.success(response.data.message);
@@ -105,6 +131,17 @@ const Add = ({ url }) => {
             <p>Product Price</p>
             <input onChange={onChangeHandler} value={data.price} type="number" name="price" placeholder="Rs.20" required />
           </div>
+        </div>
+        <div className="add-shop flex-col">
+          <p>Shop Name</p>
+          <select name="shopId" onChange={onChangeHandler} value={data.shopId} required>
+            <option value="">Select Shop</option>
+            {shops.map((shop) => (
+              <option key={shop._id} value={shop._id}>
+                {shop.shopName}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className="add-btn">Add</button>
