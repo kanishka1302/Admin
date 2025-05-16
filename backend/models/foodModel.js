@@ -5,15 +5,19 @@ const foodSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
-    image: { type: String, required: true }, // Stores image URL or path
+    image: { type: String, required: true }, // URL or local path
     category: { type: String, required: true, trim: true },
-    shopId: { type: mongoose.Schema.Types.ObjectId, ref: "ShopModel", required: false },
-    available: { type: Boolean, default: true }, // New: Track availability status
+    shopId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Shop', // Reference to the Shop model
+      required: true,
+    },    
+    available: { type: Boolean, default: true }, // for toggling availability
   },
   { timestamps: true }
 );
 
-// Prevent duplicate model registration issue
+// Avoid model overwrite error in development
 const FoodModel = mongoose.models.Food || mongoose.model("Food", foodSchema);
 
 export default FoodModel;
