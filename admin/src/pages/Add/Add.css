@@ -65,7 +65,7 @@
   }
   
   .add-category,
-  .add-price {
+  .add-price, .add-shop {
     flex: 1;
   }
   
