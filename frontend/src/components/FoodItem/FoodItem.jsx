@@ -11,7 +11,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
   // Function to get the correct image path
   const getImagePath = (image) => {
     // If image starts with "http", return it as is, else add the base URL
-    const imagePath = image?.startsWith('http') ? image : `${url}/images/${image}`;
+    const imagePath = image?.startsWith('http') ? image : `${url}/uploads/${image}`;
     console.log('Image Path:', imagePath);  // Debugging the image path
     return imagePath;
   };
