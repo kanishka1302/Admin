@@ -44,11 +44,11 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     }
   }, []);
 
-  useEffect(() => {
+  { /* useEffect(() => {
     const storedSelected = safeLocalStorage.get("selectedAddress");
     setSelectedAddress(storedSelected || null);
 
-  }, []);
+  }, []); */ }
 
   useEffect(() => {
     if (selectedAddress) {
