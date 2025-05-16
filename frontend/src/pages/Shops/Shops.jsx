@@ -46,7 +46,11 @@ const Shops = () => {
 
     const handleShopClick = (shop) => {
         console.log("Navigating to shop:", shop); // Debugging Log
-        setSelectedShop({ name: shop.name, image: shop.image });
+        const selectedShopData = { name: shop.name, image: shop.image };
+
+        setSelectedShop(selectedShopData);
+        localStorage.setItem("selectedShop", JSON.stringify(selectedShopData)); 
+        
         navigate(`/shop-details?shopId=${shop._id}&category=${shop.category}`);
     };
 
