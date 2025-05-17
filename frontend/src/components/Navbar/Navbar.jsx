@@ -18,7 +18,7 @@ const Navbar = ({ setShowLogin }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
 
-  const { getTotalCartAmount, token, setToken, clearCartLocallyOnly, location, setLocation } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, clearCartFromLocalStorage, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('selectedLocation');
     setToken(null);
-    clearCartLocallyOnly();
+    clearCartFromLocalStorage();
     setLocation('');
     setSelectedLocation('Select Location');
     navigate('/');
