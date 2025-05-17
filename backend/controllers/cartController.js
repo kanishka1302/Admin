@@ -63,44 +63,60 @@ export const getCart = async (req, res) => {
     const { mobileOrEmail } = req.body;
     console.log('getCart called with:', mobileOrEmail);
 
+    // Ensure the identifier is provided
     if (!mobileOrEmail) {
       console.log('Identifier missing');
       return res.status(400).json({ message: 'Identifier required' });
     }
 
+    // Find user profile based on mobile number or email
     const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const cart = await Cart.findOne({ profile: profile._id }).populate('items.productId');
+    // Fetch the user's cart using the profile's _id and populate shopName from Shop model
+    const cart = await Cart.findOne({ profile: profile._id })
+      .populate({
+        path: 'items.productId',  // Populate productId (Food)
+        populate: {
+          path: 'shopId',  // Populate shopId (Shop)
+          model: 'Shop',  // Specify the model to populate
+          select: 'shopName',  // Get the shop name only
+        },
+      })
+      .exec();
+      console.log("Populated cart items:", JSON.stringify(cart.items, null, 2));
     if (!cart) {
-      console.log('Cart not found', mobileOrEmail);
+      console.log('Cart not found for user:', mobileOrEmail);
       return res.status(404).json({ message: 'Cart not found' });
     }
 
-    const flatItems = cart.items
-      .filter(item => item.productId)
-      .map(item => {
-        const product = item.productId;
-        return {
-          _id: item._id,
-          productId: product._id,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          quantity: item.quantity,
-        };
-      });
+    // Flatten cart items for frontend, including shop name
+    const flatItems = cart.items.map(item => {
+      const product = item.productId;
+      return {
+        _id: item._id,
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image, // Optional: include image if needed
+        quantity: item.quantity,
+        shopName: product.shopId ? product.shopId.shopName : 'Unknown Shop', // Populate shop name
+      };
+    });
 
+    // Return the structured cart response
     console.log('✅ Cart fetched and flattened:', mobileOrEmail);
     res.status(200).json({ success: true, cart: { items: flatItems } });
+
   } catch (err) {
     console.error('getCart error:', err);
     res.status(500).json({ message: 'Failed to fetch cart' });
   }
 };
+
 
 export const removeFromCart = async (req, res) => {
   try {
