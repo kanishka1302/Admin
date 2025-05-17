@@ -202,45 +202,58 @@ const removeFromCart = async (itemId) => {
 
 // Fetch and set the cart items when the userMobileNumber changes
 useEffect(() => {
-  const fetchAndSetCart = async () => {
-    if (!userMobileNumber) {
-      console.warn("⚠️ userMobileNumber is undefined. Cart fetch skipped.");
-      return;
-    }
-    if (hasFetchedCart.current) return; // Avoid fetching again if already fetched
+  if (!userMobileNumber) {
+    console.warn("⚠️ userMobileNumber is undefined. Cart fetch skipped.");
+    return;
+  }
 
+  const formatCartArrayToObject = (items) => {
+    const formatted = {};
+    items.forEach(item => {
+      formatted[item.productId] = item.quantity;
+    });
+    return formatted;
+  };
+
+  const isCartDifferent = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
+
+  const fetchAndSetCart = async () => {
     try {
       console.log("📡 Fetching cart for:", userMobileNumber);
-      
-      // Fetch cart from backend
-      const response = await axios.post(`${url}/api/cart/get`, { mobileOrEmail: userMobileNumber});
-      
-      if (
-        response.data &&
-        response.data.cart &&
-        Array.isArray(response.data.cart.items) &&
-        response.data.cart.items.length > 0
-      ) {
-        const formattedCart = formatCartArrayToObject(response.data.cart.items);
-        localStorage.setItem("cartItems", JSON.stringify(formattedCart));
-        setCartItems(formattedCart);
-        console.log("💾 Cart data stored in localStorage");
-      } else {
-        const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
-        if (savedCart) {
-          setCartItems(JSON.parse(savedCart));
-        }
-      }      
 
-      // Set flag after fetch
-      hasFetchedCart.current = true;
+      const response = await axios.post(`${url}/api/cart/get`, {
+        mobileOrEmail: userMobileNumber,
+      });
+
+      const items = response.data?.cart?.items || [];
+      const formattedCart = formatCartArrayToObject(items);
+
+      const localCart = JSON.parse(localStorage.getItem("cartItems")) || {};
+
+      if (isCartDifferent(formattedCart, localCart)) {
+        console.log("🔄 Updating local cart with backend data");
+        localStorage.setItem("cartItems", JSON.stringify(formattedCart));
+        localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(formattedCart));
+        setCartItems(formattedCart);
+      } else {
+        console.log("✅ Local cart is already in sync");
+        setCartItems(localCart); // Still set to ensure React state is synced
+      }
+
     } catch (err) {
       console.error("❌ Error fetching cart:", err);
+
+      // If backend fails, try fallback to saved localStorage
+      const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+        console.log("🛠️ Loaded cart from local fallback");
+      }
     }
   };
 
   fetchAndSetCart();
-}, [userMobileNumber]);  // Ensure that userMobileNumber is available when this runs
+}, [userMobileNumber]);
 
 
 useEffect(() => {
