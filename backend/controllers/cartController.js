@@ -140,12 +140,11 @@ export const removeFromCart = async (req, res) => {
       console.log('Cart is empty after removal, deleting cart');
       await Cart.deleteOne({ profile: profile._id });
       return res.status(200).json({ success: true, message: 'Cart deleted' });
-    }
      // Emit empty cart event to user room
       io.to(mobileOrEmail).emit('cartUpdated', []); 
 
       return res.status(200).json({ success: true, message: 'Cart deleted' });
-    
+  }
 
     await cart.save();
     console.log('Item removed and cart updated');
