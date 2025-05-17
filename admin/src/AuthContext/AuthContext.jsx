@@ -6,25 +6,27 @@ const AuthContext = createContext();
 // AuthProvider component to wrap around your app
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const storedValue = localStorage.getItem("adminLoggedIn");
-    return storedValue === "true"; // Convert string to boolean
+    const storedValue = sessionStorage.getItem("adminLoggedIn");
+    return storedValue === "true"; // true if string is "true"
   });
 
   const [justLoggedIn, setJustLoggedIn] = useState(false); // ⬅️ new state
 
   // Sync state with localStorage
   useEffect(() => {
-    localStorage.setItem("adminLoggedIn", isLoggedIn ? "true" : "false");
+     sessionStorage.setItem("adminLoggedIn", isLoggedIn ? "true" : "false");
   }, [isLoggedIn]);
 
   // Login and logout handlers
   const login = () => {
     setIsLoggedIn(true);
+     sessionStorage.setItem("adminLoggedIn", "true");
     setJustLoggedIn(true); // ⬅️ mark just logged in
   };
 
   const logout = () => {
     setIsLoggedIn(false);
+    sessionStorage.removeItem("adminLoggedIn");
     setJustLoggedIn(false);
   };
 
