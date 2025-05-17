@@ -141,9 +141,18 @@ export const removeFromCart = async (req, res) => {
       await Cart.deleteOne({ profile: profile._id });
       return res.status(200).json({ success: true, message: 'Cart deleted' });
     }
+     // Emit empty cart event to user room
+      io.to(mobileOrEmail).emit('cartUpdated', []); 
+
+      return res.status(200).json({ success: true, message: 'Cart deleted' });
+    }
 
     await cart.save();
     console.log('Item removed and cart updated');
+
+  // Emit updated cart to all devices in user's room
+    io.to(mobileOrEmail).emit('cartUpdated', cart.items);
+  
     res.status(200).json({ success: true, message: 'Item removed from cart', cart });
   } catch (err) {
     console.error('removeFromCart error:', err);
