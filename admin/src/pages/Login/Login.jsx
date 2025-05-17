@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Login.css';
-import { FaEye, FaEyeSlash, FaTimes, FaUser } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
 import { useAuth } from '../../AuthContext/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -50,6 +50,15 @@ const Login = () => {
 
             if (data.success) {
                 console.log("✅ Login successful! Updating auth state...");
+                console.log("🔍 Response data:", data);
+                if (data.user && data.user.mobile) {
+                      sessionStorage.setItem("userMobile", data.user.mobile);
+                    setUserMobile(data.user.mobile);
+                    console.log("📦 Saved userMobile to localStorage:", data.user.mobile);
+                } else {
+                    console.warn("⚠️ user.mobile not found in response:", data);
+                }
+                sessionStorage.setItem("isLoggedIn", "true"); 
                 login();  // ✅ Updated here
                 navigate('/dashboard');
             } else {
