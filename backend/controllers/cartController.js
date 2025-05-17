@@ -145,7 +145,7 @@ export const removeFromCart = async (req, res) => {
       io.to(mobileOrEmail).emit('cartUpdated', []); 
 
       return res.status(200).json({ success: true, message: 'Cart deleted' });
-    }
+    
 
     await cart.save();
     console.log('Item removed and cart updated');
