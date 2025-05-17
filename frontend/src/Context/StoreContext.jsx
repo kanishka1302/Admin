@@ -132,82 +132,71 @@ const getTotalCartAmount = () => {
   }, 0);
 };
 
+const clearCartFromLocalStorage = () => {
+  localStorage.removeItem("cartItems");
+  if (userMobileNumber) {
+    localStorage.removeItem(`cartItems_${userMobileNumber}`);
+  }
+  setCartItems({});
+  console.log("🧹 Cart cleared from localStorage and React state");
+};
+
 const addToCart = async (itemId, quantity = 1) => {
   setCartItems((prev) => {
-    console.log(`🛒 addToCart called with itemId: ${itemId}, quantity: ${quantity}`);
     const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
-    console.log("🗂 Updated cartItems state:", updatedCart);
-    // Update localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-    if (userMobileNumber) {  // Check if userMobileNumber is defined
-      localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
-      console.log(`💾 Saved to localStorage for user ${userMobileNumber}`);
-    }
-
-    // Update cart in the database (only if user is logged in)
     if (userMobileNumber) {
-      axios.post(`${url}/api/cart/add`, {
-        mobileOrEmail: userMobileNumber,  // Send mobileNumber (or email) here
-        productId: itemId,
-        quantity,
-      })
-      .then((response) => {
-        console.log('Cart updated in the database:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error updating cart in DB:', error);
-      });
+      localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
     }
-
     return updatedCart;
   });
+
+  if (userMobileNumber) {
+    try {
+      const response = await axios.post(`${url}/api/cart/add`, {
+        mobileOrEmail: userMobileNumber,
+        productId: itemId,
+        quantity,
+      });
+      console.log('Cart updated in the database:', response.data);
+    } catch (error) {
+      console.error('Error updating cart in DB:', error);
+      // Assuming 404 or "not found" means the item doesn't exist
+      if (error.response?.status === 404 || error.response?.data?.message === 'Item not found') {
+        clearCartFromLocalStorage();
+      }
+    }
+  }
 };
 
 const removeFromCart = async (itemId) => {
-  console.log(`🛒 removeFromCart called for itemId: ${itemId}`);
   setCartItems((prev) => {
     const updatedCart = { ...prev };
-
     if (updatedCart[itemId] > 1) {
       updatedCart[itemId] -= 1;
     } else {
       delete updatedCart[itemId];
     }
-
-    console.log("🗂 Updated cartItems after removal:", updatedCart);
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
     if (userMobileNumber) {
       localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
     }
-
-    if (userMobileNumber) {
-      axios.post(`${url}/api/cart/remove`, {
-        mobileOrEmail: userMobileNumber,
-        productId: itemId,
-      })
-      .then((response) => {
-        console.log('Cart updated in the database:', response.data);
-      })
-      .catch((error) => {
-        console.error('Error updating cart in DB:', error);
-      });
-    }
-
     return updatedCart;
   });
-};
-
-
-const clearCartLocallyOnly = () => {
-  console.log("🧹 Clearing cart locally only");
-
-  setCartItems({});
-  setPromoCode("");
-  setDiscountApplied(false);
-  localStorage.removeItem("cartItems");
 
   if (userMobileNumber) {
-    localStorage.removeItem(`cartItems_${userMobileNumber}`);
+    try {
+      const response = await axios.post(`${url}/api/cart/remove`, {
+        mobileOrEmail: userMobileNumber,
+        productId: itemId,
+      });
+      console.log('Cart updated in the database:', response.data);
+    } catch (error) {
+      console.error('Error updating cart in DB:', error);
+      if (error.response?.status === 404 || error.response?.data?.message === 'Item not found') {
+        clearCartFromLocalStorage();
+      }
+    }
   }
 };
 
@@ -493,7 +482,7 @@ useEffect(() => {
         orders,
         setOrders,
         fetchOrders,
-        clearCartLocallyOnly,
+        clearCartFromLocalStorage,
         selectedAddress,
         setSelectedAddress,
         groupItemsByShop,
