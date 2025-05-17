@@ -42,7 +42,7 @@ const PlaceOrder = () => {
     setCartItems,
     currency,
     deliveryCharge,
-    clearCartLocallyOnly,
+    clearCartFromLocalStorage,
     shopNames,
     selectedShop,
   } = useContext(StoreContext);
@@ -208,7 +208,7 @@ const PlaceOrder = () => {
                     headers: { Authorization: `Bearer ${token}` },
                   });                  
                   setTimeout(() => {
-                    clearCartLocallyOnly();
+                    clearCartFromLocalStorage();
                     setCartItems({});
                     navigate("/myorders", {
                       state: { newOrder: { ...orderData, _id: finalOrderId } },
@@ -255,7 +255,7 @@ const PlaceOrder = () => {
           });
           
           setTimeout(() => {
-            clearCartLocallyOnly();
+            clearCartFromLocalStorage();
             setCartItems({});
             navigate("/myorders", {
               state: { newOrder: { ...orderData, _id: response.data.orderId } },
