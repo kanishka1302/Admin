@@ -297,13 +297,6 @@ export const io = new Server(server, {
 // ✅ Handle socket connections
 io.on("connection", (socket) => {
   console.log("🔥 Socket connected:", socket.id);
-  
-  // Listen for client to join their personal room using their userId (mobile/email)
-  socket.on("joinUserRoom", (userId) => {
-    socket.join(userId);
-    console.log(`Socket ${socket.id} joined room: ${userId}`);
-  });
-
 
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
