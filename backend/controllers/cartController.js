@@ -86,17 +86,19 @@ export const getCart = async (req, res) => {
       return res.status(404).json({ message: 'Cart not found' });
     }
     // Flatten cart items for frontend
-    const flatItems = cart.items.map(item => {
-      const product = item.productId;
-      return {
-        _id: item._id,
-        productId: product._id,
-        name: product.name,
-        price: product.price,
-        image: product.image, // optional: include image if needed
-        quantity: item.quantity,
-      };
-    });
+    const flatItems = cart.items
+  .filter(item => item.productId) // skip broken items
+  .map(item => {
+    const product = item.productId;
+    return {
+      _id: item._id,
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: item.quantity,
+    };
+  });
 
     console.log('✅ Cart fetched and flattened:', mobileOrEmail);
     res.status(200).json({ success: true, cart: { items: flatItems } });
