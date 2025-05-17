@@ -18,20 +18,17 @@ export const addToCart = async (req, res) => {
     const { mobileOrEmail, productId, quantity } = req.body;
     console.log('addToCart called with:', req.body);
 
-    // Validation
     if (!mobileOrEmail || !productId || typeof quantity !== 'number' || quantity <= 0) {
       console.log('Invalid request data');
       return res.status(400).json({ message: 'Invalid request data' });
     }
 
-    // Find user profile
-    const profile = await getProfile(mobileOrEmail);  // You should pass either mobile or email
+    const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Cart logic
     let cart = await Cart.findOne({ profile: profile._id });
     if (!cart) {
       console.log('No existing cart found, creating new cart');
@@ -66,43 +63,39 @@ export const getCart = async (req, res) => {
     const { mobileOrEmail } = req.body;
     console.log('getCart called with:', mobileOrEmail);
 
-    // Ensure the identifier is provided
     if (!mobileOrEmail) {
       console.log('Identifier missing');
       return res.status(400).json({ message: 'Identifier required' });
     }
 
-    // Find user profile based on mobile number or email
     const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Fetch the user's cart using the profile's _id
     const cart = await Cart.findOne({ profile: profile._id }).populate('items.productId');
     if (!cart) {
       console.log('Cart not found', mobileOrEmail);
       return res.status(404).json({ message: 'Cart not found' });
     }
-    // Flatten cart items for frontend
+
     const flatItems = cart.items
-  .filter(item => item.productId) // skip broken items
-  .map(item => {
-    const product = item.productId;
-    return {
-      _id: item._id,
-      productId: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: item.quantity,
-    };
-  });
+      .filter(item => item.productId)
+      .map(item => {
+        const product = item.productId;
+        return {
+          _id: item._id,
+          productId: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: item.quantity,
+        };
+      });
 
     console.log('✅ Cart fetched and flattened:', mobileOrEmail);
     res.status(200).json({ success: true, cart: { items: flatItems } });
-
   } catch (err) {
     console.error('getCart error:', err);
     res.status(500).json({ message: 'Failed to fetch cart' });
@@ -119,7 +112,6 @@ export const removeFromCart = async (req, res) => {
       return res.status(400).json({ message: 'Identifier and productId required' });
     }
 
-    // Find user profile
     const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
@@ -140,18 +132,11 @@ export const removeFromCart = async (req, res) => {
       console.log('Cart is empty after removal, deleting cart');
       await Cart.deleteOne({ profile: profile._id });
       return res.status(200).json({ success: true, message: 'Cart deleted' });
-     // Emit empty cart event to user room
-      io.to(mobileOrEmail).emit('cartUpdated', []); 
-
-      return res.status(200).json({ success: true, message: 'Cart deleted' });
-  }
+    }
 
     await cart.save();
     console.log('Item removed and cart updated');
 
-  // Emit updated cart to all devices in user's room
-    io.to(mobileOrEmail).emit('cartUpdated', cart.items);
-  
     res.status(200).json({ success: true, message: 'Item removed from cart', cart });
   } catch (err) {
     console.error('removeFromCart error:', err);
@@ -169,15 +154,13 @@ export const clearCart = async (req, res) => {
       return res.status(400).json({ message: 'Identifier required' });
     }
 
-    // Resolve profile
     const profile = await getProfile(mobileOrEmail);
     if (!profile) {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // ✅ Use mobileNumber for consistency
-    const cart = await Cart.findOne({ mobileNumber: profile.mobileNumber });
+    const cart = await Cart.findOne({ profile: profile._id });
     if (!cart) {
       console.log('Cart not found');
       return res.status(404).json({ message: 'Cart not found' });
@@ -193,14 +176,12 @@ export const clearCart = async (req, res) => {
   }
 };
 
-
 export const deleteCartAfterOrder = async (mobileOrEmail) => {
   try {
     console.log('deleteCartAfterOrder called for:', mobileOrEmail);
     const profile = await getProfile(mobileOrEmail);
 
     if (profile) {
-      // Proceed with deleting the cart if profile exists
       await Cart.deleteOne({ profile: profile._id });
       console.log('Cart deleted after order');
       return { success: true, message: 'Cart deleted successfully' };
@@ -213,4 +194,3 @@ export const deleteCartAfterOrder = async (mobileOrEmail) => {
     return { success: false, message: 'Error deleting cart after order', error: err.message };
   }
 };
-
