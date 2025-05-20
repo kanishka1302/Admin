@@ -15,29 +15,41 @@ const uploadDir = path.join(__dirname, "../../uploads");
 const addFood = async (req, res) => {
     console.log("Form Data:", req.body);
     console.log("Uploaded File:", req.file);
+  
+    const { name, description, price, category, shopId } = req.body;
+    //const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    const serverHost = process.env.SERVER_HOST || req.get("host");
+    const imageUrl =  `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
 
-    // Validate file upload
-    if (!req.file) {
-        return res.status(400).json({ success: false, message: "No file uploaded." });
+  
+    // Validate required fields explicitly
+    if (!name || !description || !price || !category || !shopId || !imageUrl) {
+      console.log("Validation failed:", { name, description, price, category, shopId, imageUrl });
+      return res.status(400).json({ success: false, message: "Missing required fields" });
     }
-
+  
+    if (isNaN(price) || Number(price) <= 0) {
+      console.log("Invalid price:", price);
+      return res.status(400).json({ success: false, message: "Invalid price" });
+    }
+  
     try {
-        const food = new foodModel({
-            name: req.body.name,
-            description: req.body.description,
-            price:req.body.price,
-            category: req.body.category,
-            image: req.file.filename,
-            shopId: req.body.shopId, // Ensure shopId is linked
-        });
-
-        await food.save();
-        res.status(201).json({ success: true, message: "Food item added successfully!", food });
+      const food = new foodModel({
+        name,
+        description,
+        price: Number(price),
+        category,
+        image: imageUrl, // just filename, or you can prefix with '/uploads/' if needed
+        shopId,
+      });
+  
+      await food.save();
+      res.status(201).json({ success: true, message: "Food item added successfully!", food });
     } catch (error) {
-        console.error("Error adding food:", error);
-        res.status(500).json({ success: false, message: "Error adding food." });
+      console.error("Error adding food:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
     }
-};
+  };
 
 const listFood = async (req, res) => {
   const { query, shopId } = req.query;
@@ -56,7 +68,7 @@ const listFood = async (req, res) => {
     }
 
     // Fetch food items based on filter
-    const foods = await foodModel.find(filter).populate('shopId', 'name');  // You can add populate if needed
+    const foods = await foodModel.find(filter);  // You can add populate if needed
 
     res.json({ success: true, data: foods });
   } catch (error) {
