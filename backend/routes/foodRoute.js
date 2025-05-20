@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import fs from "fs";
+import path from "path";
 import { addFood, listFood, removeFood } from "../controllers/foodController.js";
 
 const foodRouter = express.Router();
@@ -13,8 +14,9 @@ if (!fs.existsSync(uploadDir)) {
 
 // Multer storage engine configuration
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) =>
+    cb(null, `${Date.now()}-${file.originalname}`),
 });
 
 // File filter to accept only images
@@ -36,11 +38,14 @@ const upload = multer({
 // API Endpoints
 foodRouter.get("/list", listFood);
 
+// ⬇ Upload middleware added here
 foodRouter.post("/add", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: "Image upload failed" });
-    }
+    const imageUrl = `/uploads/${req.file.filename}`; // Relative URL to be saved in DB
+
+    // Add imageUrl to req.body so controller can access it
+    req.body.imageUrl = imageUrl;
+
     await addFood(req, res);
   } catch (error) {
     console.error("Error in /add route:", error);
