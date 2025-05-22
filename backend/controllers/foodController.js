@@ -18,9 +18,9 @@ const addFood = async (req, res) => {
   
     const { name, description, price, category, shopId } = req.body;
     //const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-    const serverHost = process.env.SERVER_HOST || req.get("host");
-    const imageUrl =  `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
-
+    //const serverHost = process.env.SERVER_HOST || req.get("host");
+    //const imageUrl =  `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
+    const imageUrl = req.file.filename;
   
     // Validate required fields explicitly
     if (!name || !description || !price || !category || !shopId || !imageUrl) {
