@@ -39,6 +39,7 @@ const Navbar = ({ setShowLogin }) => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser && storedUser.address) {
       setSelectedLocation(storedUser.address);
+      setLocation(storedUser.address);
     }
 
     const locationPopupShown = localStorage.getItem('locationPopupShown');
