@@ -89,17 +89,15 @@ const List = () => {
           <p>Loading...</p>
         ) : (
           list.map((item, index) => {
-            const imageUrl = `${url}/uploads/` + item.image; // Construct the image URL
+            const imageUrl = item.image ? `data:image/jpeg;base64,${item.image}` : '/default-food.jpg';
             return (
               <div key={index} className='list-table-format'>
-               
-                <img 
+                 <img 
                     src={imageUrl} 
                     alt={item.name} 
                     onError={(e) => { e.target.src = '/default-food.jpg'; }} // Optional fallback
                     style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                 />
-
                 <p>{item.name}</p>
                 <p>{item.category}</p>
                 <p>{currency} {item.price}</p>
