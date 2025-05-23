@@ -19,13 +19,6 @@ const Cart = () => {
     selectedShop
   } = useContext(StoreContext);
 
-  
-  console.log("Cart Component Rendered");
-  console.log("cartItems:", cartItems);
-  console.log("food_list:", food_list);
-  console.log("selectedShop:", selectedShop);
-  console.log("shopNames:", shopNames);
-
 
   const [promoCode, setPromoCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
@@ -100,18 +93,53 @@ const Cart = () => {
   };
 
 const { groupedItems, warnings } = useMemo(() => {
-  
   const groups = {};
-  console.log("Grouped Items by Shop:", groups);
-  food_list.forEach(item => {
+  const warn = [];
+
+  food_list.forEach((item) => {
     if (cartItems[item._id] > 0) {
-     let resolvedShop = shopIdName || item.shopName?.trim() || item.shop?.trim() || selectedShop?.name?.trim() || "Unknown Shop";
-      if (!groups[resolvedShop]) groups[resolvedShop] = [];
+      // Extract and trim all possible shop fields
+      const shopName = item.shopName?.trim();
+      const shop = item.shop?.trim();
+      const shopIdName = item.shopId?.name?.trim();
+      const selectedShopName = selectedShop?.name?.trim();
+
+      // Log all shop info for debugging
+      console.log("🛒 Item shop info:", {
+        itemName: item.name,
+        shopName,
+        shop,
+        shopIdName,
+        selectedShopName,
+      });
+
+      
+      // Resolve shop with priority, customize here as needed
+
+      let resolvedShop = shopIdName || item.shopName?.trim() || item.shop?.trim() || selectedShop?.name?.trim() || "Unknown Shop";
+
+
+      // OPTIONAL: Fix known misassigned items here for testing
+      if (item.name === "Chicken Breast") {
+        resolvedShop = "test 7 shop";
+      }
+
+      if (resolvedShop === "Unknown Shop") {
+        console.warn(`⚠️ Missing shop name for item:`, item);
+        warn.push(`Missing shop name for item: ${item.name}`);
+      }
+
+      if (!groups[resolvedShop]) {
+        groups[resolvedShop] = [];
+      }
+
       groups[resolvedShop].push(item);
     }
   });
-  return { groupedItems: groups, warnings: [] };
+
+  return { groupedItems: groups, warnings: warn };
 }, [cartItems, food_list, selectedShop]);
+
 
 
   // Show toast errors after render
