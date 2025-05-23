@@ -9,12 +9,22 @@ const FoodItem = ({ id, name, price, description, image }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
 
   // Function to get the correct image path
-  const getImagePath = (image) => {
-    // If image starts with "http", return it as is, else add the base URL
-    const imagePath = image?.startsWith('http') ? image : `${url}/uploads/${image}`;
-    console.log('Image Path:', imagePath);  // Debugging the image path
-    return imagePath;
-  };
+const getImagePath = (image) => {
+  if (!image) return assets.fallback_image || '/images/fallback.jpg';
+
+  if (image.startsWith("data:")) {
+    // base64 image string from DB - use directly
+    return image;
+  }
+
+  if (image.startsWith("http")) {
+    return image; // external image url
+  }
+
+  // legacy or relative path fallback, e.g. /uploads/filename.jpg
+  return `${url}/uploads/${image}`;
+};
+
 
   const handleAddToCart = (id) => {
     const user = JSON.parse(localStorage.getItem("user"));
