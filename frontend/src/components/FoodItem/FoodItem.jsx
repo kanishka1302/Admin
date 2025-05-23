@@ -10,6 +10,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
 
   // Function to get the correct image path
 const getImagePath = (image) => {
+  console.log("Image for item", name, image);
   if (!image) return assets.fallback_image || '/images/fallback.jpg';
 
   if (image.startsWith("data:")) {
