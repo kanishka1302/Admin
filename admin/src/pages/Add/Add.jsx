@@ -99,7 +99,7 @@ const Add = ({ url }) => {
     formData.append("image", image);
 
     try {
-      const response = await axios.post(`${url}/api/food/add`, formData, {
+      const response = await axios.post(`https://admin-92vt.onrender.com/api/food/add`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
