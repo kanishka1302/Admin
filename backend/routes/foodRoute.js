@@ -1,25 +1,12 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
-import path from "path";
 import { addFood, listFood, removeFood } from "../controllers/foodController.js";
 
 const foodRouter = express.Router();
 
-// Ensure 'uploads' directory exists
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Use memoryStorage to keep file in memory buffer (no disk saving)
+const storage = multer.memoryStorage();
 
-// Multer storage engine configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) =>
-    cb(null, `${Date.now()}-${file.originalname}`),
-});
-
-// File filter to accept only images
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -28,23 +15,25 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Multer middleware with file size limit (5MB)
 const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
-// API Endpoints
 foodRouter.get("/list", listFood);
 
-// ⬇ Upload middleware added here
 foodRouter.post("/add", upload.single("image"), async (req, res) => {
   try {
-    const imageUrl = `/uploads/${req.file.filename}`; // Relative URL to be saved in DB
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Image file is required" });
+    }
 
-    // Add imageUrl to req.body so controller can access it
-    req.body.imageUrl = imageUrl;
+    // Convert file buffer to base64 data URI string
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+    // Assign base64 string to req.body.image for the controller
+    req.body.image = base64Image;
 
     await addFood(req, res);
   } catch (error) {
@@ -63,3 +52,4 @@ foodRouter.delete("/remove/:id", async (req, res) => {
 });
 
 export default foodRouter;
+
