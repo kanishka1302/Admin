@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import './List.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { StoreContext } from '../../Context/StoreContext'; // Import StoreContext
 
 const List = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shops, setShops] = useState([]);
-  const { url } = useContext(StoreContext); // Use context to get the URL
+  const url = 'https://admin-92vt.onrender.com'; // Define your base API URL directly here
   const currency = 'Rs.'; // Define your currency symbol here
 
   // Function to get the correct image path
