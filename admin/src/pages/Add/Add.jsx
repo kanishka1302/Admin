@@ -23,7 +23,7 @@ const Add = ({ url }) => {
     // Fetch shops list on mount
     const fetchShops = async () => {
       try {
-        const res = await axios.get(`${url}/api/shops/shopnames`);
+        const res = await axios.get(`https://admin-92vt.onrender.com/api/shops/shopnames`);
         if (res.data.success) {
           const shopNames = res.data.data.map((shop) => ({
             _id: shop._id,
