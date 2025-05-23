@@ -68,8 +68,8 @@ const listFood = async (req, res) => {
     }
 
     // Fetch food items based on filter
-    const foods = await foodModel.find(filter);  // You can add populate if needed
-
+    const foods = await foodModel.find(filter).populate('shopId', 'name'); // You can add populate if needed
+    
     res.json({ success: true, data: foods });
   } catch (error) {
     console.error("Error retrieving foods:", error);
