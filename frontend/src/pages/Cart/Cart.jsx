@@ -105,7 +105,7 @@ const { groupedItems, warnings } = useMemo(() => {
   console.log("Grouped Items by Shop:", groups);
   food_list.forEach(item => {
     if (cartItems[item._id] > 0) {
-      let resolvedShop = item.shopName || item.shop || item.shopId?.name || selectedShop?.name || "Unknown Shop";
+     let resolvedShop = shopIdName || item.shopName?.trim() || item.shop?.trim() || selectedShop?.name?.trim() || "Unknown Shop";
       if (!groups[resolvedShop]) groups[resolvedShop] = [];
       groups[resolvedShop].push(item);
     }
