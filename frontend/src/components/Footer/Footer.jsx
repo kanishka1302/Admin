@@ -6,6 +6,7 @@ import VencobbLogo from '../../assets/vencobb.jpg';
 import SnehaChickenLogo from '../../assets/sneha chicken.jpg';
 import { Link } from 'react-router-dom'; // Import Link
 import Chat from '../../pages/Chat/Chat.jsx';
+import { toast } from 'react-toastify';
 
 const Footer = () => {
   const [showChat, setShowChat] = useState(false);
