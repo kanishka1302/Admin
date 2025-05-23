@@ -17,10 +17,10 @@ const addFood = async (req, res) => {
     console.log("Uploaded File:", req.file);
   
     const { name, description, price, category, shopId } = req.body;
-    //const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-    //const serverHost = process.env.SERVER_HOST || req.get("host");
-    //const imageUrl =  `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
-    const imageUrl = req.file.filename;
+    const serverHost = process.env.SERVER_HOST || req.get("host");
+    const imageUrl = `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
+
+
   
     // Validate required fields explicitly
     if (!name || !description || !price || !category || !shopId || !imageUrl) {
@@ -68,8 +68,8 @@ const listFood = async (req, res) => {
     }
 
     // Fetch food items based on filter
-    const foods = await foodModel.find(filter).populate('shopId', 'name'); // You can add populate if needed
-    
+    const foods = await foodModel.find(filter).populate("shopId", "name"); // populate name from Shop
+
     res.json({ success: true, data: foods });
   } catch (error) {
     console.error("Error retrieving foods:", error);
