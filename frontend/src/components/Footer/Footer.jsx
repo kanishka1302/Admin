@@ -14,7 +14,7 @@ const Footer = () => {
     if (token) {
       setShowChat(!showChat);
     } else {
-      alert("Please log in to chat.");
+       toast.error("Please log in to chat.");
     }
   };
 
