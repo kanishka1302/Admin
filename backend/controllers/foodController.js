@@ -17,8 +17,12 @@ const addFood = async (req, res) => {
     console.log("Uploaded File:", req.file);
   
     const { name, description, price, category, shopId } = req.body;
-    const serverHost = process.env.SERVER_HOST || req.get("host");
-    const imageUrl = `${req.protocol}://${serverHost}/uploads/${req.file.filename}`;
+    //const imageUrl = ${req.protocol}://${req.get("host")}/uploads/${req.file.filename};
+    //const serverHost = process.env.SERVER_HOST || req.get("host");
+    //const imageUrl =  ${req.protocol}://${serverHost}/uploads/${req.file.filename};
+    const imageUrl = req.file.filename;
+  
+
 
 
   
