@@ -1,14 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './List.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { StoreContext } from '../../Context/StoreContext'; // Import StoreContext
 
 const List = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shops, setShops] = useState([]);
-  const url = 'https://admin-92vt.onrender.com' // Replace with your API base URL
+  const { url } = useContext(StoreContext); // Use context to get the URL
   const currency = 'Rs.'; // Define your currency symbol here
+
+  // Function to get the correct image path
+  const getImagePath = (image) => {
+    console.log("Image for item", image);
+    if (!image) return '/images/fallback.jpg'; // Use default image if no image is provided
+
+    if (image.startsWith("data:")) {
+      // base64 image string from DB - use directly
+      return image;
+    }
+
+    if (image.startsWith("http")) {
+      return image; // external image URL
+    }
+
+    // legacy or relative path fallback, e.g. /uploads/filename.jpg
+    return `${url}/uploads/${image}`;
+  };
 
   // Fetch the list of food items from the API
   const fetchList = async () => {
@@ -29,7 +48,7 @@ const List = () => {
     }
   };
 
-   // Fetch shops list
+  // Fetch shops list
   const fetchShops = async () => {
     try {
       const response = await axios.get(`${url}/api/shops/shopnames`);
@@ -60,12 +79,6 @@ const List = () => {
     }
   };
 
-  // Helper to get shop name by shopId
-  const getShopName = (shopId) => {
-    const shop = shops.find((s) => s._id === shopId);
-    return shop ? shop.name : 'Unknown Shop';
-  };
-
   // Fetch the food list when the component mounts
   useEffect(() => {
     fetchList();
@@ -89,19 +102,21 @@ const List = () => {
           <p>Loading...</p>
         ) : (
           list.map((item, index) => {
-            const imageUrl = item.image ? `data:image/jpeg;base64,${item.image}` : '/default-food.jpg';
+            // Get the image path using the getImagePath function
+            const imageUrl = getImagePath(item.image);
             return (
               <div key={index} className='list-table-format'>
-                 <img 
+                <img 
                     src={imageUrl} 
                     alt={item.name} 
-                    onError={(e) => { e.target.src = '/default-food.jpg'; }} // Optional fallback
+                    onError={(e) => { e.target.src = '/images/fallback.jpg'; }} // Optional fallback
                     style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                 />
+
                 <p>{item.name}</p>
                 <p>{item.category}</p>
                 <p>{currency} {item.price}</p>
-                 <p>{item.shopId?.name || 'Unknown Shop'}</p>  
+                <p>{item.shopId?.name || 'Unknown Shop'}</p>  
                 <p className='cursor' onClick={() => removeFood(item._id)}>x</p>
               </div>
             );
