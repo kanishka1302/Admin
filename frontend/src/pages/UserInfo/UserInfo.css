@@ -14,8 +14,17 @@
   border-radius: 12px;
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  
 }
-
+.address{
+  gap: 10px;
+  row-gap: 10px;
+  padding: 10px;
+  margin: 10px;
+  border-left: 5px solid #dd0202;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
 .userinfo-section h1 {
   margin-bottom: 20px;
   color: #333;
