@@ -54,12 +54,12 @@ const Shops = () => {
         navigate(`/shop-details?shopId=${shop._id}&category=${shop.category}`);
     };
 
-    const getShopImage = (shop) => {
+   const getShopImage = (shop) => {
         if (!shop.image) return FALLBACK_IMAGE;
-        const imageUrl = shop.image.startsWith("/") ? `${API_BASE_URL}${shop.image}` : `${API_BASE_URL}/uploads/${shop.image}`;
-        console.log(`Image for ${shop.name}:`, imageUrl); // Debugging Log
-        return imageUrl;
+        if (shop.image.startsWith("data:image")) return shop.image; // It's a base64 image
+        return `${API_BASE_URL}/uploads/${shop.image}`; // Fallback for older file-based images
     };
+
 
     const categoryIcons = {
         chicken: '🍗',
