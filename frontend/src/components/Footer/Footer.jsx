@@ -94,7 +94,7 @@ const Footer = () => {
           <div className="footer-content-right">
             <h2>Get In Touch!!</h2>
             <ul>
-              <li>Contact@noveg.pvt.ltd</li>
+             
               <li onClick={handleChatClick} className="chat-button" style={{ cursor: 'pointer' }}>
                Chat with us
               </li>
