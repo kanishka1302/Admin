@@ -6,12 +6,6 @@ import ShopModel from "../models/shopModel.js";
 
 const router = express.Router();
 
-// Ensure uploads directory exists
-const uploadDir = "uploads";
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 // Multer configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
@@ -19,13 +13,12 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ Add a New Shop
+// ✅ Add a New Shop with image stored as base64
 router.post("/addshops", upload.single("image"), async (req, res) => {
   try {
     const { name, address, phone, category } = req.body;
-    const image = req.file ? req.file.filename : null;
 
-    if (!name || !address || !phone || !category || !image) {
+    if (!name || !address || !phone || !category || !req.file) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
@@ -35,7 +28,17 @@ router.post("/addshops", upload.single("image"), async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid phone number format" });
     }
 
-    const newShop = new ShopModel({ name, address, phone, category, image });
+    // Convert image buffer to base64
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+    const newShop = new ShopModel({
+      name,
+      address,
+      phone,
+      category,
+      image: base64Image,
+    });
+
     await newShop.save();
 
     res.json({ success: true, message: "Shop added successfully", data: newShop });
