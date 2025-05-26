@@ -192,13 +192,9 @@ const { groupedItems, warnings } = useMemo(() => {
                 <div key={item._id} className="cart-item">
                   <div className="cart-item-details">
                     <img
-                      src={`${url}/uploads/${item.image}`}
+                      src={item.image} // since it's already a base64 string
                       alt={item.name}
                       className="cart-item-image"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = `${url}/images/${item.image}`;
-                      }}
                     />
                     <p>{item.name}</p>
                     <p>Price: {currency}{(item.price * cartItems[item._id]).toFixed(2)}</p>
