@@ -55,10 +55,14 @@ body {
 }
 
 .my-orders .container {
+  max-width: 1200px; /* or 100%, depending on your design */
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
   margin-top: var(--spacing-base);
+  width: 85%;
 }
 
 .my-orders-order {
