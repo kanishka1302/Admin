@@ -49,8 +49,28 @@ const MyOrders = () => {
     }
   };
 
+  const refreshOrdersSilently = async () => {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const userId = storedUser?.userId || storedUser?._id;
+
+    const response = await axios.post(
+      `${url}/api/orders/userorders`,
+      { userId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data?.success) {
+      const updatedOrders = response.data.data.reverse();
+      setData(updatedOrders);
+    }
+    } catch (error) {
+      console.error("Silent refresh failed:", error);
+    }
+  };
+
   const handleTrackOrder = async (index) => {
-    await fetchOrders(); // 👈 Fetch latest orders when button is clicked
+    await refreshOrdersSilently(); // Silent fetch, no loading message
     setVisibleProgressIndex(index === visibleProgressIndex ? null : index);
   };
 
@@ -89,7 +109,7 @@ const MyOrders = () => {
                   <span>●</span>
                   <b>{order.status || "Unknown"}</b>
                 </p>
-                <button onClick={() => handleTrackOrder(index)}>
+                <button type="button" onClick={() => handleTrackOrder(index)}>
                   Track Order
                 </button>
               </div>
