@@ -1,10 +1,10 @@
 import express from "express";
 import multer from "multer";
+import sharp from "sharp";
 import { addFood, listFood, removeFood } from "../controllers/foodController.js";
 
 const foodRouter = express.Router();
 
-// Use memoryStorage to keep file in memory buffer (no disk saving)
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -18,23 +18,32 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max upload size
 });
 
+// List all food
 foodRouter.get("/list", listFood);
 
+// Add new food
 foodRouter.post("/add", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "Image file is required" });
     }
 
-    // Convert file buffer to base64 data URI string
-    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+    // Resize and compress image using sharp
+    const optimizedBuffer = await sharp(req.file.buffer)
+      .resize({ width: 500 }) // adjust width as needed (height auto)
+      .webp({ quality: 40 }) // reduce quality for smaller size
+      .toBuffer();
 
-    // Assign base64 string to req.body.image for the controller
+    // Convert to base64
+    const base64Image = `data:image/webp;base64,${optimizedBuffer.toString("base64")}`;
+
+    // Attach to body
     req.body.image = base64Image;
 
+    // Continue with controller
     await addFood(req, res);
   } catch (error) {
     console.error("Error in /add route:", error);
@@ -52,4 +61,3 @@ foodRouter.delete("/remove/:id", async (req, res) => {
 });
 
 export default foodRouter;
-
