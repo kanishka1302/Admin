@@ -172,6 +172,8 @@ const PlaceOrder = () => {
     
 
     try {
+      console.log("Payload size (bytes):", JSON.stringify(orderData).length);
+      console.log("Order Data:", orderData); // Optional: Helps inspect structure
       if (paymentMethod === "razorpay") {
         const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
@@ -240,6 +242,8 @@ const PlaceOrder = () => {
           }
         }
       } else {
+        console.log("Payload size (bytes):", JSON.stringify(orderData).length);
+        console.log("Order Data:", orderData); // Optional: Helps inspect structure
         const response = await axios.post(`${url}/api/order/cod`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
         });
