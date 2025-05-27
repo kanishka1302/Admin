@@ -28,28 +28,30 @@ foodRouter.get("/list", listFood);
 foodRouter.post("/add", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
+      console.log("No file uploaded.");
       return res.status(400).json({ success: false, message: "Image file is required" });
     }
 
-    // Resize and compress image using sharp
+    console.log("Uploaded file type:", req.file.mimetype);
+    console.log("File size:", req.file.size);
+
     const optimizedBuffer = await sharp(req.file.buffer)
-      .resize({ width: 500 }) // adjust width as needed (height auto)
-      .webp({ quality: 40 }) // reduce quality for smaller size
+      .resize({ width: 500 })
+      .webp({ quality: 40 })
       .toBuffer();
 
-    // Convert to base64
     const base64Image = `data:image/webp;base64,${optimizedBuffer.toString("base64")}`;
-
-    // Attach to body
     req.body.image = base64Image;
 
-    // Continue with controller
+    console.log("Image converted and attached to req.body");
+
     await addFood(req, res);
   } catch (error) {
-    console.error("Error in /add route:", error);
+    console.error("Error in /add route:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+
 
 foodRouter.delete("/remove/:id", async (req, res) => {
   try {
