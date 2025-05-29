@@ -39,10 +39,13 @@ const placeOrderCod = async (req, res) => {
       shopName,
       orderId,
       paymentMethod: "cod",
-      status: "Order Received",
+      status: "Order Placed",
       payment: false,
       discountApplied,
       promoCode,
+      statusTimestamps: {
+        "Order Placed": new Date()
+      }
     });
 
     await newOrder.save();
@@ -91,7 +94,7 @@ const placeOrderRazorpay = async (req, res) => {
     const totalAmountInPaise = Math.round(totalAmountInRupees * 100); // Razorpay expects amount in paise
 
     // ✅ Generate custom order ID
-    const orderId = await generateOrderId();
+    { /* const orderId = await generateOrderId(); */ }
 
     // ✅ Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({
@@ -103,7 +106,8 @@ const placeOrderRazorpay = async (req, res) => {
         items: JSON.stringify(items),
         shopName,
         discountApplied,
-        promoCode
+        promoCode,
+        userId
       }
     });
 
@@ -113,7 +117,6 @@ const placeOrderRazorpay = async (req, res) => {
       message: "Razorpay order initialized",
       data: {
         key: process.env.RAZORPAY_KEY_ID, // Safe to expose
-        orderId,
         razorpayOrderId: razorpayOrder.id,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
@@ -169,7 +172,11 @@ const verifyOrder = async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       payment: true,
-      status: "Order Received",
+      status: "Order Placed",
+      paymentMethod: "razorpay",
+       statusTimestamps: {
+        "Order Placed": new Date()
+      }
     });
 
     await newOrder.save();
@@ -243,17 +250,31 @@ const userOrders = async (req, res) => {
   }
 };
 
-// ✅ Update Status
 const updateOrderStatus = async (req, res) => {
   try {
-    const { orderId, status } = req.body;
+    const { orderId, newStatus } = req.body;
+
+    if (typeof newStatus !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid status" });
+    }
 
     const order = await orderModel.findById(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    order.status = status;
+    order.status = newStatus;
+
+    // Ensure statusTimestamps is a Map
+    if (order.statusTimestamps instanceof Map) {
+      // Record timestamp if not already set
+      if (!order.statusTimestamps.has(newStatus)) {
+        order.statusTimestamps.set(newStatus, new Date());
+      }
+    } else {
+      return res.status(500).json({ success: false, message: "Invalid statusTimestamps field" });
+    }
+
     await order.save();
 
     const io = req.app.get("io");
@@ -268,6 +289,7 @@ const updateOrderStatus = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update order status" });
   }
 };
+
 
 // ✅ Update Progress
 const updateOrderProgress = async (req, res) => {
