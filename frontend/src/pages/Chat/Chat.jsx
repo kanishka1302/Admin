@@ -18,8 +18,8 @@ const getInitialChatKey = () => {
   }
   return "chatMessages_default";
 };
-
-const socket = io("https://socket1-8bma.onrender.com");
+//Socket
+const socket = io("https://customer-desk-backend.onrender.com");
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -70,17 +70,30 @@ const Chat = () => {
   useEffect(() => {
     const identifier = chatKey.split("_")[1];
     const storedTicketId = localStorage.getItem(`ticketId_${identifier}`);
-    if (storedTicketId) {
+    console.log("Stored Ticket ID:", storedTicketId);
+    if (storedTicketId && storedTicketId !== "undefined" && storedTicketId !== "null") {
       setTicketId(storedTicketId);
-      socket.emit("joinRoom", storedTicketId);
+      ticketIdRef.current = storedTicketId;
+      console.log("[JOIN ROOM] Emitting joinRoom with strdId:", storedTicketId);
+      socket.emit("joinRoom", { roomId: storedTicketId });
       setAgentConnected(true);
     }
   }, [chatKey]);
 
+  // Join room whenever ticketId changes and is valid
+  useEffect(() => {
+    if (ticketId && ticketId !== "undefined" && ticketId !== "null") {
+      ticketIdRef.current = ticketId;
+      console.log("[JOIN ROOM] Emitting joinRoom with ticketId:", ticketId);
+      socket.emit("joinRoom", { roomId: ticketId });
+    }
+  }, [ticketId]);
+
   useEffect(() => {
     socket.on("connect", () => {
       if (ticketIdRef.current) {
-        socket.emit("joinRoom", ticketIdRef.current);
+        console.log("[JOIN ROOM] Emitting joinRoom with curId:", ticketIdRef.current);
+        socket.emit("joinRoom", { roomId: ticketIdRef.current });
       }
     });
     return () => socket.off("connect");
@@ -88,7 +101,7 @@ const Chat = () => {
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-      if (data.ticketId === ticketIdRef.current && data.sender !== "user") {
+      if (data.roomId === ticketIdRef.current && data.sender !== "user") {
         setMessages((prev) => [
           ...prev,
           { sender: data.sender, text: data.message },
@@ -134,7 +147,7 @@ const Chat = () => {
     }
 
     if (agentConnected && ticketId) {
-      socket.emit("sendMessage", { ticketId, sender: "user", message: msgToSend, timestamp: new Date().toISOString() });
+      socket.emit("sendMessage", { roomId: ticketId, sender: "user", message: msgToSend});
       return;
     }
 
@@ -181,7 +194,10 @@ const Chat = () => {
 
   const connectAgent = (ticketRoom) => {
     setAgentConnected(true);
-    socket.emit("joinRoom", ticketRoom || ticketId);
+    if (ticketRoom) {
+      console.log("[JOIN ROOM] Emitting joinRoom with roomId:", ticketRoom);
+      socket.emit("joinRoom", { roomId: ticketRoom }); // Always join as ticketId string
+    }
     updateMessages({
       sender: "support",
       text: "Hello, I am here to help you with your issue. How can I assist further?",
@@ -214,21 +230,18 @@ const Chat = () => {
         setTicketId(generatedTicketId);
         const identifier = chatKey.split("_")[1];
         localStorage.setItem(`ticketId_${identifier}`, generatedTicketId);
-
         updateMessages({
           sender: "bot",
           text: `Your ticket ID is ${generatedTicketId}. Please wait while we process your request.`,
         });
-
-        socket.emit("joinRoom", generatedTicketId);
-
+        console.log("[JOIN ROOM] Emitting joinRoom with gId:", generatedTicketId);
+        socket.emit("joinRoom", { roomId: generatedTicketId }); // Always join as ticketId string
         setTimeout(() => {
           updateMessages({ sender: "bot", text: "Chat with our live customer agent." });
           setTimeout(() => {
             connectAgent(generatedTicketId);
           }, 2000);
         }, 2000);
-
         setConversationState("active_ticket");
       } else {
         updateMessages({ sender: "bot", text: "Ticket created but ID missing. Please try again." });
