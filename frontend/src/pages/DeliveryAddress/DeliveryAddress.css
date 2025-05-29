@@ -126,6 +126,7 @@ button {
   margin: 10px 0;
   letter-spacing: 0.5px;
   user-select: none;
+  margin-left: 15px;
 }
 
 button:focus, input[type="radio"]:focus {
@@ -211,6 +212,16 @@ button:focus, input[type="radio"]:focus {
 }
 
 .address-form input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.state-dropdown {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
@@ -355,6 +366,10 @@ button:focus, input[type="radio"]:focus {
   display: block;
   margin: 20px auto 0;
 }
+.address-wrapper .address-card add-new{
+  padding-left: 10px;
+  width:500px;
+}
 
 /* ======================= */
 /* Responsive Styling */
@@ -383,7 +398,6 @@ button:focus, input[type="radio"]:focus {
     flex-direction: column;
     align-items: center;
   }
-
   .address-actions button {
     width: 100%;
   }
@@ -422,9 +436,6 @@ button:focus, input[type="radio"]:focus {
   .delivery-address {
     padding: 10px;
   }
-    .address-card{
-    width:200px;
-  }
 
   .address-form {
     padding: 12px;
@@ -434,6 +445,9 @@ button:focus, input[type="radio"]:focus {
     width: 90%;
     padding: 16px;
   }
+  .address-card{
+    width:200px;
+  }
 
   .address-card h4 {
     font-size: 16px;
@@ -441,6 +455,9 @@ button:focus, input[type="radio"]:focus {
 
   .address-card p {
     font-size: 14px;
+  }
+  .address-card add-new{
+    width:300px;
   }
 
   button {
