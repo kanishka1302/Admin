@@ -49,12 +49,18 @@ const OrderSchema = new mongoose.Schema(
     discountApplied: { type: Boolean, default: false },
     promoCode: { type: String, default: "" },
 
-    status: { type: String, default: "Order Received" }, // You can expand this: "Pending", "Confirmed", "Delivered", "Cancelled", etc.
+    status: { type: String, default: "Order Placed" }, // You can expand this: "Pending", "Confirmed", "Delivered", "Cancelled", etc.
+    statusTimestamps: {
+      type: Map,
+      of: Date,
+      default: {},
+    },
   },
   {
-    timestamps: true, // createdAt & updatedAt auto-managed
+    timestamps: true,
   }
 );
+
 
 // Prevent model overwrite in development
 const OrderModel = mongoose.models.Order || mongoose.model("Order", OrderSchema);
