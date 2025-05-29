@@ -35,8 +35,8 @@ const NavigationPopup = ({ onClose, onLocationSubmit }) => {
           <>
             ✨ We're not in your area yet, but we're growing! Currently, our
             service is available in{' '}
-            <span className="highlight">Manikonda</span> and{' '}
-            <span className="highlight">Narsingi</span>. Stay tuned for updates! 🍽️
+            <span className="highlight">Manikonda(500089)</span> and{' '}
+            <span className="highlight">Narsingi(500075)</span>. Stay tuned for updates! 🍽️
           </>
         );
       }
