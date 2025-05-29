@@ -21,7 +21,10 @@ const StoreContextProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const currency = "₹";
   const deliveryCharge = 50;
-  const [selectedShop, setSelectedShop] = useState(() => localStorage.getItem("selectedShop") || "");
+  const [selectedShop, setSelectedShop] = useState(() => {
+    const saved = localStorage.getItem("selectedShop");
+    return saved ? JSON.parse(saved) : null;
+  });
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [location, setLocation] = useState(localStorage.getItem('location') || '');
   const [userMobileNumber, setUserMobileNumber] = useState(null);
