@@ -293,6 +293,7 @@ export const io = new Server(server, {
   },
 });
 
+app.set("io", io);
 
 // ✅ Handle socket connections
 io.on("connection", (socket) => {
