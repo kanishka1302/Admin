@@ -219,6 +219,7 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
+  margin-bottom: 20px;
   padding: 0 10px;
   position: relative;
 }
@@ -276,6 +277,15 @@ body {
 .stage.active:not(:last-child)::after {
   background-color: green;
 }
+
+.stage-timestamp {
+  font-size: 0.75rem;
+  color: #666;
+  display: block;
+  margin-top: 4px; /* Add spacing if needed */
+  white-space: nowrap; 
+}
+
 
 /* RESPONSIVE DESIGN */
 
