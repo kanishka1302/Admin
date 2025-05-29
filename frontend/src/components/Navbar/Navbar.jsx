@@ -159,7 +159,7 @@ const Navbar = ({ setShowLogin }) => {
         {/* Location */}
         <div className="select-location" onClick={handleSelectLocation}>
           <img src={locationIcon} alt="Location Icon" className="location-icon" />
-          <span>{selectedLocation || 'select location'}</span>
+          <span>{selectedLocation || 'Select Location'}</span>
         </div>
 
         {/* Cart */}
