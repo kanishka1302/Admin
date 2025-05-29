@@ -104,7 +104,7 @@ const Footer = () => {
           <div className="footer-content-right">
             <h2>Support Hours</h2>
             <ul>
-              <li>Monday to Sunday: 9AM-6PM</li>
+              <li>Monday to Sunday: 8AM-8PM</li>
             </ul>
           </div>
         </div>
