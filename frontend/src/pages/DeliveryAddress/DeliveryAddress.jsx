@@ -265,7 +265,6 @@ const DeliveryAddress = ({ onSelectAddress }) => {
 
           <button onClick={handleAddOrUpdateAddress}>{editIndex !== null ? "Update Address" : "Save Address"}</button>
           <button onClick={() => { setShowForm(false); setEditIndex(null); }}>Cancel</button>
-          <button onClick={handleUseLiveLocation}>Use Live Location</button>
         </div>
       )}
 
