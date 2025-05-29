@@ -26,6 +26,14 @@ const DeliveryAddress = ({ onSelectAddress }) => {
     country: "India",
   });
 
+  const indianStates = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", 
+    "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
+    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
+    "Tripura", "Uttarakhand", "Uttar Pradesh", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", 
+    "Dadra and Nagar Haveli and Daman and Diu", "Lakshadweep", "Delhi", "Puducherry"
+  ];
+
   useEffect(() => {
     const storedUser = safeLocalStorage.get("user");
     const mobileNumber = storedUser?.mobileNumber;
@@ -246,7 +254,13 @@ const DeliveryAddress = ({ onSelectAddress }) => {
           <input type="text" name="mobileNumber" placeholder="Mobile Number" maxLength="10" value={newAddress.mobileNumber} onChange={handleInputChange} />
           <input type="text" name="address" placeholder="Address" value={newAddress.address} onChange={handleInputChange} />
           <input type="text" name="city" placeholder="City" value={newAddress.city} onChange={handleInputChange} />
-          <input type="text" name="state" placeholder="State" value={newAddress.state} onChange={handleInputChange} />
+          {/* State Dropdown */}
+          <select name="state" value={newAddress.state} onChange={handleInputChange}  className="state-dropdown">
+            <option value="">Select State</option>
+            {indianStates.map((state, index) => (
+              <option key={index} value={state}>{state}</option>
+            ))}
+          </select>
           <input type="text" name="pincode" placeholder="Pincode" maxLength="6" value={newAddress.pincode} onChange={handleInputChange} />
 
           <button onClick={handleAddOrUpdateAddress}>{editIndex !== null ? "Update Address" : "Save Address"}</button>
