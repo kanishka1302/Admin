@@ -50,13 +50,18 @@ export const getAllHistory = async (req, res) => {
 };
 
 // @desc   Fetch all history logs for a specific user (by userEmail or userMobile)
-// @route  GET /api/history/:userEmail
+// @route  GET /api/history/:userMobile
 export const getUserHistory = async (req, res) => {
   try {
-    const { userEmail } = req.params;
+    const { userMobile } = req.params;
 
-    const logs = await History.find({ userEmail }).sort({ creditedAt: -1 });
-    console.log("History logs for user:", userEmail, logs);
+    if (!userMobile) {
+      return res.status(400).json({ message: 'userMobile is required' });
+    }
+
+    // Find history logs by userMobile
+    const logs = await History.find({ userMobile }).sort({ creditedAt: -1 });
+    console.log("History logs for user:", userMobile, logs);
 
     const creditedAmount = logs.reduce((total, log) => {
       const amount = typeof log.creditedAmount === 'number' ? log.creditedAmount : 0;
@@ -69,4 +74,3 @@ export const getUserHistory = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
