@@ -12,7 +12,7 @@ const MyOrders = () => {
   const [visibleProgressIndex, setVisibleProgressIndex] = useState(null);
   const { url, token, currency } = useContext(StoreContext);
   const location = useLocation();
-  const orderStages = ["Order Received", "Out for Delivery", "Delivered"];
+  const orderStages = ["Order Placed","Order Received", "Out for delivery", "Delivered"];
 
   const getOrderStageIndex = (status) => {
     if (!status) return -1;
@@ -33,6 +33,7 @@ const MyOrders = () => {
         { userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log(response.data);
 
       if (response.data?.success) {
         const updatedOrders = response.data.data.reverse();
@@ -87,6 +88,7 @@ const MyOrders = () => {
       {!loading && !error && data.length > 0 && (
         <div className="container">
           {data.map((order, index) => (
+            console.log("statusTimestamps for order", order.orderId, order.statusTimestamps), 
             <div key={order._id || index} className="my-orders-order">
               <div className="order-main">
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
@@ -105,10 +107,10 @@ const MyOrders = () => {
                 <p>
                   {currency} {order.amount?.toFixed(2) || "0.00"}
                 </p>
-                <p>
-                  <span>●</span>
-                  <b>{order.status || "Unknown"}</b>
-                </p>
+               <p>
+                <span>●</span>
+                <b>{order.status || "Unknown"}</b>
+              </p>
                 <button type="button" onClick={() => handleTrackOrder(index)}>
                   Track Order
                 </button>
@@ -126,8 +128,18 @@ const MyOrders = () => {
                             : ""
                         }`}
                       >
+                       
                         <span className="stage-icon">{stageIndex + 1}</span>
                         <p>{stage}</p>
+                          {order.statusTimestamps?.[stage] && (
+                            <small className="stage-timestamp">
+                              {new Date(order.statusTimestamps[stage]).toLocaleString("en-IN", {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </small>
+                            
+                          )}
                       </div>
                     ))}
                   </div>
