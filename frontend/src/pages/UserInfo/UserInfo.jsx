@@ -26,7 +26,7 @@ const UserInfo = () => {
   const storedUser = localStorage.getItem("user");
   const userId = storedUser ? JSON.parse(storedUser).userId : null; // Extract userId from localStorage
 
-  const { walletBalance, setUserId, fetchWalletBalance } = useContext(StoreContext);
+  // const { walletBalance, setUserId,} = useContext(StoreContext);
   const firstSavedAddress = userAddresses[0];  // This will always give the first address
 
   // Fetch user data from localStorage
@@ -88,11 +88,13 @@ const UserInfo = () => {
   // Fetch credited amount for the user
   useEffect(() => {
     const fetchCreditedAmount = async () => {
-      if (user && user.email) {
+      if (user && user.mobileNumber) {
         try {
-          const response = await axios.get(`https://admin-92vt.onrender.com/api/history/user/${user.email}`);
+          const response = await axios.get(`https://admin-92vt.onrender.com/api/history/user/${user.mobileNumber}`);
+          console.log("Wallet API Response:", response.data);
           const creditedAmount = response.data.creditedAmount;
           setCreditedAmount(typeof creditedAmount === "number" ? creditedAmount : 0);
+          //fetchWalletBalance();
         } catch (err) {
           console.error("Error fetching credited amount:", err);
           setCreditedAmount(0); // Fallback value in case of an error
@@ -277,9 +279,8 @@ const UserInfo = () => {
             <input type="text" name="mobileNumber" maxLength="10" value={formData.mobileNumber} onChange={handleChange} />
           ) : user.mobileNumber}
         </p>
-        <p><strong>Wallet Balance:</strong>₹{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
-      <div>
-      <p className="address"><strong>Address:</strong> 
+
+        <p className="address"><strong>Address:</strong> 
           {isEditing ? (
             <>
               <input className="text"
@@ -328,10 +329,8 @@ const UserInfo = () => {
             </>
           )}
         </p>
-      </div>
-        
-        
 
+        <p><strong>Wallet Balance:</strong>{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
         
         {isEditing ? (
           <button className="save-button" onClick={handleSaveClick}>Save</button>
