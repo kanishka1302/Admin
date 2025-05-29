@@ -6,9 +6,13 @@ const historySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  employeeEmail: {
+  employeeMobile: {
     type: String,
     required: true,
+  },
+   employeeEmail: {  // Add this field
+    type: String,
+    required: false,  // Make it required if necessary
   },
   creditedAmount: {
     type: Number,
