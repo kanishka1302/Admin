@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/add', addHistoryEntry);
 router.get('/', getAllHistory);
 // New route to fetch credited amount for a specific user
-router.get('/user/:userEmail', getUserHistory);
+router.get('/user/:userMobile', getUserHistory);
 
 
 export { router as historyRoutes };
