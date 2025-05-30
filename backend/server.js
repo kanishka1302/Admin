@@ -153,7 +153,9 @@ app.post("/api/order/verify", async (req, res) => {
       status: "Order Placed",
       statusTimestamps: {
         "Order Placed": new Date()
-      }
+      },
+      discountApplied, 
+      promoCode,
     });
 
     await newOrder.save();
@@ -194,7 +196,7 @@ app.post("/api/order/cod", async (req, res) => {
       status: "Order Placed",
       statusTimestamps: {
         "Order Placed": new Date()
-      }
+      },
       payment: false,
       shopName,
       discountApplied, 
