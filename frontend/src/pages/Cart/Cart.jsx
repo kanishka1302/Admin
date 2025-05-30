@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import "./Cart.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../Context/StoreContext";
+import LoginPopup from "../../components/LoginPopup/LoginPopup";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +17,8 @@ const Cart = () => {
     url, // Use url from context instead of hardcoding
     currency,
     shopNames,
-    selectedShop
+    selectedShop,
+    token,
   } = useContext(StoreContext);
 
 
@@ -71,14 +73,18 @@ const Cart = () => {
   const handleContinueShopping = () => navigate("/");
 
   const handleProceedToCheckout = () => {
-    navigate("/order", {
-      state: {
-        totalAmount: calculateTotalAmount(),
-        discountApplied,
-        promoCode,
-      },
-    });
-  };
+  if (!token) {
+    setShowLoginPopup(true); // Show login if not authenticated
+    return;
+  }
+  navigate("/order", {
+    state: {
+      totalAmount: calculateTotalAmount(),
+      discountApplied,
+      promoCode,
+    },
+  });
+};
 
   const isCartEmpty = Object.keys(cartItems).every(
     (itemId) => cartItems[itemId] === 0
@@ -256,6 +262,7 @@ const { groupedItems, warnings } = useMemo(() => {
           </div>
         </>
       )}
+      {showLoginPopup && <LoginPopup setShowLogin={setShowLoginPopup} />}
       <ToastContainer />
     </div>
   );
