@@ -150,7 +150,9 @@ app.post("/api/order/verify", async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       payment: true,
-      status: "Order Received",
+      status: "Order Placed",
+      discountApplied, 
+      promoCode,
     });
 
     await newOrder.save();
@@ -188,7 +190,7 @@ app.post("/api/order/cod", async (req, res) => {
       amount,
       orderId,
       paymentMethod: "cod",
-      status: "Order Received",
+      status: "Order Placed",
       payment: false,
       shopName,
       discountApplied, 
