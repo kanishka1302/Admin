@@ -43,7 +43,7 @@ const getImagePath = (image) => {
   
     if (!locationPopupShown) {
       localStorage.setItem("locationPopupShown", "true");
-      toast.info("Please confirm your delivery location.");
+      //toast.info("Please confirm your delivery location.");
       const event = new CustomEvent("show-location-popup");
       window.dispatchEvent(event);
       return;
