@@ -151,6 +151,9 @@ app.post("/api/order/verify", async (req, res) => {
       razorpay_payment_id,
       payment: true,
       status: "Order Placed",
+      statusTimestamps: {
+        "Order Placed": new Date()
+      }
       discountApplied, 
       promoCode,
     });
@@ -191,6 +194,9 @@ app.post("/api/order/cod", async (req, res) => {
       orderId,
       paymentMethod: "cod",
       status: "Order Placed",
+      statusTimestamps: {
+        "Order Placed": new Date()
+      }
       payment: false,
       shopName,
       discountApplied, 
