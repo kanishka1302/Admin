@@ -154,8 +154,6 @@ app.post("/api/order/verify", async (req, res) => {
       statusTimestamps: {
         "Order Placed": new Date()
       },
-      discountApplied, 
-      promoCode,
     });
 
     await newOrder.save();
