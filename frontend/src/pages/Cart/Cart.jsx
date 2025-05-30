@@ -24,6 +24,7 @@ const Cart = () => {
 
   const [promoCode, setPromoCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const navigate = useNavigate();
 
   // Load promoCode and discountApplied from localStorage
