@@ -322,7 +322,7 @@ const PlaceOrder = () => {
                   checked={paymentMethod === "razorpay"}
                   onChange={() => setPaymentMethod("razorpay")}
                 />
-                Razorpay
+                Online Payment (UPI/Card/RazorPay)
               </label>
 
               {(!isFormComplete || !selectedAddress) && (
