@@ -54,6 +54,7 @@ import addCart from './add_cart.gif';
 import Banner2 from './Banner2.jpg';
 import Banner1 from './Banner1.png';
 import oderconfirmm from './orderconfirmm.gif';
+import WebsiteBanner from './WebsiteBanner.jpg';
 
 export const assets = {
   logo,
@@ -111,6 +112,7 @@ export const assets = {
   addCart,
   Banner2,
   Banner1,
+  WebsiteBanner,
 };
 
 export const menu_list = [
