@@ -248,6 +248,17 @@
 .chat-icon:hover {
   transform: scale(1.15);
 }
+  /* Fullscreen override for mobile when using the fullscreen class */
+  .chat-page-wrapper.fullscreen {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    z-index: 9999;
+  }
 @media (max-width: 400px) {
   .chat-page-wrapper {
     width: 90vw;
@@ -272,7 +283,7 @@
   }
 
   .chat-messages {
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 160px);
     padding: 8px;
   }
 
