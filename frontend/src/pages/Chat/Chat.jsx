@@ -275,7 +275,7 @@ const Chat = () => {
               <div className="chat-header">
                 Customer Support
                 <button className="minimize-btn" onClick={handleMinimize}>⎯⎯</button>
-                <button className="close-btn" onClick={handleClose}>X</button>
+                <button className="chat-close-btn" onClick={handleClose}>X</button>
               </div>
               <div className="chat-messages">
                 {messages.map((msg, index) => (
