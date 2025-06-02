@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Banner1 from "../../assets/Banner1.jpg";
+import Banner2 from "../../assets/Banner2.jpg";
 import WebsiteBanner from "../../assets/WebsiteBanner.jpg";
 import "./Header.css"; // Import the CSS file
 
 const Header = () => {
   const slides = [
     {
-      image: Banner1,
+      image: Banner2,
     },
     {
       image: WebsiteBanner,
