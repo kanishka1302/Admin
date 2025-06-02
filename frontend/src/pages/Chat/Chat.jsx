@@ -34,6 +34,13 @@ const Chat = () => {
   const [isChatVisible, setIsChatVisible] = useState(true);
   const messagesEndRef = useRef(null);
   const [conversationState, setConversationState] = useState("initial");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth <= 768);
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     ticketIdRef.current = ticketId;
@@ -270,7 +277,7 @@ const Chat = () => {
         <img src={chaticon} alt="Chat Icon" className="chat-icon" onClick={() => setIsMinimized(false)} />
       ) : (
         isChatVisible && (
-          <div className="chat-page-wrapper">
+          <div className={`chat-page-wrapper ${isMobile ? "fullscreen" : ""}`}>
             <div className="chat-container">
               <div className="chat-header">
                 Customer Support
