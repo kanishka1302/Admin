@@ -35,7 +35,7 @@
 
 /* Minimize and Close button styling */
 .minimize-btn,
-.close-btn {
+.chat-close-btn {
   background-color: #ff4d4d;
   color: white;
   border: none;
@@ -139,6 +139,8 @@
   color: #333;
   align-self: flex-start;
   border-bottom-left-radius: 8px;
+  margin-right: auto;
+  text-align: left;
 }
 
 .chat-message.user {
@@ -146,6 +148,8 @@
   color: #333;
   align-self: flex-end;
   border-bottom-right-radius: 8px;
+  margin-left: auto;
+  text-align: right;
 }
 
 .chat-message:hover {
@@ -247,7 +251,7 @@
 @media (max-width: 400px) {
   .chat-page-wrapper {
     width: 90vw;
-    left: 10px;
+    left: 15px;
     right: 0;
     bottom: 0;
     max-height: 100vh;
@@ -261,7 +265,7 @@
   }
 
   .minimize-btn,
-  .close-btn {
+  .chat-close-btn {
     font-size: 13px;
     padding: 4px 6px;
     margin: 0 4px;
