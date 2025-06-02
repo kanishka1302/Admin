@@ -18,68 +18,64 @@ const Navbar = ({ setShowLogin }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
 
-  const { getTotalCartAmount, token, setToken, clearCartFromLocalStorage, location, setLocation } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, clearCartLocallyOnly, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasShownPopup = sessionStorage.getItem("locationPopupShown");
-
+    const hasShownPopup = localStorage.getItem("locationPopupShown");
+  
     // Only show popup if the user is logged in and the popup hasn't been shown yet
-    const user = JSON.parse(sessionStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user"));
     if (user && !hasShownPopup) {
       setShowLocationPopup(true);
-      sessionStorage.setItem("locationPopupShown", "true");
+      localStorage.setItem("locationPopupShown", "true");
     }
   }, []);
 
   useEffect(() => {
-    const savedToken = sessionStorage.getItem('token');
+    const savedToken = localStorage.getItem('token');
     if (savedToken) setToken(savedToken);
 
-    // Check if a location was saved in sessionStorage before login
-    const savedLocation = sessionStorage.getItem('selectedLocation');
-    if (savedLocation) {
-      setSelectedLocation(savedLocation);
-      setLocation(savedLocation);
-    }
-
-    const storedUser = JSON.parse(sessionStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser && storedUser.address) {
       setSelectedLocation(storedUser.address);
       setLocation(storedUser.address);
+
     }
 
+    const locationPopupShown = localStorage.getItem('locationPopupShown');
+    if (savedToken && !locationPopupShown) {
+      setIsPopupOpen(true);
+      localStorage.setItem('locationPopupShown', 'true');
+    }
   }, [setToken]);
-
   useEffect(() => {
     // Update selectedLocation whenever location from context changes
     setSelectedLocation(location);
-  }, [location]);
+  }, [location]);  
 
   const handleSelectLocation = () => setIsPopupOpen(true);
 
   const onLocationSubmit = (locationName) => {
+    // Set the selected location name in the UI
     setSelectedLocation(locationName);
     setLocation(locationName);
     setIsPopupOpen(false);
-
-    const storedUser = JSON.parse(sessionStorage.getItem('user')) || {};
+  
+    // Save the full location name in localStorage user address
+    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
     const updatedUser = { ...storedUser, address: locationName };
-    sessionStorage.setItem('user', JSON.stringify(updatedUser));
-
-    // Save the selected location in sessionStorage to preserve it after login
-    sessionStorage.setItem('selectedLocation', locationName);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   };
-
   const logout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('cartItems');
-    sessionStorage.removeItem('locationPopupShown');
-    sessionStorage.removeItem("mobileOrEmail");
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('selectedLocation');
+    localStorage.removeItem('token');
+    localStorage.removeItem('cartItems');
+    localStorage.removeItem('locationPopupShown');
+    localStorage.removeItem("mobileOrEmail");
+    localStorage.removeItem('user');
+    localStorage.removeItem('selectedLocation');
     setToken(null);
-    clearCartFromLocalStorage();
+    clearCartLocallyOnly();
     setLocation('');
     setSelectedLocation('Select Location');
     navigate('/');
