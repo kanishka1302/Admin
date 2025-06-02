@@ -280,6 +280,8 @@ const UserInfo = () => {
           ) : user.mobileNumber}
         </p>
 
+        <p><strong>Wallet Balance:</strong>{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
+
         <p className="address"><strong>Address:</strong> 
           {isEditing ? (
             <>
@@ -330,8 +332,6 @@ const UserInfo = () => {
           )}
         </p>
 
-        <p><strong>Wallet Balance:</strong>{creditedAmount !== null && creditedAmount !== undefined ? creditedAmount.toFixed(2) : "Loading..."}</p>
-        
         {isEditing ? (
           <button className="save-button" onClick={handleSaveClick}>Save</button>
         ) : (
