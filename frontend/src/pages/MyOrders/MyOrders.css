@@ -1,6 +1,6 @@
-/* Improved design system with extended color palette and typography */
+/* Improved design system */
 :root {
-  --primary-color: #ff6347; /* tomato */
+  --primary-color: #ff6347;
   --primary-light: #ff8c7a;
   --primary-dark: #e63c2e;
   --primary-bg: rgba(255, 99, 71, 0.05);
@@ -42,7 +42,7 @@ body {
   padding-bottom: 10px;
 }
 
-.my-orders h2:after {
+.my-orders h2::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -54,7 +54,7 @@ body {
 }
 
 .my-orders .container {
-  max-width: 1200px; /* or 100%, depending on your design */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -64,18 +64,17 @@ body {
   width: 85%;
 }
 
-
 .my-orders-order {
   display: flex;
   flex-direction: column;
-  position: relative;
   gap: 1rem;
+  position: relative;
   padding: 10px;
-  color: var(--text-color);
-  border-radius: var(--border-radius);
   background: var(--bg-color);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
   box-shadow: var(--shadow-md);
-  transition: all var(--transition-speed);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
   overflow: hidden;
 }
 
@@ -84,13 +83,13 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-.my-orders-order:before {
+.my-orders-order::before {
   content: '';
   position: absolute;
-  left: 0;
   top: 0;
-  height: 100%;
+  left: 0;
   width: 4px;
+  height: 100%;
   background: linear-gradient(to bottom, var(--primary-color), var(--primary-light));
   border-radius: 2px 0 0 2px;
 }
@@ -100,8 +99,8 @@ body {
   height: 60px;
   object-fit: cover;
   border-radius: 50%;
-  box-shadow: var(--shadow-sm);
   border: 2px solid white;
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s;
 }
 
@@ -114,20 +113,19 @@ body {
   line-height: 1.6;
 }
 
-.my-orders-order .product-name {
+.product-name {
   font-weight: 600;
   color: var(--text-bold);
   margin-bottom: 5px;
   word-wrap: break-word;
-  white-space: normal;
 }
 
 .my-orders-order p span {
   color: var(--primary-color);
-  font-weight: 600;
   background: var(--primary-bg);
   padding: 2px 8px;
   border-radius: 12px;
+  font-weight: 600;
   font-size: 0.9em;
 }
 
@@ -136,9 +134,9 @@ body {
   color: var(--text-bold);
 }
 
-.my-orders-order .order-date {
-  color: var(--text-light);
+.order-date {
   font-size: 0.85em;
+  color: var(--text-light);
 }
 
 .my-orders button {
@@ -150,19 +148,19 @@ body {
   color: white;
   font-weight: 600;
   letter-spacing: 0.3px;
-  transition: all var(--transition-speed);
+  transition: var(--transition-speed);
   box-shadow: 0 4px 10px rgba(255, 99, 71, 0.3);
 }
 
 .my-orders button:hover {
-  background: linear-gradient(to right, var(--primary-dark), var(--primary-color));
   transform: translateY(-2px);
+  background: linear-gradient(to right, var(--primary-dark), var(--primary-color));
   box-shadow: 0 6px 12px rgba(255, 99, 71, 0.4);
 }
 
 .my-orders button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.3), 0 4px 10px rgba(255, 99, 71, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.3);
 }
 
 .my-orders button:active {
@@ -174,8 +172,8 @@ body {
   height: 6px;
   background: #edf2f7;
   border-radius: 10px;
-  margin-top: 8px;
   overflow: hidden;
+  margin-top: 8px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -196,52 +194,75 @@ body {
 
 .error-message {
   color: var(--primary-dark);
-  font-weight: 600;
-  margin: 15px 0;
-  padding: 15px;
   background-color: rgba(255, 99, 71, 0.08);
-  border-radius: var(--border-radius);
+  padding: 15px;
+  margin: 15px 0;
+  font-weight: 600;
   border-left: 4px solid var(--primary-dark);
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
 }
 
-/* Order layout grid */
 .order-main {
   display: grid;
   grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr 1fr;
-  align-items: center;
   gap: var(--spacing-base);
+  align-items: center;
   width: 100%;
+}
+
+.order-info p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.order-status {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Tracking 
+.order-tracking-wrapper {
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.order-tracking-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.order-tracking-wrapper::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 10px;
 }
 
 .order-tracking {
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  padding: 0 10px;
+  gap: 30px;
+  padding: 20px;
+  background: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
   position: relative;
+  overflow-x: auto;
+  min-width: max-content;
 }
 
-/* Tracking stages */
 .stage {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
-  position: relative;
-  opacity: 0.5;
-  transition: opacity 0.3s;
-  min-width: 200px;
-  white-space: nowrap;
+  min-width: 90px;
   text-align: center;
-}
-
-.stage.active {
-  opacity: 1;
-  font-weight: bold;
-  color: green;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
 }
 
 .stage-icon {
@@ -249,67 +270,188 @@ body {
   height: 28px;
   background-color: lightgray;
   color: black;
-  border-radius: 50%;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  border-radius: 50%;
   margin-bottom: 4px;
   z-index: 1;
-}
-
-.stage.active .stage-icon {
-  background-color: green;
-  color: white;
-}
-
-.stage:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  right: -50%;
-  height: 3px;
-  background-color: #ccc;
-  z-index: 0;
-}
-
-.stage.active:not(:last-child)::after {
-  background-color: green;
 }
 
 .stage-timestamp {
   font-size: 0.75rem;
   color: #666;
-  display: block;
-  margin-top: 4px; /* Add spacing if needed */
-  white-space: nowrap; 
+  margin-top: 4px;
+} */
+/* Overlay behind the drawer */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+/* Side drawer */
+.tracking-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 350px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.tracking-drawer h3 {
+  margin:10px ;
+  font-size: 1.25rem;
+  
+}
+
+.track-order-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+/* Tracking stages */
+.order-tracking {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 25px;
+  padding-left: 10px;
+}
+
+.stage {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
 }
 
 
-/* RESPONSIVE DESIGN */
 
-/* Medium Screens */
+/* Vertical line */
+.stage::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  width: 2px;
+  height: calc(100% + 5px);
+  background-color: #ccc;
+  z-index: 0;
+}
+/* Remove the line for the last stage */
+.stage:last-child::before {
+  display: none;
+}
+
+.stage.completed {
+  opacity: 1;
+  color: var(--success);
+  font-weight: 700;
+}
+
+
+/* Stage icon */
+.stage-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #b1aaaa;
+  color: white;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.stage-icon-img {
+  margin-left: 30px;
+  width: 23px;
+  height: 23px;
+}
+/* Active icon */
+.stage.active .stage-icon {
+  background-color: #5bd878;
+}
+
+/* Vertical line */
+.stage::before {
+  content: "";
+  position: absolute;
+  left: 11px; /* match icon center */
+  top: 24px;  /* start from bottom of icon */
+  width: 2px;
+  height: calc(100% - 0px);
+  background-color: #ccc;
+  z-index: 1;
+}
+
+/* Remove line after last stage */
+.stage:last-child::before {
+  display: none;
+}
+.stage-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #000000;
+}
+
+.stage p {
+  margin: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  padding-left: 25px;
+}
+.stage p .stage-timestamp {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-top: 2px;
+}
+/* Make sure that the timestamp is only displayed if there is a timestamp */
+.stage .stage-timestamp {
+  display: none;
+}
+
+/* Show the timestamp only when the formattedTime exists */
+.stage .stage-timestamp-visible {
+  display: inline;
+}
+
+/* Media Queries */
 @media (max-width: 1024px) {
   .order-main {
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     row-gap: 16px;
   }
-  .order-main {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
+
   .stage {
     min-width: 150px;
   }
 }
 
-/* Tablets */
 @media (max-width: 768px) {
   .my-orders-order {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
     padding: 16px;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .order-main {
@@ -317,27 +459,21 @@ body {
   }
 
   .order-tracking {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 20px;
-    padding: 10px 0;
+    text-align: center;
+    display: inline-block;
   }
 
   .stage {
     flex-direction: row;
     justify-content: flex-start;
-    align-items: center;
-    min-width: auto;
-    white-space: normal;
-    text-align: left;
     gap: 10px;
+    text-align: left;
   }
 
   .stage-icon {
     width: 24px;
     height: 24px;
     margin-right: 10px;
-    margin-bottom: 0;
   }
 
   .stage:not(:last-child)::after {
@@ -345,97 +481,86 @@ body {
   }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   body {
     font-size: 14px;
   }
+
   .my-orders-order {
     padding: 12px;
     gap: 10px;
   }
+
   .my-orders-order p,
-  .order-info p {
-    font-size: 12px;
-  }
-
-
-  .order-main {
-    grid-template-columns: 1fr;
-  }
-
-  .order-tracking {
-    padding: 0 5px;
-  }
-
-  .stage {
-    padding: 6px 0;
-    gap: 8px;
-  }
-
-  .stage-icon {
-    width: 22px;
-    height: 22px;
-    margin-right: 8px;
-  }
-
-  .stage.active {
-    font-weight: bold;
-    color: green;
-  }
-
-  .my-orders-order img {
-    width: 48px;
-    height: 48px;
-  }
-  .order-tracking-wrapper {
-    width: 100%;
-    overflow-x: auto;
-  }
-  .order-tracking-wrapper::-webkit-scrollbar {
-    height: 6px;
-  }
-  
-  .order-tracking-wrapper::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-  }
-    
-  
-  .order-tracking {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 16px;
-    padding: 10px;
-    min-width: max-content;
-  }
-  .order-info p {
-    font-size: 13px;
-  }
-
+  .order-info p,
   .order-status {
     font-size: 12px;
   }
+
+  .order-tracking {
+    padding: 10px;
+    gap: 10px;
+    flex-direction: row;
+    min-width: max-content;
+  }
+
   .stage {
     flex: 0 0 auto;
     min-width: 50px;
-    align-items: center;
     text-align: center;
-    font-size: 12px;
+    font-size: 10px;
+    align-items: center;
   }
-  
+
+  .tracking-drawer {
+    width: 60%;
+    padding: 10px;
+  }
+
+  /* Further reduce close button size */
+  .track-order-close-btn {
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+  }
+
+  /* Make the stage icon smaller */
   .stage-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+    border: 2px solid #5bd878; /* subtle border */
+    background-color: #5bd878;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+  }
+
+  /* Smaller font size for stage labels and paragraphs */
+  .stage-label {
+    font-size: 11px;
+  }
+  .tracking-drawer h3 {
+    margin:5px ;
+    font-size: 1.25rem;
+  }
+  .stage-icon-img {
+    margin-top: -20px;
+    margin-left: 25px;
     width: 20px;
     height: 20px;
-    margin: 0 auto 4px auto;
+  }
+
+  .stage p {
+    font-size: 11px;
+    padding-left:2px;
+  }
+  .stage p .stage-timestamp{
     font-size: 10px;
   }
-  .order-tracking {
-    gap: 12px;
-  }
-  .stage:not(:last-child)::after {
-    left: 50%;
-    right: -60%;
-  }
-  
 }
+
