@@ -153,6 +153,29 @@ body {
   min-height: 100vh;
   margin: 0;
 }
+.food-item-price-cart {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.inline-view-cart-button {
+  background-color: #ff9999;
+  color: rgb(216, 99, 31);
+  border: none;
+  padding: 10px 5px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family:sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inline-view-cart-button:hover {
+  background-color: #ffffff;
+}
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
