@@ -93,14 +93,15 @@ const MyOrders = () => {
               <div className="order-main">
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
                 <p>
+                  Order ID: {order.orderId}<br />
                   {order.items
                     .map((item) => `${item.name} x ${item.quantity}`)
                     .join(", ")}<br></br>
-                    Order ID: {order.orderId}
+                    
                 </p>
                
                 <p>
-                  <b>Shop(s):</b>{" "}
+                  <b>Shop Name:</b>{" "}
                   {order.items.map((item) => item.shopName).join(", ") ||
                     "Unknown Shop"}
                 </p>
