@@ -29,6 +29,7 @@ const ExploreMenu = () => {
     const selectedLocation = localStorage.getItem('selectedLocation');
     if (selectedLocation) {
       setLocationSelected(true); // If location is selected, we don't need to ask again
+      setLocation(savedLocation);
     }
   }, []);
 
