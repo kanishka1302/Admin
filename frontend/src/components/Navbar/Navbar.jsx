@@ -56,6 +56,10 @@ const Navbar = ({ setShowLogin }) => {
 
   const handleSelectLocation = () => setIsPopupOpen(true);
 
+  useEffect(() => {
+    setSelectedLocation(location || 'Select Location');
+  }, [location]);
+
   const onLocationSubmit = (locationName) => {
     // Set the selected location name in the UI
     setSelectedLocation(locationName);
@@ -63,8 +67,9 @@ const Navbar = ({ setShowLogin }) => {
     setIsPopupOpen(false);
   
     // Save the full location name in localStorage user address
-    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
-    const updatedUser = { ...storedUser, address: locationName };
+   localStorage.setItem('selectedLocation', locationName);
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    const updatedUser = { ...user, address: locationName };
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
   const logout = () => {
