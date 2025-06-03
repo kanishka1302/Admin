@@ -220,7 +220,6 @@ const Navbar = ({ setShowLogin }) => {
           onLocationSubmit={onLocationSubmit}
         />
       )}
-
       {/* Chat */}
       {showChat && <Chat />}
     </div>
@@ -228,3 +227,4 @@ const Navbar = ({ setShowLogin }) => {
 };
 
 export default Navbar;
+
