@@ -13,7 +13,6 @@ const ExploreMenu = () => {
   const [locationSelected, setLocationSelected] = useState(false);
   const { setLocation } = useContext(StoreContext);
 
-
   const menuItems = [
     { menu_name: 'chicken', image: assets.chicken, label: 'Chicken' },
     { menu_name: 'fish', image: assets.fish, label: 'Fish' },
@@ -23,20 +22,22 @@ const ExploreMenu = () => {
   ];
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
+    const user = JSON.parse(localStorage.getItem('user'));
     setIsLoggedIn(!!user);
-    
-    const selectedLocation = localStorage.getItem('selectedLocation');
-    if (selectedLocation) {
-      setLocationSelected(true); // If location is selected, we don't need to ask again
-      setLocation(savedLocation);
+
+    const savedLocation = user?.address || localStorage.getItem('selectedLocation');
+    if (savedLocation) {
+      setLocationSelected(true);
+      setLocation(savedLocation); // Ensure global state is updated
+    } else {
+      setLocationSelected(false);
     }
   }, []);
 
   const handleNavigation = (menuName) => {
     if (!isLoggedIn || !locationSelected) {
       setPendingCategory(menuName);
-      setShowPopup(true); // Show location popup before login or when location isn't selected
+      setShowPopup(true); // Ask for location or login
       return;
     }
 
@@ -51,23 +52,23 @@ const ExploreMenu = () => {
 
   const handleLocationSubmit = (location) => {
     console.log('Location selected:', location);
-    localStorage.setItem('selectedLocation', location); // Store raw location
-    setLocation(location); // ✅ Update context so Navbar gets updated
-  
-    // Optionally update user object if your app relies on it elsewhere
+    localStorage.setItem('selectedLocation', location);
+    setLocation(location);
+
+    // Preserve and update user object
     const user = JSON.parse(localStorage.getItem('user')) || {};
     const updatedUser = { ...user, address: location };
     localStorage.setItem('user', JSON.stringify(updatedUser));
-  
+
     setShowPopup(false);
-  
+    setLocationSelected(true);
+
     if (pendingCategory) {
       navigate(`/shops?category=${pendingCategory}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setPendingCategory(null);
     }
   };
-  
 
   return (
     <div className="explore-menu" id="explore-menu">
@@ -111,7 +112,7 @@ const ExploreMenu = () => {
         </div>
       </div>
 
-      {/* 🔒 Login Location Popup */}
+      {/* Location/Login Popup */}
       {showPopup && (
         <NavigationPopup
           onClose={handlePopupClose}
