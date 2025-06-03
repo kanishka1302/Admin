@@ -298,22 +298,26 @@
   }
 
   .chat-input-container {
-    flex-direction: column;
-    gap: 8px;
+    display: flex;
+    flex-direction: row; /* Stack horizontally */
+    align-items: center;
+    justify-content: space-between;
     padding: 8px;
+    gap: 8px;
   }
 
   .chat-input-container input {
     font-size: 13px;
     padding: 8px 10px;
-    width: 90%;
+    width: 100%; /* Let it take most space */
+    flex: 1;
   }
 
   .chat-input-container button {
-    width: 90%;
     font-size: 13px;
-    padding: 10px;
-    margin-left: 0;
+    padding: 8px 12px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .chat-icon {
