@@ -16,9 +16,9 @@ const MyOrders = () => {
   const orderStages = ["Order Placed", "Order Received", "Out for delivery", "Delivered"];
   const stageIcons = {
   "Order Placed": assets.checkout_icon,
-  "Order Received": assets.order_received_icon,
+  "Order Received": assets.butcher_icon,
   "Out for delivery": assets.motorbike_icon,
-  "Delivered": assets.delivered_icon,
+  "Delivered": assets.tick_icon,
 };
 
   const getOrderStageIndex = (status) => {
