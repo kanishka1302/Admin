@@ -16,6 +16,7 @@ const StoreContextProvider = ({ children }) => {
   const [promoCode, setPromoCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState("");
   const [error, setError] = useState(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orders, setOrders] = useState([]);
