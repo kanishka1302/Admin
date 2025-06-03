@@ -55,6 +55,10 @@ import Banner2 from './Banner2.jpg';
 import Banner1 from './Banner1.png';
 import oderconfirmm from './orderconfirmm.gif';
 import WebsiteBanner from './WebsiteBanner.jpg';
+import checkout_icon from './check-out.png';
+import motorbike_icon from './out_for_delivery.png';
+import tick_icon from './tick.jpg';
+import butcher_icon from './butcher.png';
 
 export const assets = {
   logo,
@@ -113,6 +117,10 @@ export const assets = {
   Banner2,
   Banner1,
   WebsiteBanner,
+  checkout_icon,
+  motorbike_icon,
+  tick_icon,
+  butcher_icon
 };
 
 export const menu_list = [
