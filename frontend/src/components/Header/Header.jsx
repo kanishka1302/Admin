@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Banner1 from "../../assets/Banner1.jpg";
 import Banner2 from "../../assets/Banner2.jpg";
-import WebsiteBanner from "../../assets/WebsiteBanner.jpg";
+import WebsiteBanner from '../../assets/WebsiteBanner.jpg';
 import "./Header.css"; // Import the CSS file
 
 const Header = () => {
@@ -11,6 +10,7 @@ const Header = () => {
     },
     {
       image: WebsiteBanner,
+      text: "For those who demand the best",
     }
   ];
 
@@ -24,17 +24,20 @@ const Header = () => {
   }, []);
 
   return (
-    <div className="header-container">
-      <img
-        src={slides[currentIndex].image}
-        alt="banner"
-        className="header-image"
-      />
+  <div className="header-container">
+    <img
+      src={slides[currentIndex].image}
+      alt="banner"
+      className="header-image"
+    />
+    {slides[currentIndex].text && (
       <div className="header-text">
-        {slides[currentIndex].text}
+        <div>{slides[currentIndex].text}</div>
+        <div className="header-subtext">-NoVeg</div>
       </div>
-    </div>
-  );
-};
+    )}
+  </div>
+);
+}
 
 export default Header;
