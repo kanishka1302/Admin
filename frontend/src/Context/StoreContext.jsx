@@ -26,7 +26,9 @@ const StoreContextProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [location, setLocation] = useState(localStorage.getItem('location') || '');
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+  return localStorage.getItem("selectedLocation") || "";
+  });
   const [userMobileNumber, setUserMobileNumber] = useState(null);
   const hasFetchedCart = useRef(false);
 
