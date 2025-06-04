@@ -22,6 +22,13 @@ const Navbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+  if (!token) {
+    setLocation('');
+    setSelectedLocation('Select Location');
+  }
+  }, [token]);
+
+  useEffect(() => {
     const hasShownPopup = localStorage.getItem("locationPopupShown");
   
     // Only show popup if the user is logged in and the popup hasn't been shown yet
