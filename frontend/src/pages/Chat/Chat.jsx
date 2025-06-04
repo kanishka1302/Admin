@@ -300,7 +300,9 @@ const Chat = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                 />
-                <button onClick={handleSend}>Send</button>
+                <button onClick={handleSend} className="send-btn">
+                  <img src={assets.send_btn_icon} alt="Send" />
+                </button>
               </div>
             </div>
           </div>
