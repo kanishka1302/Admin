@@ -133,6 +133,19 @@ body {
   font-weight: 600;
   color: var(--text-bold);
 }
+.stage-text {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.order-status-inline {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
 
 .order-date {
   font-size: 0.85em;
