@@ -18,8 +18,6 @@ const Navbar = ({ setShowLogin }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
  
-
-
   const { getTotalCartAmount, token, setToken, clearCartLocallyOnly, location, setLocation } = useContext(StoreContext);
   const navigate = useNavigate();
 
@@ -75,18 +73,28 @@ const Navbar = ({ setShowLogin }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('cartItems');
-    localStorage.removeItem('locationPopupShown');
-    localStorage.removeItem("mobileOrEmail");
-    localStorage.removeItem('user');
-    localStorage.removeItem('selectedLocation');
-    setToken(null);
-    clearCartLocallyOnly();
-    setLocation('');
-    setSelectedLocation('Select Location');
-    navigate('/');
-  };
+  localStorage.removeItem('token');
+  localStorage.removeItem('cartItems');
+  localStorage.removeItem('locationPopupShown');
+  localStorage.removeItem('mobileOrEmail');
+  localStorage.removeItem('selectedLocation');
+
+  // Clear user address before removing user
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user) {
+    user.address = '';
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+  localStorage.removeItem('user');
+
+  setToken(null);
+  clearCartLocallyOnly();
+  setLocation('');
+  setSelectedLocation('Select Location');
+
+  navigate('/');
+};
+
 
   const handleProfileClick = () => navigate('/userinfo');
 
