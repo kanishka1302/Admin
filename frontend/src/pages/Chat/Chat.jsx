@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./Chat.css";
 import chaticon from "../../assets/chaticon.png";
+import { assets } from "../../assets/assets";
 
 const getInitialChatKey = () => {
   const storedUser = localStorage.getItem("user");
