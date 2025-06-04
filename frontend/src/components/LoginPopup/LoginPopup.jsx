@@ -76,25 +76,33 @@ const LoginPopup = ({ setShowLogin }) => {
   
         console.log("Server Response:", response.data);
   
-        if (response.data.exists) {
-          // Save user details in localStorage
-          localStorage.setItem("user", JSON.stringify(response.data.profile));
-  
-          // Set authentication token
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
+       if (response.data.exists) {
+  // Get any pre-selected location
+  const selectedLocation = localStorage.getItem("selectedLocation");
 
-          // Update login state without reloading
-          setIsLoggedIn(true); 
-  
-          // Close login popup
-          setShowLogin(false);
-  
+  // Merge it into the user profile
+  const updatedUser = {
+    ...response.data.profile,
+    address: selectedLocation || response.data.profile.address,
+  };
 
-        } else {
-          // User is not registered, show the registration popup
-          setIsRegisterPopupOpen(true);
-        }
+  // Save merged user to localStorage
+  localStorage.setItem("user", JSON.stringify(updatedUser));
+
+  // Set authentication token
+  setToken(response.data.token);
+  localStorage.setItem("token", response.data.token);
+
+  // Update login state if needed (optional)
+  // setIsLoggedIn(true); ← this line is only useful if state exists here
+
+  // Close login popup
+  setShowLogin(false);
+         
+  } else {
+        // User is not registered, show the registration popup
+        setIsRegisterPopupOpen(true);
+      }
       } else {
         throw new Error("OTP verification failed. Invalid user.");
       }
