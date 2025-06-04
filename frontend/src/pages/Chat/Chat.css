@@ -48,8 +48,8 @@
 }
 
 .minimize-btn {
-  margin-left: 70px;
-  margin-right: 60px;
+  margin-left: 50px;
+  margin-right: 10px;
 }
 
 /* Wrapper for the chat box */
@@ -291,6 +291,11 @@
     font-size: 13px;
     padding: 4px 6px;
     margin: 0 4px;
+  }
+  .minimize-btn{
+    margin-left: 75px;
+    margin-right: 10px;
+
   }
 
   .chat-messages {
