@@ -259,6 +259,17 @@
     max-height: 100vh;
     z-index: 9999;
   }
+  .send-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.send-btn img {
+  width: 20px;
+  height: 20px;
+}
 @media (max-width: 400px) {
   .chat-page-wrapper {
     width: 90vw;
