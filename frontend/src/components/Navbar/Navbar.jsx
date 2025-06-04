@@ -52,7 +52,20 @@ const Navbar = ({ setShowLogin }) => {
   useEffect(() => {
     // Update selectedLocation whenever location from context changes
     setSelectedLocation(location);
-  }, [location]);  
+  }, [location]);
+  
+  useEffect(() => {
+  const handleStorageChange = () => {
+    setLocation('');
+    setSelectedLocation('Select Location');
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+
+  return () => {
+    window.removeEventListener("storage", handleStorageChange);
+  };
+ }, []);
 
   const handleSelectLocation = () => setIsPopupOpen(true);
 
@@ -93,6 +106,7 @@ const Navbar = ({ setShowLogin }) => {
   setSelectedLocation('Select Location');
 
   navigate('/');
+  window.dispatchEvent(new Event("storage"));
 };
 
 
