@@ -122,7 +122,9 @@ const MyOrders = () => {
                   {currency} {order.amount?.toFixed(2) || "0.00"}
                 </p>
                 <p>
-                  <span>●</span> <b>{order.status || "Unknown"}</b>
+                  <span className="order-status-inline">
+                    ● <b>{order.status || "Unknown"}</b>
+                  </span>
                 </p>
                 <button onClick={() => handleTrackOrder(order)}>Track Order</button>
               </div>
@@ -162,7 +164,7 @@ const MyOrders = () => {
                       
                     <p>
                       <span className="stage-label">{stage}</span>
-                      {formattedTime && (
+                      {isActive && formattedTime && (
                         <small className="stage-timestamp"> – {formattedTime}</small>
                       )}
                     </p>
