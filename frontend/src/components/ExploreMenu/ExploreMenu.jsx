@@ -22,16 +22,19 @@ const ExploreMenu = () => {
   ];
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    setIsLoggedIn(!!user);
+  const user = JSON.parse(localStorage.getItem('user'));
+  setIsLoggedIn(!!user);
 
-    const savedLocation = user?.address || localStorage.getItem('selectedLocation');
-    if (savedLocation) {
-      setLocationSelected(true);
-      setLocation(savedLocation); // Ensure global state is updated
-    } else {
-      setLocationSelected(false);
-    }
+  // Use either the address from user OR the selectedLocation
+  const storedLocation = localStorage.getItem('selectedLocation');
+  const savedLocation = user?.address || storedLocation;
+
+  if (savedLocation) {
+    setLocationSelected(true);
+    setLocation(savedLocation); // Set global state
+  } else {
+    setLocationSelected(false);
+  }
   }, []);
 
   const handleNavigation = (menuName) => {
