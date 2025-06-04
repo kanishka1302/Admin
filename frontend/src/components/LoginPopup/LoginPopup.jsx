@@ -8,6 +8,7 @@ import {
 import axios from "axios";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
+import { useNavigate } from "react-router-dom";
 import { StoreContext } from "../../Context/StoreContext.jsx";
 import { auth } from "../../firebase";
 import RegisterPopup from "../Registerpopup/Registerpopup.jsx";
@@ -21,13 +22,17 @@ const LoginPopup = ({ setShowLogin }) => {
   const [otp, setOtp] = useState("");
   const [verificationId, setVerificationId] = useState(null);
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
+  const [phoneNumberError, setPhoneNumberError] = useState('');
+  const navigate = useNavigate();
+
+
 
   const requestOtp = async () => {
     if (phoneNumber.length !== 10) {
       toast.success("Please enter a valid 10-digit phone number");
       return;
     }
-
+    setPhoneNumberError("");
     try {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
@@ -78,12 +83,14 @@ const LoginPopup = ({ setShowLogin }) => {
           // Set authentication token
           setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
+
+          // Update login state without reloading
+          setIsLoggedIn(true); 
   
           // Close login popup
           setShowLogin(false);
   
-          // Redirect to home page or profile page if needed
-          window.location.href = "";
+
         } else {
           // User is not registered, show the registration popup
           setIsRegisterPopupOpen(true);
@@ -102,10 +109,27 @@ const LoginPopup = ({ setShowLogin }) => {
     setShowLogin(false);
   };
 
+const handlePhoneNumberChange = (e) => {
+  const value = e.target.value;
+
+  // Allow only numeric input and limit to 10 digits
+  if (/^\d{0,10}$/.test(value)) {
+    setPhoneNumber(value);
+    setPhoneNumberError(""); // Clear error if user is typing
+  }
+};
+
+const handleOtpChange = (e) => {
+  const value = e.target.value;
+  if (/^\d{0,6}$/.test(value)) {
+    setOtp(value);
+  }
+};
+
   return (
     <>
       <div className="login-popup">
-        <form className="login-popup-container">
+        <form className="login-popup-container" onSubmit={(e) => e.preventDefault()}>
           <div className="login-popup-title">
             <h2>{currState}</h2>
             <img
@@ -121,9 +145,10 @@ const LoginPopup = ({ setShowLogin }) => {
               type="text"
               placeholder="Enter your mobile number"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={handlePhoneNumberChange} 
               required
             />
+             {phoneNumberError && <p className="error-message">{phoneNumberError}</p>}
             <div id="recaptcha-container"></div>
             <button type="button" onClick={requestOtp}>
               Send OTP
@@ -133,7 +158,7 @@ const LoginPopup = ({ setShowLogin }) => {
               <div>
                 <input
                   name="otp"
-                  onChange={(e) => setOtp(e.target.value)}
+                  onChange={handleOtpChange}
                   value={otp}
                   type="text"
                   placeholder="Enter OTP"
