@@ -270,6 +270,7 @@
   width: 20px;
   height: 20px;
 }
+
 @media (max-width: 400px) {
   .chat-page-wrapper {
     width: 90vw;
