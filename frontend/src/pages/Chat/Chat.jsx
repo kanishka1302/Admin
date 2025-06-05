@@ -208,7 +208,7 @@ const Chat = () => {
     }
     updateMessages({
       sender: "support",
-      text: "Hello, I am here to help you with your issue. How can I assist further?",
+      text: "Please stay in the chat while we connect you to our live agent",
     });
   };
 
@@ -281,7 +281,7 @@ const Chat = () => {
           <div className={`chat-page-wrapper ${isMobile ? "fullscreen" : ""}`}>
             <div className="chat-container">
               <div className="chat-header">
-                Customer Support
+                NoVeg Chat Support
                 <button className="minimize-btn" onClick={handleMinimize}>⎯⎯</button>
                 <button className="chat-close-btn" onClick={handleClose}>X</button>
               </div>
