@@ -282,7 +282,7 @@ const Chat = () => {
             <div className="chat-container">
               <div className="chat-header">
                 NoVeg Chat Support
-                <button className="minimize-btn" onClick={handleMinimize}>⎯⎯</button>
+                <button className="minimize-btn" onClick={handleMinimize}>⎯</button>
                 <button className="chat-close-btn" onClick={handleClose}>X</button>
               </div>
               <div className="chat-messages">
