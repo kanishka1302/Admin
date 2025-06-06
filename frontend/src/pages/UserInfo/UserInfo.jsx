@@ -2,12 +2,14 @@ import React, { useEffect, useState, useContext } from "react";
 import "./UserInfo.css";
 import { StoreContext } from "../../Context/StoreContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const UserInfo = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [userAddresses, setUserAddresses] = useState([]);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -83,6 +85,12 @@ const UserInfo = () => {
     };
 
     fetchAddresses();
+  }, []);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        navigate("/", { replace: true });
+    }
   }, []);
 
   // Fetch credited amount for the user
