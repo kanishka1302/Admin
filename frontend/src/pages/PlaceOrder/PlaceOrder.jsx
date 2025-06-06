@@ -249,7 +249,7 @@ const PlaceOrder = () => {
         });
 
         if (response.data.success) {
-          toast.success("Order placed successfully!");
+          //toast.success("Order placed successfully!");
           setNewOrder({ ...orderData, _id: response.data.orderId });
           setOrderPlaced(true);
           await axios.post(`${url}/api/cart/order/placed`, {
