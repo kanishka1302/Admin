@@ -3,7 +3,7 @@ import "./MyOrders.css";
 import axios from "axios";
 import { StoreContext } from "../../Context/StoreContext";
 import { assets } from "../../assets/assets";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MyOrders = () => {
   const [data, setData] = useState([]);
@@ -96,6 +96,16 @@ const MyOrders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const userId = storedUser?.userId || storedUser?._id;
+
+    if (!userId || !token) {
+      navigate("/"); // 👈 Redirect to home
+    } else {
+      fetchOrders();
+    }
+  }, [token, navigate]);
 
   return (
     <div className="my-orders">
