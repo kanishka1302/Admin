@@ -201,7 +201,7 @@ const PlaceOrder = () => {
 
                 if (verifyResponse.data.success) {
                   const finalOrderId = verifyResponse.data.orderId;
-                  toast.success("Payment Verified & Order Placed!");
+                  //toast.success("Payment Verified & Order Placed!");
                   setNewOrder({ ...orderData, _id: finalOrderId });
                   setOrderPlaced(true);
                   await axios.post(`${url}/api/cart/order/placed`, {
