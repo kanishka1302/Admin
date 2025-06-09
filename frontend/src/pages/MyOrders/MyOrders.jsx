@@ -12,6 +12,7 @@ const MyOrders = () => {
   const [visibleOrder, setVisibleOrder] = useState(null); // To control side drawer
   const { url, token, currency } = useContext(StoreContext);
   const location = useLocation();
+   const navigate = useNavigate();
 
   const orderStages = ["Order Placed", "Order Received", "Out for delivery", "Delivered"];
   const stageIcons = {
