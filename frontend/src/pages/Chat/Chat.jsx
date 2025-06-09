@@ -208,7 +208,7 @@ const Chat = () => {
     }
     updateMessages({
       sender: "support",
-      text: "Please stay in the chat while we connect you to our live agent",
+      text: "Please stay in the chat while we connect you to our live agent.",
     });
   };
 
@@ -245,10 +245,7 @@ const Chat = () => {
         console.log("[JOIN ROOM] Emitting joinRoom with gId:", generatedTicketId);
         socket.emit("joinRoom", { roomId: generatedTicketId }); // Always join as ticketId string
         setTimeout(() => {
-          updateMessages({ sender: "bot", text: "Chat with our live customer agent." });
-          setTimeout(() => {
-            connectAgent(generatedTicketId);
-          }, 2000);
+           connectAgent(generatedTicketId);
         }, 2000);
         setConversationState("active_ticket");
       } else {
