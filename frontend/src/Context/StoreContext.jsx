@@ -25,6 +25,7 @@ const StoreContextProvider = ({ children }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [location, setLocation] = useState(localStorage.getItem('location') || '');
   const [userMobileNumber, setUserMobileNumber] = useState(null);
+  const [filteredFoodList, setFilteredFoodList] = useState([]);
   const hasFetchedCart = useRef(false);
 
 // Set userMobileNumber when the user logs in or on page load if available
@@ -35,6 +36,17 @@ useEffect(() => {
     setUserMobileNumber(savedMobileNumber);
   }
 }, []);
+  useEffect(() => {
+  const savedShop = localStorage.getItem("selectedShop");
+  if (savedShop) {
+    setSelectedShop(JSON.parse(savedShop));
+  }
+  }, []);
+  useEffect(() => {
+    if (selectedShop) {
+      localStorage.setItem("selectedShop", JSON.stringify(selectedShop));
+    }
+  }, [selectedShop]);
 
   const [cartItems, setCartItems] = useState(() => {
     const storedCartItems = localStorage.getItem("cartItems");
