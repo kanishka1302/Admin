@@ -19,6 +19,9 @@ const Cart = () => {
     shopNames,
     selectedShop,
     token,
+    loading,
+    error,
+    fetchFoodList,
   } = useContext(StoreContext);
 
 
@@ -27,6 +30,25 @@ const Cart = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const navigate = useNavigate();
 
+  // 🔄 Wait until food list is loaded
+   if (loading || food_list.length === 0) {
+    return (
+      <div className="cart-loading">
+        <p>Loading cart...</p>
+      </div>
+    );
+  }
+  
+  // ❌ If there's an error loading food list
+  if (error) {
+    return (
+      <div className="cart-error">
+        <p>{error}</p>
+        <button onClick={fetchFoodList}>Retry</button>
+      </div>
+    );
+  }
+  
   // Load promoCode and discountApplied from localStorage
   useEffect(() => {
     const savedPromoCode = localStorage.getItem("promoCode");
@@ -103,51 +125,33 @@ const { groupedItems, warnings } = useMemo(() => {
   const groups = {};
   const warn = [];
 
-  food_list.forEach((item) => {
-    if (cartItems[item._id] > 0) {
-      // Extract and trim all possible shop fields
-      const shopName = item.shopName?.trim();
-      const shop = item.shop?.trim();
-      const shopIdName = item.shopId?.name?.trim();
-      const selectedShopName = selectedShop?.name?.trim();
+  Object.entries(cartItems).forEach(([itemId, quantity]) => {
+    if (quantity > 0) {
+      const item = food_list.find((food) => food._id === itemId);
 
-      // Log all shop info for debugging
-      console.log("🛒 Item shop info:", {
-        itemName: item.name,
-        shopName,
-        shop,
-        shopIdName,
-        selectedShopName,
-      });
-
-      
-      // Resolve shop with priority, customize here as needed
-
-      let resolvedShop = shopIdName || item.shopName?.trim() || item.shop?.trim() || selectedShop?.name?.trim() || "Unknown Shop";
-
-
-      // OPTIONAL: Fix known misassigned items here for testing
-      if (item.name === "Chicken Breast") {
-        resolvedShop = "test 7 shop";
+      if (!item) {
+        warn.push(`⚠️ Item not found in food_list for ID: ${itemId}`);
+        return;
       }
+
+      let resolvedShop =
+        item.shopId?.name?.trim() ||
+        item.shopName?.trim() ||
+        item.shop?.trim() ||
+        "Unknown Shop";
 
       if (resolvedShop === "Unknown Shop") {
-        console.warn(`⚠️ Missing shop name for item:`, item);
-        warn.push(`Missing shop name for item: ${item.name}`);
+        warn.push(`⚠️ Missing shop info for item: ${item.name}`);
+        console.warn("Missing shop info for item:", item);
       }
 
-      if (!groups[resolvedShop]) {
-        groups[resolvedShop] = [];
-      }
-
+      if (!groups[resolvedShop]) groups[resolvedShop] = [];
       groups[resolvedShop].push(item);
     }
   });
 
   return { groupedItems: groups, warnings: warn };
-}, [cartItems, food_list, selectedShop]);
-
-
+}, [cartItems, food_list]);
 
   // Show toast errors after render
   useEffect(() => {
