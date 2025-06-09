@@ -100,13 +100,25 @@ const clearCartFromLocalStorage = () => {
   console.log("🧹 Cart cleared from localStorage and React state");
 };
 
-const addToCart = async (itemId, quantity = 1) => {
+const addToCart = async (itemId, quantity = 1, shopName) => {
   setCartItems((prev) => {
-    const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
+    // Updating cart with quantity and shopName
+    const updatedCart = {
+      ...prev,
+      [itemId]: {
+        quantity: (prev[itemId]?.quantity || 0) + quantity,
+        shopName: shopName, // store the shop name with each item
+      },
+    };
+
+    // Save the updated cart to localStorage
     localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+
+    // Optionally save the cart using userMobileNumber (if available)
     if (userMobileNumber) {
       localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
     }
+
     return updatedCart;
   });
 
