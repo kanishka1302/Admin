@@ -146,21 +146,19 @@ const UserInfo = () => {
       alert("Mobile number must be 10 digits.");
       return;
     }
+     if (!userId) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
 
     const updatedUser = {
-      ...user,
-      userId: user._id,
+       ...user,
       ...formData,
     };
 
     setUser(updatedUser);
     setFormData(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    if (!userId) {
-      alert("User ID is missing. Please log in again.");
-      return;
-    }
+     localStorage.setItem("user", JSON.stringify({ ...updatedUser, userId: user._id }));
 
     try {
       const response = await fetch(`https://admin-92vt.onrender.com/api/profile/${userId}`, {
