@@ -119,49 +119,67 @@ const UserInfo = () => {
     setIsEditing(true);
     setSuccessMessage("");
   };
-
   const handleSaveClick = async () => {
-    console.log("formData before save:", formData);
+  console.log("formData before save:", formData);
 
-    if (
-      (formData.name ?? "").trim() === "" ||
-      (formData.email ?? "").trim() === "" ||
-      (formData.mobileNumber ?? "").trim() === "" ||
-      (formData.address ?? "").trim() === "" ||
-      (formData.city ?? "").trim() === "" ||
-      (formData.state ?? "").trim() === "" ||
-      (formData.pincode ?? "").trim() === "" ||
-      (formData.country ?? "").trim() === ""
-    ) {
-      alert("Please fill out all fields before saving.");
-      return;
-    }
+  // Validation
+  if (
+    (formData.name ?? "").trim() === "" ||
+    (formData.email ?? "").trim() === "" ||
+    (formData.mobileNumber ?? "").trim() === "" ||
+    (formData.address ?? "").trim() === "" ||
+    (formData.city ?? "").trim() === "" ||
+    (formData.state ?? "").trim() === "" ||
+    (formData.pincode ?? "").trim() === "" ||
+    (formData.country ?? "").trim() === ""
+  ) {
+    alert("Please fill out all fields before saving.");
+    return;
+  }
 
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      alert("Please enter a valid email address.");
-      return;
-    }
+  if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
 
-    if (!/^\d{10}$/.test(formData.mobileNumber)) {
-      alert("Mobile number must be 10 digits.");
-      return;
-    }
-     if (!userId) {
-      alert("User ID is missing. Please log in again.");
-      return;
-    }
+  if (!/^\d{10}$/.test(formData.mobileNumber)) {
+    alert("Mobile number must be 10 digits.");
+    return;
+  }
 
-    const updatedUser = {
-       ...user,
-      ...formData,
-    };
+  // ✨ Check if any user data changed
+  const userInfoChanged =
+    user.name !== formData.name ||
+    user.email !== formData.email ||
+    user.mobileNumber !== formData.mobileNumber;
 
-    setUser(updatedUser);
-    setFormData(updatedUser);
-     localStorage.setItem("user", JSON.stringify({ ...updatedUser, userId: user._id }));
+  const addressChanged =
+    formData.address !== firstSavedAddress?.address ||
+    formData.city !== firstSavedAddress?.city ||
+    formData.state !== firstSavedAddress?.state ||
+    formData.pincode !== firstSavedAddress?.pincode ||
+    formData.country !== firstSavedAddress?.country;
 
-    try {
-      const response = await fetch(`https://admin-92vt.onrender.com/api/profile/${userId}`, {
+  // If nothing changed, just exit edit mode
+  if (!userInfoChanged && !addressChanged) {
+    setIsEditing(false);
+    return;
+  }
+
+  // Update user info
+  const updatedUser = {
+    ...user,
+    userId: user._id,
+    ...formData,
+  };
+
+  setUser(updatedUser);
+  setFormData(updatedUser);
+  localStorage.setItem("user", JSON.stringify(updatedUser));
+
+  try {
+    if (userInfoChanged) {
+      const response = await fetch(`http://localhost:4000/api/profile/profile/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -178,15 +196,10 @@ const UserInfo = () => {
       } else {
         alert("Failed to update user data in the database.");
       }
-    } catch (error) {
-      console.error("Error updating user:", error);
-      alert("An error occurred while updating user data.");
     }
-     // ✅ Also update the address in Address collection
-  if (firstSavedAddress?._id) {
-    try {
-      console.log("Attempting to update address with ID:", firstSavedAddress._id);
-      const res = await fetch(`https://admin-92vt.onrender.com/api/address/${firstSavedAddress._id}`, {
+
+    if (firstSavedAddress?._id && addressChanged) {
+      const res = await fetch(`http://localhost:4000/api/address/${firstSavedAddress._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -201,33 +214,36 @@ const UserInfo = () => {
       if (!res.ok) {
         throw new Error("Failed to update address.");
       }
-    } catch (error) {
-      console.error("Error updating address:", error);
+
+      if (!userInfoChanged) {
+        setSuccessMessage("Your address has been successfully updated.");
+      }
     }
+
+    // Optionally re-fetch updated addresses
+    const fetchAddresses = async () => {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const mobileNumber = storedUser?.mobileNumber;
+      if (!mobileNumber) return;
+      try {
+        const res = await fetch(`http://localhost:4000/api/address/user/${mobileNumber}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setUserAddresses(data);
+        }
+      } catch (err) {
+        console.error("Error fetching addresses:", err);
+      }
+    };
+    await fetchAddresses();
+
+  } catch (error) {
+    console.error("Error updating user:", error);
+    alert("An error occurred while updating.");
   }
 
-  // ✅ Optionally re-fetch updated address
-  const fetchAddresses = async () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const mobileNumber = storedUser?.mobileNumber;
-
-    if (!mobileNumber) return;
-
-    try {
-      const res = await fetch(`https://admin-92vt.onrender.com/api/address/user/${mobileNumber}`);
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setUserAddresses(data);
-      }
-    } catch (err) {
-      console.error("Error fetching addresses:", err);
-    }
-  };
-
-  await fetchAddresses(); // Refresh updated address list
-
-    setIsEditing(false);
-  };
+  setIsEditing(false);
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
