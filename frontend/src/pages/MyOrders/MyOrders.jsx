@@ -127,7 +127,9 @@ const MyOrders = () => {
                 </p>
                 <p>
                   <b>Shop Name:</b>{" "}
-                  {order.items.map((item) => item.shopName).join(", ") || "Unknown Shop"}
+                   {order.items.length > 0 ? 
+                      order.items.map((item, index) => item.shopName).filter((value, index, self) => self.indexOf(value) === index).join(", ")
+                      : "Unknown Shop"}
                 </p>
                 <p>
                   {currency} {order.amount?.toFixed(2) || "0.00"}
