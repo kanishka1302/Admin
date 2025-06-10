@@ -89,7 +89,7 @@ const MyOrders = () => {
   }
 
   const grams = item.quantity * 500;
-  return grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`;
+  return grams >= 1000 ? `${grams / 1000}kilograms` : `${grams}grams`;
   };
 
   const closeDrawer = () => setVisibleOrder(null);
