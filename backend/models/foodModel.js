@@ -13,6 +13,7 @@ const foodSchema = new mongoose.Schema(
       required: true,
     },    
     available: { type: Boolean, default: true }, // for toggling availability
+    quantity: { type: Number, required: true, min: 0 }, // in grams
   },
   { timestamps: true }
 );
