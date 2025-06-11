@@ -212,6 +212,8 @@ const PlaceOrder = () => {
                   setTimeout(() => {
                     clearCartFromLocalStorage();
                     setCartItems({});
+                    localStorage.removeItem("promoCode");
+                    localStorage.removeItem("discountApplied");
                     navigate("/myorders", {
                       state: { newOrder: { ...orderData, _id: finalOrderId } },
                     });
@@ -257,7 +259,9 @@ const PlaceOrder = () => {
           }, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
+          localStorage.removeItem("promoCode");
+          localStorage.removeItem("discountApplied");
+        
           setTimeout(() => {
             clearCartFromLocalStorage();
             setCartItems({});
