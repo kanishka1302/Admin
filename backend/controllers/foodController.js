@@ -13,16 +13,24 @@ const uploadDir = path.join(__dirname, "../../uploads");
 
 // ✅ Add food item (image is base64 string)
 const addFood = async (req, res) => {
-  const { name, description, price, category, shopId, image } = req.body;
+  const { name, description, price, category, shopId, image, quantity } = req.body;
+  console.log("Received req.body:", req.body);
+
+   const parsedQuantity = Number(quantity);
 
   // Validate required fields explicitly
-  if (!name || !description || !price || !category || !shopId || !image) {
+  if (!name || !description || !price || !category || !shopId || !image || !quantity) {
     return res.status(400).json({ success: false, message: "Missing required fields" });
   }
 
   if (isNaN(price) || Number(price) <= 0) {
     return res.status(400).json({ success: false, message: "Invalid price" });
   }
+
+  if (isNaN(quantity) || Number(quantity) <= 0) {
+    return res.status(400).json({ success: false, message: "Invalid quantity" });
+  }
+
 
   try {
     const food = new foodModel({
@@ -32,6 +40,7 @@ const addFood = async (req, res) => {
       category,
       image, // base64 string directly saved here
       shopId,
+      quantity: parsedQuantity,
     });
 
     await food.save();
