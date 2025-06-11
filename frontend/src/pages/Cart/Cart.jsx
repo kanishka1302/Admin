@@ -48,6 +48,9 @@ const Cart = () => {
       </div>
     );
   }
+  useEffect(() => {
+  console.log("🛒 Cart Items:", cartItems);
+}, [cartItems]);
   
   // Load promoCode and discountApplied from localStorage
   useEffect(() => {
@@ -115,11 +118,11 @@ const Cart = () => {
 
   // Function to calculate weight based on quantity
   const getItemWeight = (item, quantity) => {
-    if (item.name.toLowerCase().includes("egg")) {
-      return `${quantity} dozen${quantity > 1 ? "s" : ""}`;
-    }
-    return `${quantity * 500}g`;
-  };
+  const itemGrams = Number(item.quantity) || 0;
+  const qty = Number(quantity) || 0;
+  return `${itemGrams * qty}g`;
+};
+
 
 const { groupedItems, warnings } = useMemo(() => {
   const groups = {};
@@ -210,7 +213,7 @@ const { groupedItems, warnings } = useMemo(() => {
                     <p>{item.name}</p>
                     <p>Price: {currency}{(item.price * cartItems[item._id]).toFixed(2)}</p>
                     <p>Quantity: {cartItems[item._id]}</p>
-                    <p>Weight: {getItemWeight(item, cartItems[item._id])}</p> {/* New column */}
+                    <p>Weight: {getItemWeight(item, cartItems[item._id] ?? 0)}</p>
                   </div>
                   <div className="cart-item-actions">
                     <button
