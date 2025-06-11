@@ -7,7 +7,7 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import "./ShopDetails.css";
 
-const API_BASE_URL = "http://localhost:4000"; // Update this for production
+const API_BASE_URL = "https://admin-92vt.onrender.com"; // Update this for production
 
 const ShopDetails = () => {
   const { addToCart, cartItems } = useContext(StoreContext);
