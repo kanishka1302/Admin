@@ -60,6 +60,7 @@ import motorbike_icon from './out_for_delivery.png';
 import tick_icon from './tick.jpg';
 import butcher_icon from './butcher.png';
 import send_btn_icon from './send.png';
+import live_chat from './live-chat.png';
 
 export const assets = {
   logo,
@@ -123,6 +124,7 @@ export const assets = {
   tick_icon,
   butcher_icon,
   send_btn_icon,
+  live_chat,
 };
 
 export const menu_list = [
