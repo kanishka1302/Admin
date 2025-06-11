@@ -181,18 +181,34 @@ const DeliveryAddress = ({ onSelectAddress }) => {
       const mobileNumber = address.ownerMobile;
 
       const response = await axios.delete(
-        `https://admin-92vt.onrender.com/api/address/delete/${addressId}/${mobileNumber}`
+      `https://admin-92vt.onrender.com/api/address/delete/${addressId}/${mobileNumber}`
       );
 
       if (response.data.success) {
         toast.success("Address deleted successfully");
-        fetchAddresses();
+
+        if (editIndex === index) {
+          setEditIndex(null);
+          setNewAddress({
+            name: "",
+            mobileNumber: "",
+            type: "Home",
+            address: "",
+            city: "",
+            state: "",
+            pincode: "",
+            country: "India",
+          });
+          setShowForm(false);
+        }
+
+        await fetchAddresses();
       } else {
         toast.error("Failed to delete address");
       }
     } catch (error) {
       console.error("❌ Error deleting address:", error);
-      toast.error("Error deleting address");
+       toast.error("Error deleting address");
     }
   };
 
