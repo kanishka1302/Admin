@@ -5,6 +5,8 @@ import { StoreContext } from "../../Context/StoreContext";
 import { assets } from "../../assets/assets";
 import { useLocation, useNavigate } from "react-router-dom";
 
+
+
 const MyOrders = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,6 +15,7 @@ const MyOrders = () => {
   const { url, token, currency } = useContext(StoreContext);
   const location = useLocation();
   const navigate = useNavigate();
+
 
   const orderStages = ["Order Placed", "Order Received", "Out for delivery", "Delivered"];
   const stageIcons = {
@@ -81,32 +84,39 @@ const MyOrders = () => {
     setVisibleOrder(order);
   };
 
-  const formatItemQuantity = (item) => {
-  const lowerName = item.name.toLowerCase();
+const formatItemQuantity = (item) => {
+  const lowerName = item.name?.toLowerCase() || "";
+  const qty = Number(item.quantity) || 0;
 
   if (lowerName.includes("egg")) {
-    return `${item.quantity} dozen`;
+    return `${qty} dozen`;
   }
 
-  const grams = item.quantity * 500;
-  return grams >= 1000 ? `${grams / 1000}kilograms` : `${grams}grams`;
-  };
+  // ❌ Don't multiply by 500 — use the actual value directly
+  const totalGrams = qty;
+
+  return totalGrams >= 1000
+    ? `${(totalGrams / 1000).toFixed(1)}kg`
+    : `${totalGrams}g`;
+};
 
   const closeDrawer = () => setVisibleOrder(null);
 
   useEffect(() => {
     fetchOrders();
   }, []);
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const userId = storedUser?.userId || storedUser?._id;
 
-    if (!userId || !token) {
-      navigate("/"); // 👈 Redirect to home
-    } else {
-      fetchOrders();
-    }
-  }, [token, navigate]);
+  useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser?.userId || storedUser?._id;
+
+  if (!userId || !token) {
+    navigate("/"); // 👈 Redirect to home
+  } else {
+    fetchOrders();
+  }
+}, [token, navigate]);
+
 
   return (
     <div className="my-orders">
@@ -123,11 +133,19 @@ const MyOrders = () => {
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
                 <p>
                   Order ID: {order.orderId}<br />
-                  {order.items.map((item) => `${item.name} - ${formatItemQuantity(item)}`).join(", ")}
+                  {order.items.map((item, i) => (
+                    <span key={i} className="align">
+                    {item.name} - {formatItemQuantity(item)}<br />
+                  </span>
+                  ))}
                 </p>
                 <p>
                   <b>Shop Name:</b>{" "}
-                     {order.items.map((item) => item.shopName).join(", ") || "Unknown Shop"}
+                  {order.items.map((item, i) => (
+                    <span key={i} className="align">
+                    {item.shopName || "Unknown Shop"}<br />
+                    </span>
+                  ))}
                 </p>
                 <p>
                   {currency} {order.amount?.toFixed(2) || "0.00"}
@@ -175,10 +193,10 @@ const MyOrders = () => {
                       
                     <p>
                       <span className="stage-label">{stage}</span>
-                      {isActive && formattedTime && (
-                        <small className="stage-timestamp"> – {formattedTime}</small>
-                      )}
-                    </p>
+                        {isActive && formattedTime && (
+                          <small className="stage-timestamp"> – {formattedTime}</small>
+                        )}  
+                  </p>
                   </div>
                 );
               })}
