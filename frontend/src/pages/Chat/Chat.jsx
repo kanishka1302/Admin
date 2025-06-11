@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./Chat.css";
-import chaticon from "../../assets/chaticon.png";
+import live_chat from "../../assets/live-chat.png";
 import { assets } from "../../assets/assets";
 
 const getInitialChatKey = () => {
@@ -272,7 +272,7 @@ const Chat = () => {
   return (
     <div>
       {isMinimized ? (
-        <img src={chaticon} alt="Chat Icon" className="chat-icon" onClick={() => setIsMinimized(false)} />
+        <img src={live_chat} alt="Chat Icon" className="chat-icon" onClick={() => setIsMinimized(false)} />
       ) : (
         isChatVisible && (
           <div className={`chat-page-wrapper ${isMobile ? "fullscreen" : ""}`}>
