@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../Context/StoreContext";
 import FoodItem from "../FoodItem/FoodItem";
 import { ToastContainer, toast } from "react-toastify";
@@ -7,11 +7,12 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import "./ShopDetails.css";
 
-const API_BASE_URL = "https://admin-92vt.onrender.com"; // Update this for production
+const API_BASE_URL = "http://localhost:4000"; // Update this for production
 
 const ShopDetails = () => {
-  const { addToCart } = useContext(StoreContext);
+  const { addToCart, cartItems } = useContext(StoreContext);
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
 
   const selectedCategory = params.get("category") || "Food";
@@ -27,32 +28,35 @@ const ShopDetails = () => {
   }, [selectedShopId, selectedCategory]);
 
   const fetchFoodItems = async (shopId, category) => {
-  setLoading(true);
-  try {
-    const { data } = await axios.get(`${API_BASE_URL}/api/food/list?shopId=${shopId}`);
-    console.log('All items received from backend:', data.data);
-    if (data.success) {
-      const filtered = data.data.filter(
-        item => item.category.toLowerCase() === category.toLowerCase()
-      );
-      console.log('Filtered items (category):', filtered); 
-      setFoodItems(filtered);
-    } else {
-      toast.error("Failed to fetch food items.");
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API_BASE_URL}/api/food/list?shopId=${shopId}`);
+      if (data.success) {
+        const filtered = data.data.filter(
+          item => item.category.toLowerCase() === category.toLowerCase()
+        );
+        setFoodItems(filtered);
+      } else {
+        toast.error("Failed to fetch food items.");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("Something went wrong while loading food items.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Fetch error:", error);
-    toast.error("Something went wrong while loading food items.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleAddToCart = (itemId) => {
     addToCart(itemId, 1);
     toast.success("Item added to cart!");
   };
+
+  const handleViewCart = () => {
+    navigate("/cart");
+  };
+
+  const cartHasItems = Object.values(cartItems).some(quantity => quantity > 0);
 
   return (
     <div className="food-display-wrapper">
@@ -76,6 +80,12 @@ const ShopDetails = () => {
                 description={item.description}
                 price={item.price}
                 image={item.image}
+                quantity={typeof item.quantity === 'object' && item.quantity !== null
+                          ? item.quantity.quantity
+                          : item.quantity} 
+                shopName={typeof item.quantity === 'object' && item.quantity !== null
+                          ? item.quantity.shopName 
+                          : undefined}
                 onAddToCart={() => handleAddToCart(item._id)}
               />
             ))}
@@ -83,7 +93,11 @@ const ShopDetails = () => {
         ) : (
           <p className="no-items-text">No {selectedCategory.toLowerCase()} items available at this shop.</p>
         )}
+        
+     
       </div>
+
+     
     </div>
   );
 };
