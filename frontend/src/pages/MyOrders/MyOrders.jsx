@@ -121,11 +121,11 @@ const MyOrders = () => {
             <div key={order._id || index} className="my-orders-order">
               <div className="order-main">
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
-                <p>
+                <p className="shopitem">
                   Order ID: {order.orderId}<br />
                   {order.items.map((item) => `${item.name} - ${formatItemQuantity(item)}`).join(", ")}
                 </p>
-                <p>
+                <p className="shopitem">
                   <b>Shop Name:</b>{" "}
                      {order.items.map((item) => item.shopName).join(", ") || "Unknown Shop"}
                 </p>
