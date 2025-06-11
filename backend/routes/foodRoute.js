@@ -52,7 +52,6 @@ foodRouter.post("/add", upload.single("image"), async (req, res) => {
   }
 });
 
-
 foodRouter.delete("/remove/:id", async (req, res) => {
   try {
     await removeFood(req, res);
