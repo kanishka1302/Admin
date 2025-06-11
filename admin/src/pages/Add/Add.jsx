@@ -17,6 +17,7 @@ const Add = ({ url }) => {
     price: "",
     category: "Chicken",
     shopId: "",
+    quantity: "",
   });
 
   useEffect(() => {
@@ -97,8 +98,10 @@ const Add = ({ url }) => {
     formData.append("category", data.category);
     formData.append("shopId", data.shopId);
     formData.append("image", image);
+    formData.append("quantity", data.quantity);
 
     try {
+      console.log("Sending data:", data);
       const response = await axios.post(`https://admin-92vt.onrender.com/api/food/add`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -178,7 +181,19 @@ const Add = ({ url }) => {
             />
           </div>
         </div>
-
+        <div className="add-quantity flex-col">
+            <p>Quantity (in grams)</p>
+            <input
+              onChange={onChangeHandler}
+              value={data.quantity}
+              type="number"
+              name="quantity"
+              placeholder="Eg. 500"
+              min="1"
+              required
+            />
+          </div>
+      
         <div className="add-shop flex-col">
           <p>Shop Name</p>
           <select name="shopId" onChange={onChangeHandler} value={data.shopId} required>
