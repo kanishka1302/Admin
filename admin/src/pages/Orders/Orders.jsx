@@ -46,6 +46,13 @@ const Order = () => {
     toast.error('Failed to update order status.');
   }
 };
+  const formatGrams = (grams) => {
+  if (!grams || isNaN(grams)) return "0g";
+
+  return grams >= 1000
+    ? `${(grams / 1000).toFixed(1)}kg`
+    : `${grams}g`;
+};
 
   useEffect(() => {
     fetchAllOrders();
@@ -63,7 +70,7 @@ const Order = () => {
               <p className="order-item-food">
                 {order.items.map((item, i) => (
                   <span key={i}>
-                    {item.name} x {item.quantity}
+                    {item.name} - {formatGrams(item.quantity)}
                     {i < order.items.length - 1 ? ', ' : ''}
                   </span>
                 ))}
