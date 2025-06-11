@@ -100,6 +100,8 @@ const formatItemQuantity = (item) => {
     : `${totalGrams}g`;
 };
 
+
+
   const closeDrawer = () => setVisibleOrder(null);
 
   useEffect(() => {
@@ -134,15 +136,16 @@ const formatItemQuantity = (item) => {
                 <p>
                   Order ID: {order.orderId}<br />
                   {order.items.map((item, i) => (
-                    <span key={i} className="align">
+                    <span key={i} className="no">
                     {item.name} - {formatItemQuantity(item)}<br />
                   </span>
                   ))}
                 </p>
+
                 <p>
                   <b>Shop Name:</b>{" "}
                   {order.items.map((item, i) => (
-                    <span key={i} className="align">
+                    <span key={i} className="shops">
                     {item.shopName || "Unknown Shop"}<br />
                     </span>
                   ))}
