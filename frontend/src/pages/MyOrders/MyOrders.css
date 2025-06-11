@@ -205,6 +205,30 @@ body {
   background: linear-gradient(to right, #fbd38d, #f6ad55);
 }
 
+/* Ensures all direct text within .shopitem paragraphs is black (e.g., Order ID) */
+.my-orders-order p.shopitem {
+  color: #000000; /* Pure black */
+}
+
+/* Overrides the primary-color for the item names and quantities (which are in <span>) */
+.my-orders-order p.shopitem span {
+  color: #000000; /* Pure black */
+  background: none; /* Remove the background if it's not desired for these spans */
+  padding: 0;      /* Remove padding if it's not desired for these spans */
+  font-weight: normal; /* Reset font-weight if desired, as it was 600 from original rule */
+  font-size: inherit; /* Inherit font size or set a specific one */
+}
+
+/* Overrides the --text-bold for the "Shop Name:" (which is in <b>) */
+.my-orders-order p.shopitem b {
+  color: #000000; /* Pure black */
+}
+
+/* Ensure the span with class "align" inside shopitem (for actual shop name) is also black */
+.my-orders-order p.shopitem span.align {
+  color: #000000; /* Pure black */
+}
+
 .error-message {
   color: var(--primary-dark);
   background-color: rgba(255, 99, 71, 0.08);
