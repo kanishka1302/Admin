@@ -102,7 +102,7 @@ const displayQuantityWithUnit = () => {
               src={assets.remove_icon_red}
               alt="Remove from cart"
             />
-            <p>{cartItems[id]?.quantity || 0}</p>
+            <p>{cartItems[id]}</p>
             <img
               onClick={() => handleAddToCart(id)}
               src={assets.add_icon_green}
