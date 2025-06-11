@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 
-const FoodItem = ({ id, name, price, description, image }) => {
+const FoodItem = ({ id, name, price, description, image, quantity }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
 
     if (!locationPopupShown) {
       localStorage.setItem("locationPopupShown", "true");
-      //toast.info("Please confirm your delivery location.");
+      
       const event = new CustomEvent("show-location-popup");
       window.dispatchEvent(event);
       return;
@@ -44,6 +44,36 @@ const FoodItem = ({ id, name, price, description, image }) => {
   const handleRemoveFromCart = (id) => {
     removeFromCart(id);
     toast.info(`${name} removed from cart!`);
+  };
+
+const displayQuantityWithUnit = () => {
+    const numericQuantity = parseFloat(quantity);
+
+    if (isNaN(numericQuantity) || numericQuantity === 0) {
+      return '0';
+    }
+
+    // Check if the item name contains 'egg' (case-insensitive) AND quantity is exactly 12
+    if (name.toLowerCase().includes('egg') && numericQuantity === 12) {
+      return '1 dozen'; // Specific case for 12 eggs
+    }
+    // If it's an egg item but not exactly 12, show in dozens (e.g., 24 eggs -> 2 dozen)
+    else if (name.toLowerCase().includes('egg')) {
+      // Assuming eggs are always in multiples of 12 for dozen display
+      if (numericQuantity % 12 === 0) {
+        return `${numericQuantity / 12} dozen`;
+      } else {
+        return `${numericQuantity} eggs`; // Or you can decide how to handle non-dozen quantities of eggs
+      }
+    }
+    // If quantity is 1000 or more, convert to kilograms
+    else if (numericQuantity >= 1000) {
+      return `${numericQuantity / 1000} kg`;
+    }
+    // Otherwise, show in grams
+    else {
+      return `${numericQuantity} grams`;
+    }
   };
 
   return (
@@ -72,7 +102,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
               src={assets.remove_icon_red}
               alt="Remove from cart"
             />
-            <p>{cartItems[id]}</p>
+            <p>{cartItems[id]?.quantity || 0}</p>
             <img
               onClick={() => handleAddToCart(id)}
               src={assets.add_icon_green}
@@ -88,7 +118,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
         </div>
         <p className="food-item-desc">{description}</p>
         <p className="food-item-weight">
-          {name.toLowerCase().includes('eggs') ? '1 dozen' : '500 g'}
+          {displayQuantityWithUnit()}
         </p>
 
         <div className="food-item-price-cart">
