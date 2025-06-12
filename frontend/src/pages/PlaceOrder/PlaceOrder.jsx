@@ -132,6 +132,8 @@ const PlaceOrder = () => {
       toast.error("Please complete all required fields.");
       return;
     }
+    console.log("Cart Items from Context (cartItems):", cartItems);
+    console.log("Food List from Context (food_list):", food_list);
 
     const orderItems = food_list
       .filter((item) => cartItems[item._id] > 0)
