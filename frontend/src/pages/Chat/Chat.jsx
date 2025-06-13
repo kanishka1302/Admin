@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./Chat.css";
-import live_chat from "../../assets/live-chat.png";
+import chat_icon from "../../assets/chat-icon1.png";
 import { assets } from "../../assets/assets";
 
 const getInitialChatKey = () => {
@@ -20,7 +20,7 @@ const getInitialChatKey = () => {
   return "chatMessages_default";
 };
 //Socket
-const socket = io("https://customer-desk-backend.onrender.com");
+const socket = io("http://localhost:5000");
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -82,8 +82,8 @@ const Chat = () => {
     if (storedTicketId && storedTicketId !== "undefined" && storedTicketId !== "null") {
       setTicketId(storedTicketId);
       ticketIdRef.current = storedTicketId;
-      console.log("[JOIN ROOM] Emitting joinRoom with strdId:", storedTicketId);
-      socket.emit("joinRoom", { roomId: storedTicketId });
+      console.log("[JOIN ROOM] Emitting joinTicket with strdId:", storedTicketId);
+      socket.emit("joinTicket", { ticketId: storedTicketId, role: "user" });
       setAgentConnected(true);
     }
   }, [chatKey]);
@@ -92,16 +92,16 @@ const Chat = () => {
   useEffect(() => {
     if (ticketId && ticketId !== "undefined" && ticketId !== "null") {
       ticketIdRef.current = ticketId;
-      console.log("[JOIN ROOM] Emitting joinRoom with ticketId:", ticketId);
-      socket.emit("joinRoom", { roomId: ticketId });
+      console.log("[JOIN ROOM] Emitting joinTicket with ticketId:", ticketId);
+      socket.emit("joinTicket", { ticketId: ticketId, role: "user" });
     }
   }, [ticketId]);
 
   useEffect(() => {
     socket.on("connect", () => {
       if (ticketIdRef.current) {
-        console.log("[JOIN ROOM] Emitting joinRoom with curId:", ticketIdRef.current);
-        socket.emit("joinRoom", { roomId: ticketIdRef.current });
+        console.log("[JOIN ROOM] Emitting joinTicket with curId:", ticketIdRef.current);
+        socket.emit("joinTicket", { ticketId: ticketIdRef.current, role: "user" });
       }
     });
     return () => socket.off("connect");
@@ -109,7 +109,10 @@ const Chat = () => {
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-      if (data.roomId === ticketIdRef.current && data.sender !== "user") {
+      console.log("[Chat.jsx] Incoming message:", data);
+      // Accept both ticketId and roomId for compatibility
+      const incomingId = data.ticketId;
+      if (incomingId === ticketIdRef.current && data.sender !== "user" && data.message) {
         setMessages((prev) => [
           ...prev,
           { sender: data.sender, text: data.message },
@@ -119,7 +122,7 @@ const Chat = () => {
 
     socket.on("receiveMessage", handleReceiveMessage);
     return () => socket.off("receiveMessage", handleReceiveMessage);
-  }, [chatKey]);
+  }, [ticketId]); // Only depend on ticketId for stability
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,6 +137,14 @@ const Chat = () => {
     });
   };
 
+  // Leave ticket room when chat is closed or ticket is ended
+  const leaveTicket = () => {
+    if (ticketIdRef.current) {
+      console.log("[LEAVE TICKET] Emitting leaveTicket for ticketId:", ticketIdRef.current);
+      socket.emit("leaveTicket", { ticketId: ticketIdRef.current, role: "user" });
+    }
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
     const msgToSend = input.trim();
@@ -143,6 +154,7 @@ const Chat = () => {
     const newMessage = { sender: "user", text: msgToSend };
     updateMessages(newMessage);
 
+    // If chat is solved, end conversation
     if (userInput === "solved") {
       updateMessages({ sender: "bot", text: "Thank you, have a good day!" });
       updateMessages({ sender: "system", text: "Live chat ended. Start a new issue to reopen support." });
@@ -151,14 +163,17 @@ const Chat = () => {
       const identifier = chatKey.split("_")[1];
       localStorage.removeItem(`ticketId_${identifier}`);
       setTicketId(null);
+      leaveTicket();
       return;
     }
 
+    // If agent is connected and ticketId exists, send message to agent
     if (agentConnected && ticketId) {
-      socket.emit("sendMessage", { roomId: ticketId, sender: "user", message: msgToSend});
+      socket.emit("sendMessage", { ticketId: ticketId, sender: "user", message: msgToSend});
       return;
     }
 
+    // If no ticket, handle chatbot logic
     if (["hi", "hello", "hlo"].includes(userInput)) {
       updateMessages({ sender: "bot", text: `Hello ${userName}! How can I assist you today?` });
     } else if (userInput === "issues") {
@@ -203,12 +218,12 @@ const Chat = () => {
   const connectAgent = (ticketRoom) => {
     setAgentConnected(true);
     if (ticketRoom) {
-      console.log("[JOIN ROOM] Emitting joinRoom with roomId:", ticketRoom);
-      socket.emit("joinRoom", { roomId: ticketRoom }); // Always join as ticketId string
+      console.log("[JOIN ROOM] Emitting joinTicket with ticketId:", ticketRoom);
+      socket.emit("joinTicket", { ticketId: ticketRoom, role: "user" }); // Always join as ticketId string
     }
     updateMessages({
       sender: "support",
-      text: "Please stay in the chat while we connect you to our live agent.",
+      text: "Hello, I am here to help you with your issue. How can I assist further?",
     });
   };
 
@@ -223,7 +238,7 @@ const Chat = () => {
       const parsedUser = JSON.parse(storedUser);
       const { mobileNumber } = parsedUser;
 
-      const response = await fetch("https://admin-92vt.onrender.com/api/tickets/create", {
+      const response = await fetch("http://localhost:4000/api/tickets/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ issue, mobileNumber }),
@@ -236,16 +251,20 @@ const Chat = () => {
 
       if (generatedTicketId) {
         setTicketId(generatedTicketId);
+        setAgentConnected(true); // Ensure agent is connected after ticket creation
         const identifier = chatKey.split("_")[1];
         localStorage.setItem(`ticketId_${identifier}`, generatedTicketId);
         updateMessages({
           sender: "bot",
           text: `Your ticket ID is ${generatedTicketId}. Please wait while we process your request.`,
         });
-        console.log("[JOIN ROOM] Emitting joinRoom with gId:", generatedTicketId);
-        socket.emit("joinRoom", { roomId: generatedTicketId }); // Always join as ticketId string
+        console.log("[JOIN ROOM] Emitting joinTicket with gId:", generatedTicketId);
+        socket.emit("joinTicket", { ticketId: generatedTicketId, role: "user" }); // Always join as ticketId string
         setTimeout(() => {
-           connectAgent(generatedTicketId);
+          updateMessages({ sender: "bot", text: "Please stay in the chat while we connect you to our live agent." });
+          setTimeout(() => {
+            connectAgent(generatedTicketId);
+          }, 2000);
         }, 2000);
         setConversationState("active_ticket");
       } else {
@@ -266,13 +285,14 @@ const Chat = () => {
   };
 
   const handleClose = () => {
+    leaveTicket();
     setIsChatVisible(false);
   };
 
   return (
     <div>
       {isMinimized ? (
-        <img src={live_chat} alt="Chat Icon" className="chat-icon" onClick={() => setIsMinimized(false)} />
+        <img src={chat_icon} alt="Chat Icon" className="chat-icon" onClick={() => setIsMinimized(false)} />
       ) : (
         isChatVisible && (
           <div className={`chat-page-wrapper ${isMobile ? "fullscreen" : ""}`}>
