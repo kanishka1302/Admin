@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// cartModel.js
 const cartSchema = new mongoose.Schema({
   profile: {
     type: mongoose.Schema.Types.ObjectId,
@@ -9,8 +8,9 @@ const cartSchema = new mongoose.Schema({
   },
   mobileNumber: {
     type: String,
-    required: true, // Make sure the mobileNumber is required
+    required: true,
   },
+  
   items: [
     {
       productId: {
@@ -23,9 +23,15 @@ const cartSchema = new mongoose.Schema({
         default: 1,
         min: 1,
       },
+      shop: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Shop',
+      required: true, // Optional: only if each cart is bound to one shop
+  },
     },
   ],
 }, { timestamps: true });
 
 const Cart = mongoose.model('Cart', cartSchema);
 export default Cart;
+
