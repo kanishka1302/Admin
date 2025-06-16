@@ -186,10 +186,16 @@ app.post("/api/order/cod", async (req, res) => {
 
     const orderId = await generateOrderId();
 
+    // ✅ Inject shopName into each item
+    const updatedItems = items.map(item => ({
+      ...item,
+      shopName: item.shopName || "Unknown Shop"
+    }));
+
     const newOrder = new orderModel({
       userId,
       address,
-      items,
+      items: updatedItems,
       amount,
       orderId,
       paymentMethod: "cod",
@@ -214,6 +220,7 @@ app.post("/api/order/cod", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // ✅ Fetch Orders of a User
 app.post("/api/orders/userOrders", async (req, res) => {
