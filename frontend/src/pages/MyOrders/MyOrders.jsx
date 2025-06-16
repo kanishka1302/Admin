@@ -3,9 +3,7 @@ import "./MyOrders.css";
 import axios from "axios";
 import { StoreContext } from "../../Context/StoreContext";
 import { assets } from "../../assets/assets";
-import { useLocation, useNavigate } from "react-router-dom";
-
-
+import { useLocation } from "react-router-dom";
 
 const MyOrders = () => {
   const [data, setData] = useState([]);
@@ -14,15 +12,13 @@ const MyOrders = () => {
   const [visibleOrder, setVisibleOrder] = useState(null); // To control side drawer
   const { url, token, currency } = useContext(StoreContext);
   const location = useLocation();
-  const navigate = useNavigate();
-
 
   const orderStages = ["Order Placed", "Order Received", "Out for delivery", "Delivered"];
   const stageIcons = {
   "Order Placed": assets.checkout_icon,
-  "Order Received": assets.butcher_icon,
+  "Order Received": assets.order_received_icon,
   "Out for delivery": assets.motorbike_icon,
-  "Delivered": assets.tick_icon,
+  "Delivered": assets.delivered_icon,
 };
 
   const getOrderStageIndex = (status) => {
@@ -84,41 +80,22 @@ const MyOrders = () => {
     setVisibleOrder(order);
   };
 
-const formatItemQuantity = (item) => {
-  const lowerName = item.name?.toLowerCase() || "";
-  const qty = Number(item.quantity) || 0;
+  const formatItemQuantity = (item) => {
+  const lowerName = item.name.toLowerCase();
 
   if (lowerName.includes("egg")) {
-    return `${qty} dozen`;
+    return `${item.quantity} dozen`;
   }
 
-  // ❌ Don't multiply by 500 — use the actual value directly
-  const totalGrams = qty;
-
-  return totalGrams >= 1000
-    ? `${(totalGrams / 1000).toFixed(1)}kg`
-    : `${totalGrams}g`;
-};
-
-
+  const grams = item.quantity * 500;
+  return grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`;
+  };
 
   const closeDrawer = () => setVisibleOrder(null);
 
   useEffect(() => {
     fetchOrders();
   }, []);
-
-  useEffect(() => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = storedUser?.userId || storedUser?._id;
-
-  if (!userId || !token) {
-    navigate("/"); // 👈 Redirect to home
-  } else {
-    fetchOrders();
-  }
-}, [token, navigate]);
-
 
   return (
     <div className="my-orders">
@@ -135,28 +112,23 @@ const formatItemQuantity = (item) => {
                 <img src={assets.parcel_icon} alt="Parcel Icon" />
                 <p>
                   Order ID: {order.orderId}<br />
-                  {order.items.map((item, i) => (
-                    <span key={i} className="no">
-                    {item.name} - {formatItemQuantity(item)}<br />
-                  </span>
-                  ))}
+                  {order.items.map((item) => `${item.name} - ${formatItemQuantity(item)}`).join(", ")}
                 </p>
+                {(() => {
+  const shopNames = [...new Set(order.items.map((item) => item.shopName))];
+  const display = shopNames.join(", ") || "Unknown Shop";
 
-                <p>
-                  <b>Shop Name:</b>{" "}
-                  {order.items.map((item, i) => (
-                    <span key={i} className="shops">
-                    {item.shopName || "Unknown Shop"}<br />
-                    </span>
-                  ))}
-                </p>
+  return (
+    <p>
+      <b>Shop:</b> {display}
+    </p>
+  );
+})()}
                 <p>
                   {currency} {order.amount?.toFixed(2) || "0.00"}
                 </p>
                 <p>
-                  <span className="order-status-inline">
-                    ● <b>{order.status || "Unknown"}</b>
-                  </span>
+                  <span>●</span> <b>{order.status || "Unknown"}</b>
                 </p>
                 <button onClick={() => handleTrackOrder(order)}>Track Order</button>
               </div>
@@ -196,10 +168,10 @@ const formatItemQuantity = (item) => {
                       
                     <p>
                       <span className="stage-label">{stage}</span>
-                        {isActive && formattedTime && (
-                          <small className="stage-timestamp"> – {formattedTime}</small>
-                        )}  
-                  </p>
+                      {formattedTime && (
+                        <small className="stage-timestamp"> – {formattedTime}</small>
+                      )}
+                    </p>
                   </div>
                 );
               })}
