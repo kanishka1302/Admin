@@ -132,16 +132,18 @@ const PlaceOrder = () => {
       toast.error("Please complete all required fields.");
       return;
     }
-    console.log("Cart Items from Context (cartItems):", cartItems);
-    console.log("Food List from Context (food_list):", food_list);
 
     const orderItems = food_list
-      .filter((item) => cartItems[item._id] > 0)
-      .map((item) => ({
-        ...item,
-        quantity: cartItems[item._id],
-        shopName: shopNames[item._id] || selectedShop?.name || "Unknown Shop",
-      }));
+  .filter((item) => cartItems[item._id] > 0)
+  .map((item) => ({
+    productId: item._id,
+    name: item.name,
+    price: item.price,
+    quantity: cartItems[item._id],
+    shopId: item.shopId?._id || item.shopId, // Handles populated or plain IDs
+    shopName: item.shopId?.name || shopNames[item._id] || selectedShop?.name || "Unknown Shop",
+  }));
+
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const userId = storedUser?.userId || storedUser?._id;
@@ -164,7 +166,6 @@ const PlaceOrder = () => {
       name: `${data.firstName} ${data.lastName}`,
       address: data,
       items: orderItems,
-      shopName,
       amount: totalAmountFinal,
       paymentMethod,
       status: "Pending",
@@ -174,8 +175,6 @@ const PlaceOrder = () => {
     
 
     try {
-      console.log("Payload size (bytes):", JSON.stringify(orderData).length);
-      console.log("Order Data:", orderData); // Optional: Helps inspect structure
       if (paymentMethod === "razorpay") {
         const response = await axios.post(`${url}/api/order/razorpay`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
@@ -184,7 +183,7 @@ const PlaceOrder = () => {
         if (response.data.success) {
           const options = {
             key: response.data.data.key, // Correct key
-            amount: response.data.data.amount, // Correct path to amount
+             amount: totalAmountFinal * 100, // Correct path to amount
             currency: response.data.data.currency,
             name: "NoVeg Pvt. Ltd.",
             description: "Order Payment",
@@ -203,7 +202,7 @@ const PlaceOrder = () => {
 
                 if (verifyResponse.data.success) {
                   const finalOrderId = verifyResponse.data.orderId;
-                  //toast.success("Payment Verified & Order Placed!");
+                  toast.success("Payment Verified & Order Placed!");
                   setNewOrder({ ...orderData, _id: finalOrderId });
                   setOrderPlaced(true);
                   await axios.post(`${url}/api/cart/order/placed`, {
@@ -214,8 +213,6 @@ const PlaceOrder = () => {
                   setTimeout(() => {
                     clearCartFromLocalStorage();
                     setCartItems({});
-                    localStorage.removeItem("promoCode");
-                    localStorage.removeItem("discountApplied");
                     navigate("/myorders", {
                       state: { newOrder: { ...orderData, _id: finalOrderId } },
                     });
@@ -246,14 +243,12 @@ const PlaceOrder = () => {
           }
         }
       } else {
-        console.log("Payload size (bytes):", JSON.stringify(orderData).length);
-        console.log("Order Data:", orderData); // Optional: Helps inspect structure
         const response = await axios.post(`${url}/api/order/cod`, orderData, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.success) {
-          //toast.success("Order placed successfully!");
+          toast.success("Order placed successfully!");
           setNewOrder({ ...orderData, _id: response.data.orderId });
           setOrderPlaced(true);
           await axios.post(`${url}/api/cart/order/placed`, {
@@ -261,9 +256,7 @@ const PlaceOrder = () => {
           }, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          localStorage.removeItem("promoCode");
-          localStorage.removeItem("discountApplied");
-        
+          
           setTimeout(() => {
             clearCartFromLocalStorage();
             setCartItems({});
