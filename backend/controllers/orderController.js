@@ -21,9 +21,10 @@ const deliveryCharge = 50;
 // ✅ COD Order
 const placeOrderCod = async (req, res) => {
   try {
-    const { userId, address, items, shopName, discountApplied, promoCode } = req.body;
+    const { userId, address, items, discountApplied, promoCode } = req.body;
 
-    if (!userId || !address || !items || !shopName) {
+
+    if (!userId || !address || !items ) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
@@ -31,22 +32,27 @@ const placeOrderCod = async (req, res) => {
 
     const orderId = await generateOrderId();
 
+    console.log("Items from frontend verifyOrder:", orderData.items); // ✅ ADD THIS HERE
+
     const newOrder = new orderModel({
-      userId,
-      address,
-      items,
-      amount: totalAmount,
-      shopName,
-      orderId,
-      paymentMethod: "cod",
-      status: "Order Placed",
-      payment: false,
-      discountApplied,
-      promoCode,
-      statusTimestamps: {
-        "Order Placed": new Date()
-      }
-    });
+  userId,
+  address,
+  items: items.map(item => ({
+    ...item,
+    shopId: item.shopId,
+    shopName: item.shopName
+  })),
+  amount: totalAmount,
+  orderId,
+  paymentMethod: "cod",
+  status: "Order Placed",
+  payment: false,
+  discountApplied,
+  promoCode,
+  statusTimestamps: {
+    "Order Placed": new Date()
+  }
+});
 
     await newOrder.save();
     // 🔥 Delete cart items for this user after placing the order
@@ -76,9 +82,9 @@ const placeOrderCod = async (req, res) => {
 // ✅ Razorpay Order
 const placeOrderRazorpay = async (req, res) => {
   try {
-    const { userId, address, items, shopName, discountApplied, promoCode } = req.body;
+    const { userId, address, items, discountApplied, promoCode } = req.body;
 
-    if (!userId || !items || !address || !shopName) {
+    if (!userId || !items || !address ) {
       return res.status(400).json({ success: false, message: "All order details are required." });
     }
 
@@ -104,7 +110,6 @@ const placeOrderRazorpay = async (req, res) => {
       notes: {
         address: JSON.stringify(address),
         items: JSON.stringify(items),
-        shopName,
         discountApplied,
         promoCode,
         userId
@@ -165,20 +170,26 @@ const verifyOrder = async (req, res) => {
     // ✅ Generate NV Order ID
     const customOrderId = await generateOrderId();
 
+    console.log("Items from frontend verifyOrder:", orderData.items); // ✅ ADD THIS HERE
+
     // ✅ Create and Save Order
     const newOrder = new orderModel({
-      ...orderData,
-      orderId: customOrderId,
-      razorpay_order_id,
-      razorpay_payment_id,
-      payment: true,
-      status: "Order Placed",
-      paymentMethod: "razorpay",
-       statusTimestamps: {
-        "Order Placed": new Date()
-      }
-    });
-
+  ...orderData,
+  items: orderData.items.map(item => ({
+    ...item,
+    shopId: item.shopId,
+    shopName: item.shopName
+  })),
+  orderId: customOrderId,
+  razorpay_order_id,
+  razorpay_payment_id,
+  payment: true,
+  status: "Order Placed",
+  paymentMethod: "razorpay",
+  statusTimestamps: {
+    "Order Placed": new Date()
+  }
+});
     await newOrder.save();
 
      // 🔥 Delete cart items for this user after placing the order
@@ -357,6 +368,20 @@ const generateAdminOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to generate Admin Order" });
   }
 };
+// ✅ Delete All Orders (use only when needed)
+const deleteAllOrders = async (req, res) => {
+  try {
+    const result = await orderModel.deleteMany({});
+    res.status(200).json({
+      success: true,
+      message: `Deleted ${result.deletedCount} orders.`,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting all orders:", error);
+    res.status(500).json({ success: false, message: "Failed to delete all orders" });
+  }
+};
+
 
 export {
   placeOrder,
@@ -368,4 +393,5 @@ export {
   verifyOrder,
   generateAdminOrder,
   updateOrderStatus,
+  deleteAllOrders,
 };
