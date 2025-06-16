@@ -1,15 +1,15 @@
-import { createContext, useEffect, useState,  useRef } from "react";
+import { createContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
-export const socket = io("https://socket1-8bma.onrender.com");  // replace with your server URL
 
+export const socket = io("http://localhost:4000"); // ✅ Update for production
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = ({ children }) => {
-  const url = "https://admin-92vt.onrender.com";
+  const url = "http://localhost:4000";
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
   const [userId, setUserId] = useState("");
@@ -19,251 +19,148 @@ const StoreContextProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orders, setOrders] = useState([]);
-  const currency = "₹";
-  const deliveryCharge = 50;
   const [selectedShop, setSelectedShop] = useState(() => localStorage.getItem("selectedShop") || "");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [location, setLocation] = useState(localStorage.getItem('location') || '');
   const [userMobileNumber, setUserMobileNumber] = useState(null);
-  const [filteredFoodList, setFilteredFoodList] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [transactionHistory, setTransactionHistory] = useState([]);
+  const [shopNames, setShopNames] = useState(() => JSON.parse(localStorage.getItem("shopNames")) || {});
+  const currency = "₹";
+  const deliveryCharge = 50;
   const hasFetchedCart = useRef(false);
-
-// Set userMobileNumber when the user logs in or on page load if available
-useEffect(() => {
-  // Assuming userMobileNumber is stored in localStorage or context
-  const savedMobileNumber = localStorage.getItem('userMobileNumber');
-  if (savedMobileNumber) {
-    setUserMobileNumber(savedMobileNumber);
-  }
-}, []);
-  useEffect(() => {
-  const savedShop = localStorage.getItem("selectedShop");
-  if (savedShop) {
-    setSelectedShop(JSON.parse(savedShop));
-  }
-  }, []);
-  useEffect(() => {
-    if (selectedShop) {
-      localStorage.setItem("selectedShop", JSON.stringify(selectedShop));
-    }
-  }, [selectedShop]);
 
   const [cartItems, setCartItems] = useState(() => {
     const storedCartItems = localStorage.getItem("cartItems");
     return storedCartItems ? JSON.parse(storedCartItems) : {};
   });
 
-  const [shopNames, setShopNames] = useState(() => {
-    const storedShopNames = localStorage.getItem("shopNames");
-    return storedShopNames ? JSON.parse(storedShopNames) : {};
-  });
-
-  // 💰 Wallet-related state
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [transactionHistory, setTransactionHistory] = useState([]);
-
-  const formatCartArrayToObject = (cartArray = []) => {
-    const cartObj = {};
-    cartArray.forEach((item) => {
-      if (item.productId && item.quantity !== undefined) {
-        cartObj[item.productId] = item.quantity;
-      }
-    });
-    return cartObj;
-  };
-  
+  useEffect(() => {
+    const savedMobile = localStorage.getItem("userMobileNumber");
+    if (savedMobile) setUserMobileNumber(savedMobile);
+  }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setToken(localStorage.getItem("token") || "");
-  
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUserId(parsedUser?.userId || parsedUser?._id || "");
-  
-        // ✅ Clean fallback logic
-        const contactId = parsedUser.mobileNumber || parsedUser.email;
-        if (contactId) {
-          setUserMobileNumber(contactId);
-          localStorage.setItem("userMobileNumber", contactId);
-        }
-      } catch (error) {
-        console.error("❌ Error parsing user data from localStorage:", error);
-      }
-    }
+    const savedShop = localStorage.getItem("selectedShop");
+    if (savedShop) setSelectedShop(JSON.parse(savedShop));
   }, []);
-  
 
-  // 🛒 Cart logic
-const getTotalCartAmount = () => {
-  return Object.entries(cartItems).reduce((total, [id, quantity]) => {
-    const item = food_list.find((food) => food._id === id);
-    return total + (item?.price || 0) * quantity;
-  }, 0);
-};
+  useEffect(() => {
+    if (selectedShop) {
+      localStorage.setItem("selectedShop", JSON.stringify(selectedShop));
+    }
+  }, [selectedShop]);
 
-const clearCartFromLocalStorage = () => {
-  localStorage.removeItem("cartItems");
-  if (userMobileNumber) {
-    localStorage.removeItem(`cartItems_${userMobileNumber}`);
-  }
-  setCartItems({});
-  console.log("🧹 Cart cleared from localStorage and React state");
-};
+  const formatCartArrayToObject = (items = []) =>
+    items.reduce((acc, item) => {
+      if (item.productId && item.quantity !== undefined) acc[item.productId] = item.quantity;
+      return acc;
+    }, {});
 
-const addToCart = async (itemId, quantity = 1) => {
-  setCartItems((prev) => {
-    const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+  const getTotalCartAmount = () => {
+    return Object.entries(cartItems).reduce((total, [id, quantity]) => {
+      const item = food_list.find((food) => food._id === id);
+      return total + (item?.price || 0) * quantity;
+    }, 0);
+  };
+
+  const clearCartFromLocalStorage = () => {
+    localStorage.removeItem("cartItems");
     if (userMobileNumber) {
-      localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
+      localStorage.removeItem(`cartItems_${userMobileNumber}`);
     }
-    return updatedCart;
-  });
+    setCartItems({});
+  };
 
-  if (userMobileNumber) {
-    try {
-      const response = await axios.post(`${url}/api/cart/add`, {
-        mobileOrEmail: userMobileNumber,
-        productId: itemId,
-        quantity,
-      });
-      console.log('Cart updated in the database:', response.data);
-    } catch (error) {
-      console.error('Error updating cart in DB:', error);
-      // Assuming 404 or "not found" means the item doesn't exist
-      if (error.response?.status === 404 || error.response?.data?.message === 'Item not found') {
-        clearCartFromLocalStorage();
-      }
-    }
-  }
-};
-
-const removeFromCart = async (itemId) => {
-  setCartItems((prev) => {
-    const updatedCart = { ...prev };
-    if (updatedCart[itemId] > 1) {
-      updatedCart[itemId] -= 1;
-    } else {
-      delete updatedCart[itemId];
-    }
-    localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-    if (userMobileNumber) {
-      localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updatedCart));
-    }
-    return updatedCart;
-  });
-
-  if (userMobileNumber) {
-    try {
-      const response = await axios.post(`${url}/api/cart/remove`, {
-        mobileOrEmail: userMobileNumber,
-        productId: itemId,
-      });
-      console.log('Cart updated in the database:', response.data);
-    } catch (error) {
-      console.error('Error updating cart in DB:', error);
-      if (error.response?.status === 404 || error.response?.data?.message === 'Item not found') {
-        clearCartFromLocalStorage();
-      }
-    }
-  }
-};
-
-// Fetch and set the cart items when the userMobileNumber changes
-useEffect(() => {
-  if (!userMobileNumber) {
-    console.warn("⚠️ userMobileNumber is undefined. Cart fetch skipped.");
-    return;
-  }
-
-  const formatCartArrayToObject = (items) => {
-    const formatted = {};
-    items.forEach(item => {
-      formatted[item.productId] = item.quantity;
+  const addToCart = async (itemId, quantity = 1) => {
+    setCartItems((prev) => {
+      const updated = { ...prev, [itemId]: (prev[itemId] || 0) + quantity };
+      localStorage.setItem("cartItems", JSON.stringify(updated));
+      if (userMobileNumber) localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updated));
+      return updated;
     });
-    return formatted;
-  };
 
-  const isCartDifferent = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
-
-  const fetchAndSetCart = async () => {
-    try {
-      console.log("📡 Fetching cart for:", userMobileNumber);
-
-      const response = await axios.post(`${url}/api/cart/get`, {
-        mobileOrEmail: userMobileNumber,
-      });
-
-      const items = response.data?.cart?.items || [];
-      const formattedCart = formatCartArrayToObject(items);
-
-      const localCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-
-      if (isCartDifferent(formattedCart, localCart)) {
-        console.log("🔄 Updating local cart with backend data");
-        localStorage.setItem("cartItems", JSON.stringify(formattedCart));
-        localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(formattedCart));
-        setCartItems(formattedCart);
-      } else {
-        console.log("✅ Local cart is already in sync");
-        setCartItems(localCart); // Still set to ensure React state is synced
-      }
-
-    } catch (err) {
-      console.error("❌ Error fetching cart:", err);
-
-      // If backend fails, try fallback to saved localStorage
-      const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-        console.log("🛠️ Loaded cart from local fallback");
+    if (userMobileNumber) {
+      try {
+        const res = await axios.post(`${url}/api/cart/add`, {
+          mobileOrEmail: userMobileNumber,
+          productId: itemId,
+          quantity,
+        });
+        socket.emit("cartUpdated", { user: userMobileNumber });
+      } catch (err) {
+        if (err.response?.status === 404) clearCartFromLocalStorage();
       }
     }
   };
 
-  fetchAndSetCart();
-}, [userMobileNumber]);
+  const removeFromCart = async (itemId) => {
+    setCartItems((prev) => {
+      const updated = { ...prev };
+      if (updated[itemId] > 1) updated[itemId] -= 1;
+      else delete updated[itemId];
 
+      localStorage.setItem("cartItems", JSON.stringify(updated));
+      if (userMobileNumber) localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(updated));
+      return updated;
+    });
 
-useEffect(() => {
-  if (!userMobileNumber) return;
+    if (userMobileNumber) {
+      try {
+        await axios.post(`${url}/api/cart/remove`, {
+          mobileOrEmail: userMobileNumber,
+          productId: itemId,
+        });
+        socket.emit("cartUpdated", { user: userMobileNumber });
+      } catch (err) {
+        if (err.response?.status === 404) clearCartFromLocalStorage();
+      }
+    }
+  };
 
-  const guestCart = JSON.parse(localStorage.getItem("cartItems")) || {};
-  const userCart = JSON.parse(localStorage.getItem(`cartItems_${userMobileNumber}`)) || {};
+  useEffect(() => {
+    if (!userMobileNumber) return;
 
-  const hasGuestItems = Object.keys(guestCart).length > 0;
-  const hasUserItems = Object.keys(userCart).length > 0;
+    const fetchAndSetCart = async () => {
+      try {
+        const response = await axios.post(`${url}/api/cart/get`, {
+          mobileOrEmail: userMobileNumber,
+        });
+        const backendCart = formatCartArrayToObject(response.data?.cart?.items || []);
+        const localCart = JSON.parse(localStorage.getItem("cartItems")) || {};
 
-  if (hasGuestItems && !hasUserItems) {
-    setCartItems(guestCart);
-    localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(guestCart));
-  } else {
-    setCartItems(userCart);
-  }
-}, [userMobileNumber]);
+        if (JSON.stringify(backendCart) !== JSON.stringify(localCart)) {
+          localStorage.setItem("cartItems", JSON.stringify(backendCart));
+          localStorage.setItem(`cartItems_${userMobileNumber}`, JSON.stringify(backendCart));
+          setCartItems(backendCart);
+        } else {
+          setCartItems(localCart);
+        }
+      } catch (err) {
+        const fallback = localStorage.getItem(`cartItems_${userMobileNumber}`);
+        if (fallback) setCartItems(JSON.parse(fallback));
+      }
+    };
+
+    fetchAndSetCart();
+  }, [userMobileNumber]);
 
   const setShopNameForItem = (itemId, shopName) => {
     setShopNames((prev) => {
-      const updatedShopNames = { ...prev, [itemId]: shopName };
-      localStorage.setItem("shopNames", JSON.stringify(updatedShopNames));
-      return updatedShopNames;
+      const updated = { ...prev, [itemId]: shopName };
+      localStorage.setItem("shopNames", JSON.stringify(updated));
+      return updated;
     });
   };
 
   const fetchFoodList = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${url}/api/food/list`);
-      if (response.data.success) {
-        setFoodList(response.data.data || []);
-      } else {
-        throw new Error("Failed to load food list from server.");
-      }
-    } catch (error) {
-      console.error("Error fetching food list:", error.message);
-      setError("Failed to load food list. Please check your connection.");
+      const res = await axios.get(`${url}/api/food/list`);
+      if (res.data.success) setFoodList(res.data.data);
+      else throw new Error("Failed to load food list");
+    } catch (err) {
+      setError("❌ Failed to fetch food list");
     } finally {
       setLoading(false);
     }
@@ -272,19 +169,11 @@ useEffect(() => {
   const fetchOrders = async () => {
     if (!token) return;
     try {
-      const response = await axios.post(
-        `${url}/api/orders/userorders`,
+      const res = await axios.post(`${url}/api/orders/userorders`,
         { userId: userId || token },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (response.data.success) {
-        setOrders(response.data.data);
-      } else {
-        console.error("Error fetching orders: Response unsuccessful");
-        setOrders([]);
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error.message);
+        { headers: { Authorization: `Bearer ${token}` } });
+      setOrders(res.data.success ? res.data.data : []);
+    } catch (err) {
       setOrders([]);
     }
   };
@@ -293,11 +182,7 @@ useEffect(() => {
     setToken("");
     setUserId("");
     setUserMobileNumber("");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("cartItems");
-    localStorage.removeItem("mobileOrEmail");
-    localStorage.removeItem("userMobileNumber");
+    localStorage.clear();
     setCartItems({});
     setOrders([]);
     setWalletBalance(0);
@@ -314,68 +199,49 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
-    if (userMobileNumber) {
-      const savedCart = localStorage.getItem(`cartItems_${userMobileNumber}`);
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-      }
-    }
-  }, [userMobileNumber]);
-  
   const groupItemsByShop = () => {
-    const groupedItems = {};
-    Object.entries(cartItems).forEach(([itemId, quantity]) => {
+    const grouped = {};
+    Object.entries(cartItems).forEach(([id, quantity]) => {
       if (quantity > 0) {
-        const item = food_list.find((food) => food._id === itemId);
+        const item = food_list.find((food) => food._id === id);
         if (item) {
-          const shopName = shopNames[itemId] || "Unknown Shop";
-          if (!groupedItems[shopName]) {
-            groupedItems[shopName] = [];
-          }
-          groupedItems[shopName].push({ ...item, quantity });
+          const shop = shopNames[id] || "Unknown Shop";
+          if (!grouped[shop]) grouped[shop] = [];
+          grouped[shop].push({ ...item, quantity });
         }
       }
     });
-    return groupedItems;
+    return grouped;
   };
 
   const placeOrderWithWallet = async (orderData) => {
     if (!token || !userId) return;
     try {
-      const response = await axios.post(
-        `${url}/api/orders/place-order-wallet`,
+      const res = await axios.post(`${url}/api/orders/place-order-wallet`,
         { ...orderData, userId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (response.data.success) {
+        { headers: { Authorization: `Bearer ${token}` } });
+      if (res.data.success) {
         handleWalletPaymentSuccess();
       } else {
-        notify(response.data.message || "Failed to place wallet order", "error");
+        notify(res.data.message || "Failed to place wallet order", "error");
       }
-    } catch (error) {
-      console.error("Wallet order error:", error.message);
-      notify("Something went wrong with wallet payment", "error");
+    } catch {
+      notify("Wallet payment failed", "error");
     }
   };
 
   const handleWalletPaymentSuccess = () => {
-    clearCart();
+    clearCartFromLocalStorage();
     setOrderPlaced(true);
     fetchOrders();
-    //fetchWalletBalance();
-    notify("Order placed using Wallet!");
+    notify("Order placed via Wallet!");
   };
 
   const notify = (msg, type = "success") => toast[type](msg);
 
   useEffect(() => {
     fetchFoodList();
-    if (token) {
-      fetchOrders();
-      //fetchWalletBalance();
-      //fetchTransactions();
-    }
+    if (token) fetchOrders();
   }, [token]);
 
   if (loading) {
@@ -386,54 +252,21 @@ useEffect(() => {
     );
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  if (error) return <div>{error}</div>;
 
   return (
     <StoreContext.Provider
       value={{
-        food_list,
-        cartItems,
-        setCartItems,
-        addToCart,
-        removeFromCart,
-        getTotalCartAmount,
-        promoCode,
-        applyPromoCode,
-        discountApplied,
-        currency,
-        deliveryCharge,
-        token,
-        userId,
-        setUserId,
-        setToken,
-        url,
-        selectedShop,
-        setSelectedShop,
-        shopNames,
-        setShopNames,
-        orders,
-        setOrders,
-        fetchOrders,
-        clearCartFromLocalStorage,
-        selectedAddress,
-        setSelectedAddress,
-        groupItemsByShop,
-        logoutUser,
-        orderPlaced,
-        setOrderPlaced,
-        walletBalance,
-        setWalletBalance,
-        transactionHistory,
-        //fetchWalletBalance,
-        //addToWallet,
-        //fetchTransactions,
-        handleWalletPaymentSuccess,
-        notify,
-        placeOrderWithWallet,
-        setLocation,
-        location
+        food_list, cartItems, setCartItems, addToCart, removeFromCart,
+        getTotalCartAmount, promoCode, applyPromoCode, discountApplied,
+        currency, deliveryCharge, token, userId, setUserId, setToken,
+        url, selectedShop, setSelectedShop, shopNames, setShopNames,
+        orders, setOrders, fetchOrders, clearCartFromLocalStorage,
+        selectedAddress, setSelectedAddress, groupItemsByShop,
+        logoutUser, orderPlaced, setOrderPlaced, walletBalance,
+        setWalletBalance, transactionHistory,
+        handleWalletPaymentSuccess, notify, placeOrderWithWallet,
+        setLocation, location
       }}
     >
       {children}
