@@ -29,45 +29,42 @@ const getProfile = async (identifier) => {
 
 export const addToCart = async (req, res) => {
   try {
-    const { mobileOrEmail, productId, quantity } = req.body;
+    const { mobileOrEmail, productId, quantity, shopId } = req.body;
     console.log('addToCart called with:', req.body);
 
     // Validation
-    if (!mobileOrEmail || !productId || typeof quantity !== 'number' || quantity <= 0) {
-      console.log('Invalid request data');
+    if (!mobileOrEmail || !productId || !shopId || typeof quantity !== 'number' || quantity <= 0) {
       return res.status(400).json({ message: 'Invalid request data' });
     }
 
-    // Find user profile
-    const profile = await getProfile(mobileOrEmail);  // You should pass either mobile or email
-    if (!profile) {
-      console.log('User not found');
-      return res.status(404).json({ message: 'User not found' });
-    }
+    const profile = await getProfile(mobileOrEmail);
+    if (!profile) return res.status(404).json({ message: 'User not found' });
 
-    // Cart logic
     let cart = await Cart.findOne({ profile: profile._id });
+
     if (!cart) {
-      console.log('No existing cart found, creating new cart');
       cart = new Cart({
         profile: profile._id,
         mobileNumber: profile.mobileNumber,
-        items: [{ productId, quantity }],
+        items: [{ productId, quantity, shop: shopId }]
       });
     } else {
-      console.log('Existing cart found');
       const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+
+      // Prevent mixing shops (optional business rule)
+      const isDifferentShop = cart.items.length > 0 && cart.items[0].shop.toString() !== shopId;
+      if (isDifferentShop) {
+        return res.status(400).json({ message: 'Cannot add items from different shops' });
+      }
+
       if (itemIndex !== -1) {
-        console.log('Item already in cart, updating quantity');
         cart.items[itemIndex].quantity += quantity;
       } else {
-        console.log('Item not in cart, adding new item');
-        cart.items.push({ productId, quantity });
+        cart.items.push({ productId, quantity, shop: shopId });
       }
     }
 
     await cart.save();
-    console.log('Cart saved successfully');
     res.status(200).json({ success: true, message: 'Item added to cart', cart });
   } catch (err) {
     console.error('addToCart error:', err);
@@ -75,26 +72,23 @@ export const addToCart = async (req, res) => {
   }
 };
 
+
 export const getCart = async (req, res) => {
   try {
     const { mobileOrEmail } = req.body;
-    console.log('📥 getCart called with:', mobileOrEmail);
 
     if (!mobileOrEmail) {
-      console.log('❗ Identifier missing');
       return res.status(400).json({ message: 'Identifier required' });
     }
 
     const profile = await getProfile(mobileOrEmail);
-    if (!profile) {
-      console.log('❌ User not found');
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!profile) return res.status(404).json({ message: 'User not found' });
 
-    const cart = await Cart.findOne({ profile: profile._id }).populate('items.productId');
-    
+    const cart = await Cart.findOne({ profile: profile._id })
+      .populate('items.productId')
+      .populate('items.shop');
+
     if (!cart || !Array.isArray(cart.items)) {
-       console.log('🪣 No cart found — returning empty cart');
       return res.status(200).json({ success: true, cart: { items: [] } });
     }
 
@@ -106,13 +100,16 @@ export const getCart = async (req, res) => {
         name: item.productId.name,
         price: item.productId.price,
         image: item.productId.image,
-        quantity: item.quantity
+        quantity: item.quantity,
+        shop: {
+          _id: item.shop?._id,
+          name: item.shop?.name,
+        }
       }));
 
-    console.log('✅ Cart fetched and flattened:', flatItems.length, 'items');
     res.status(200).json({ success: true, cart: { items: flatItems } });
   } catch (err) {
-    console.error('❌ getCart error:', err.message || err);
+    console.error('getCart error:', err);
     res.status(500).json({ message: 'Failed to fetch cart' });
   }
 };
