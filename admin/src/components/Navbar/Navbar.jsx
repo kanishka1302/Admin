@@ -53,7 +53,7 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-links">
-        <p>NoVeg Admin</p>
+        <p>NoVegRapix Admin</p>
       </div>
 
       <div className="navbar-button">
