@@ -59,7 +59,7 @@ const Footer = () => {
               </div>
             </div>
             <p>
-              NoVeg delivers freshly cut, high-quality meat directly from local vendors to your doorstep. We ensure that all our products are 100% fresh, never frozen, providing you with the best of the local market. Whether you need cuts for your everyday meals or special occasions, we promise prompt and reliable delivery in 45 minutes.
+              NoVegRapix delivers freshly cut, high-quality meat directly from local vendors to your doorstep. We ensure that all our products are 100% fresh, never frozen, providing you with the best of the local market. Whether you need cuts for your everyday meals or special occasions, we promise prompt and reliable delivery in 45 minutes.
             </p>
             <div className="footer-social-icons">
               <a href="https://www.instagram.com/novegindia/" target="_blank" rel="noopener noreferrer">
