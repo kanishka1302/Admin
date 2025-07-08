@@ -1,185 +1,251 @@
-/* ===========================
-   Login Popup Base Styles
-=========================== */
+/* Vendors Heading */
+.vendors-heading {
+  text-align: center;
+  font-size: 2.2em; /* Slightly larger for emphasis */
+  margin: 30px 0;
+  color: #333; /* Darker shade for better contrast */
+  font-weight: bold;
+  letter-spacing: 1px; /* Slight letter spacing for a polished look */
+}
 
-.login-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+/* Scrolling Images Section */
+.scrolling-images {
+  overflow: hidden;
+  background-color: #fbf9f9; /* Light grey background */
+  padding: 20px 0;
+}
+
+.scrolling-images-content {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 10px;
-  box-sizing: border-box;
+  animation: scroll-left 30s linear infinite;
 }
 
-/* Popup container */
-.login-popup-container {
-  width: 100%;
-  max-width: 400px;
-  background-color: #f5c4c4; /* Light red shade */
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  animation: fadeIn 0.3s ease-in-out;
-  box-sizing: border-box;
+.scrolling-images img {
+  height: 100px; /* Adjust as needed */
+  margin: 0 25px; /* Increased margin for better spacing */
+  filter: grayscale(50%); /* Slight grayscale for a subtle look */
+  transition: filter 0.3s ease;
 }
 
-/* Title section */
-.login-popup-title {
+.scrolling-images img:hover {
+  filter: grayscale(0); /* Remove grayscale on hover */
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+/* Footer Section */
+.footer {
+  background-color: #d1c7b7; /* Slightly darker cream background for footer */
+  color: #333; /* Dark text for better contrast */
+  padding: 20px 40px; /* Reduced padding to make footer more compact */
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0px -5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+
+.footer-content {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px; /* Reduced gap between content */
+}
+
+.footer-content-left {
+  flex: 1;
+  max-width: 30%;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px; /* Reduced gap between items */
+  flex-direction: column;
+}
+
+.footer-logo-section {
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  gap: 25px; /* Reduced gap between logo items */
 }
 
-.login-popup-title h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: bold;
+.footer-logo-section img {
+  height: 90px; /* Reduced logo size */
+  width: auto;
+  filter: contrast(0.9); /* Subtle contrast for logo */
 }
 
-.login-popup-title img {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-}
-
-/* Input fields */
-.login-popup-inputs {
+.app-download-platforms {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  
-}
-
-.login-popup-inputs div {
-  display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  
+  gap: 12px; /* Reduced gap between download icons */
+  margin-top: -30px; /* Reduced negative margin */
 }
 
-/* Input styling */
-.login-popup-inputs input[type="text"] {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #f5c4c4;
-  background-color: #fce0e0;
-  border-radius: 6px;
-  font-size: 16px;
-  box-sizing: border-box;
-  margin-left: 15px;
-  margin-right: 15px;
-}
-
-/* Buttons */
-.login-popup-container button {
-  padding: 12px 16px;
-  margin-left: 15px;
-  margin-right: 15px;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-  background-color: #8B0000;
-  border: none;
-  border-radius: 6px;
+.app-download-platforms img {
+  width: 170px; /* Reduced size for app download icons */
+  height: auto;
   cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
+  transition: transform 0.3s ease;
 }
 
-.login-popup-container button:hover {
-  background-color: #a80000;
+.app-download-platforms img:first-child {
+  margin-bottom: -100px; /* Reduced negative margin */
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.app-download-platforms img:hover {
+  transform: scale(1.08);
 }
 
-/* ===========================
-   Responsive Media Queries
-=========================== */
+.footer-social-icons {
+  margin-top: 10px; /* Reduced margin */
+}
 
-/* ===========================
-   Responsive Media Queries
-=========================== */
+.footer-social-icons img {
+  width: 35px; /* Smaller icon size */
+  margin-right: 10px; /* Reduced spacing between icons */
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
 
-/* Tablets */
+.footer-social-icons img:hover {
+  transform: scale(1.15);
+  opacity: 0.9;
+}
+
+.footer-content-center,
+.footer-content-right {
+  flex: 1;
+  max-width: 350px; /* Reduced max width */
+  text-align: center;
+}
+
+/* Footer Section */
+.footer-content-center h2,
+.footer-content-right h2 {
+  margin-bottom: 12px; /* Reduced margin */
+  font-size: 1.8em; /* Reduced font size */
+  font-weight: 700; /* Bolder text for better emphasis */
+  color: #a10707; /* Muted amber color for headings */
+}
+
+.footer-content-center ul,
+.footer-content-right ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+}
+
+.footer-content-center li,
+.footer-content-right li {
+  margin-bottom: 8px; /* Reduced spacing between list items */
+  font-size: 1.1em; /* Slightly smaller font size */
+}
+
+.footer hr {
+  border: 0;
+  height: 1px;
+  background: #e2d9b7; /* Light cream border for a smooth look */
+  margin: 20px 0; /* Reduced margin */
+}
+
+.footer-copyright {
+  text-align: center;
+  font-size: 0.9em; /* Reduced font size */
+  color: #333;
+}
+
+/* Footer Links */
+.footer-link {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 6px 10px; /* Reduced padding */
+  border-radius: 4px;
+  color: #a75004; /* Orange color for links */
+}
+
+.footer-link:hover {
+  color: #fff; /* Change link color to white on hover */
+  background-color: #e74c3c; /* Red background for hover */
+  padding: 6px 12px; /* Slight increase in padding for hover effect */
+}
+.chat-button {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: #b5121b; /* matching your brand red */
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.chat-button:hover {
+  background-color: #8f0f15;
+}
 @media (max-width: 768px) {
-  .login-popup-container {
-    padding: 20px;
-    max-width: 90%;
-  }
-
-  .login-popup-title h2 {
-    font-size: 20px;
-  }
-
-  .login-popup-inputs input[type="text"] {
-    font-size: 15px;
-    padding: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .login-popup-container button {
-    font-size: 15px;
-    padding: 10px 14px;
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-}
-
-/* Phones */
-@media (max-width: 480px) {
-  .login-popup-container {
-    padding: 16px;
-    max-width: 95%;
-  }
-
-  .login-popup-title h2 {
-    font-size: 18px;
-  }
-
-  .login-popup-inputs input[type="text"] {
-    font-size: 14px;
-    padding: 8px;
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-  }
-
-  .login-popup-inputs div {
+  /* Footer Layout */
+  .footer-content {
     flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    align-items: center;
+    text-align: center;
+    gap: 25px;
   }
 
-  .login-popup-container button {
-    font-size: 14px;
-    padding: 10px;
+  .footer-content-left,
+  .footer-content-center,
+  .footer-content-right {
+    max-width: 100%;
     width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    align-items: center;
+    text-align: center;
   }
 
-  .login-popup-title img {
-    width: 20px;
-    height: 20px;
+  .footer-logo-section {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .footer-logo-section img {
+    height: 70px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .footer-social-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .footer-social-icons img {
+    width: 32px;
+    margin: 0 8px;
+  }
+
+  .app-download-platforms {
+    align-items: center;
+  }
+
+  .app-download-platforms img {
+    margin: 0 auto;
   }
 }
