@@ -111,7 +111,7 @@ const Footer = () => {
 
         <hr />
         <p className="footer-copyright">
-          Copyright 2025 @ NoVeg.pvt.ltd - All Rights Reserved
+          Copyright 2025 @ NoVegRapix.pvt.ltd - All Rights Reserved
         </p>
       </div>
       {/* Show Chat component conditionally */}
