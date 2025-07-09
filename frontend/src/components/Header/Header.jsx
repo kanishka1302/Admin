@@ -33,7 +33,7 @@ const Header = () => {
     {slides[currentIndex].text && (
       <div className="header-text">
         <div>{slides[currentIndex].text}</div>
-        <div className="header-subtext">-NoVeg</div>
+        <div className="header-subtext">-NoVegRapix</div>
       </div>
     )}
   </div>
