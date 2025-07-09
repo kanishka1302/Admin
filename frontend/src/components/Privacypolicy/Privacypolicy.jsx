@@ -10,7 +10,7 @@ const Privacypolicy = () => {
       <section>
         <h2>1. Introduction</h2>
         <p>
-          Welcome to NoVeg! We value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our services.
+          Welcome to NoVegRapix! We value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our services.
         </p>
       </section>
 
@@ -76,7 +76,7 @@ const Privacypolicy = () => {
           If you have any questions about this Privacy Policy, please contact us at:
         </p>
         <ul>
-          <li>Email: contact@noveg.pvt.ltd</li>
+          <li>Email: contact@novegRapix.pvt.ltd</li>
           <li>Phone: +91 7093276351</li>
         </ul>
       </section>
